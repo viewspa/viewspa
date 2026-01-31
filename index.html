@@ -269,50 +269,6 @@
     .map-container { height: 300px; order: 2; } /* Карта под текстом */
 }
 
-        .chat-fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #25D366;
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-    z-index: 1000;
-    transition: all 0.3s ease;
-}
-
-.chat-fab:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
-}
-
-.chat-fab svg {
-    width: 35px;
-    height: 35px;
-    fill: white;
-}
-
-.chat-options {
-    position: fixed;
-    bottom: 105px;
-    right: 30px;
-    background: white;
-    padding: 10px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    display: none;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 1000;
-    border: 1px solid #f0f0f0;
-}
-
-.chat-options.open { display: flex; animation: fadeIn 0.3s ease; }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
