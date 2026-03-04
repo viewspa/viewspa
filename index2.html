@@ -555,8 +555,7 @@ body.no-scroll { overflow: hidden; }
         height: 300px; /* Чуть меньше высота на телефоне */
     }
 }
-        }
-        
+
 .hero-brand {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 700;
@@ -581,6 +580,19 @@ h1 {
 }
 
 @media (max-width: 768px) {
+     .hero {
+        /* Добавляем отступ сверху, чтобы текст не прятался под меню */
+        padding-top: 20px !important; 
+        /* Увеличиваем высоту блока на мобильных, чтобы тексту было просторно */
+        height: auto !important;
+        min-height: 70vh;
+        display: flex;
+        align-items: flex-start; /* Прижимаем контент к верху (с учетом отступа) */
+    }
+
+    .hero-text {
+        padding: 0 15px;
+    }
     .hero-brand {
         font-size: 2.5rem;
         letter-spacing: 4px;
@@ -747,6 +759,102 @@ h1 {
   ]
 }
 </script>
+
+             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style>
+    /* Стили для слайдера отзывов */
+    .swiper { width: 100%; padding-bottom: 40px; }
+    .swiper-slide {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 25px;
+        height: auto;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+    }
+    .swiper-pagination-bullet-active { background: #D4AF37 !important; }
+    
+    /* Стили для НОВОГО Блока Хука */
+    .hook-icon { font-size: 40px; margin-bottom: 15px; display: block; }
+    .hook-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; margin-bottom: 10px; font-weight: 600; }
+    .hook-desc { font-size: 14px; color: #666; line-height: 1.6; }
+    
+    /* Доп. стиль для мобильных, чтобы не прилипало */
+    @media(max-width: 768px) {
+        .hook-title { font-size: 1.3rem; }
+    }
+</style>
+
+    <style>
+        /* Улучшенные стили для мобильной версии и разделения мастеров */
+        .service-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+            align-items: flex-start;
+        }
+        .service-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .service-info {
+            flex: 1;
+            min-width: 250px;
+        }
+        .service-title-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .service-title-link h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: #222;
+        }
+        .service-meta {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        /* Блок цен с разделением мастеров */
+        .price-container {
+            width: 100%;
+            max-width: 280px;
+            background: #fdfbf7;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f0e6d2;
+        }
+        .staff-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .staff-price-row:last-of-type { margin-bottom: 0; }
+        
+        .staff-name { font-weight: 600; color: #444; }
+        .staff-cost { font-weight: 700; color: #000; font-size: 1.05rem; }
+        .tech-level { font-size: 0.75rem; color: #888; display: block; font-weight: normal; }
+        
+        .service-duration {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+</style>
 </head>
 <body>
 
@@ -771,7 +879,7 @@ h1 {
     </nav>
 
     <div class="booking-wrapper">
-        <a href="#" class="btn btn-gold" onclick="goToBooking()">Book Now</a>
+        <a href="#" class="btn btn-gold" onclick="goToBooking()">Book your session today</a>
         <span class="promo-badge">First visit: $10 OFF</span>
     </div>
 </div>
@@ -784,7 +892,7 @@ h1 {
         <strong>VIEW SPA</strong>    </h2>
     
     <p>
-        Precision nail art and licensed massage therapy - professional care, calm atmosphere, clean and luxurious studio.
+        We focus on high standards of hygiene and your total comfort, so you leave feeling refreshed and polished.
     </p>
         <br>
         <a href="#" class="btn btn-gold" onclick="goToBooking()">Book Appointment</a>
@@ -794,6 +902,114 @@ h1 {
     </div>
 </section>
 
+
+<section class="section-padding" style="background: #fff; border-bottom: 1px solid #eee;">
+    <div class="container">
+        <div class="text-center" style="margin-bottom: 50px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 15px; font-family: 'Cormorant Garamond', serif;">What You Get at View Spa</h2>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 1.1rem; line-height: 1.8; color: var(--text-grey);">
+                <li>• Licensed, experienced specialists you can trust</li>
+                <li>• A quiet studio with panoramic city views</li>
+                <li>• Care focused on long-term results, not rushed appointments</li>
+            </ul>
+        </div>
+        
+        <div class="offers-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+            
+            <div style="text-align: center; padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <img src="img/massage-icon.png" alt="Therapeutic Massage" style="width: 80px; height: 80px; object-fit: contain;">
+                </div>
+                <h3 style="font-family: 'Cormorant Garamond', serif; margin-bottom: 15px; font-size: 1.5rem;">Results, Not Just Rubs</h3>
+                <p style="font-size: 14px; color: var(--text-grey); line-height: 1.6;">Most massages only feel good for a day. Ivan works with chronic “office neck” and deep muscle knots using licensed therapeutic techniques focused on lasting relief, not temporary comfort.</p>
+            </div>
+            
+            <div style="text-align: center; padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <img src="img/nails-icon.png" alt="Russian Manicure" style="width: 80px; height: 80px; object-fit: contain;">
+                </div>
+                <h3 style="font-family: 'Cormorant Garamond', serif; margin-bottom: 15px; font-size: 1.5rem;">Designed to Last Up to 4 Weeks</h3>
+                <p style="font-size: 14px; color: var(--text-grey); line-height: 1.6;">Stop worrying about chipped polish or messy cuticles. Our Russian technique is famous for staying flawless for a month, saving you time and keeping your hands looking expensive.</p>
+            </div>
+            
+            <div style="text-align: center; padding: 20px;">
+                <div style="margin-bottom: 20px;">
+                    <img src="img/hygiene-icon.png" alt="Hygiene Standards" style="width: 80px; height: 80px; object-fit: contain;">
+                </div>
+                <h3 style="font-family: 'Cormorant Garamond', serif; margin-bottom: 15px; font-size: 1.5rem;">Uncompromising Hygiene</h3>
+                <p style="font-size: 14px; color: var(--text-grey); line-height: 1.6;">Your safety comes first. We use fully sterilized tools, disposable files, and carefully selected products to ensure a clean, controlled environment - so you can relax with complete confidence.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+       <section class="section-padding" style="background: #fff; border-bottom: 1px solid #eee;"> <div class="text-center" style="margin-bottom: 30px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" style="height: 25px;">
+            <h3 style="margin-top: 10px;">What Our Clients Say</h3>
+        </div>
+
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                
+                <div class="swiper-slide">
+                    <div class="review-header">
+                        <div class="review-avatar">S</div>
+                        <div class="review-info"><h4>Svetlana R.</h4><div class="stars">★★★★★</div></div>
+                    </div>
+                    <p class="review-text">"The best Russian manicure in Aventura! Extremely clean and the gel lasts for a full month without any chips. Highly recommend Ksenia!"</p>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="review-header">
+                        <div class="review-avatar">O</div>
+                        <div class="review-info"><h4>Olga K.</h4><div class="stars">★★★★★</div></div>
+                    </div>
+                    <p class="review-text">"Ivan, thank you so much! You truly have a gift. After your massage, I felt amazing — my body felt lighter and more mobile."</p>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="review-header">
+                        <div class="review-avatar">N</div>
+                        <div class="review-info"><h4>Natalya S.</h4><div class="stars">★★★★★</div></div>
+                    </div>
+                    <p class="review-text">"Cozy place with a beautiful view! Ivan will fix any problem in your body, and Ksenia is a master of her craft. Reasonable prices for such skill."</p>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="review-header">
+                        <div class="review-avatar">JB</div>
+                        <div class="review-info"><h4>Joshua B.</h4><div class="stars">★★★★★</div></div>
+                    </div>
+                    <p class="review-text">"One of the best massages I’ve had in a very long time. Exactly what I needed after travel. Professional and genuinely restorative."</p>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="review-header">
+                        <div class="review-avatar">I</div>
+                        <div class="review-info"><h4>Iana S.</h4><div class="stars">★★★★★</div></div>
+                    </div>
+                    <p class="review-text">"Amazing specialists and a truly relaxing massage experience. I trust Ksenia exclusively with my nails - she creates a masterpiece every time. Beautiful studio, great location. Highly recommend View Spa!"</p>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="review-header">
+                        <div class="review-avatar">F</div>
+                        <div class="review-info"><h4>Francy Q.</h4><div class="stars">★★★★★</div></div>
+                    </div>
+                    <p class="review-text">"Excelente atención, super profesional! El masaje muy bien de hecho volvería a ir!"</p>
+                </div>
+
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <div class="text-center" style="margin-top: 20px;">
+            <a href="https://g.page/r/Cc1wyWviJv5mEBM/review" target="_blank" style="text-decoration: underline; color: #4285F4; font-size: 14px;">Read all reviews on Google Maps</a>
+        </div>
+
+    </div>
+</section>
 
     <section class="section-padding offers-section" id="offers">
         <div class="container">
@@ -834,264 +1050,322 @@ Automatically applied at checkout.
         </div>
     </section>
 
-    <section class="section-padding" id="services">
-        <div class="container">
-            <h2 class="text-center" style="margin-bottom: 40px;">Nail & Massage Services</h2>
-            <p class="text-center" style="max-width:700px;margin:0 auto 40px;color:#666;">
-    At View Spa Aventura, we specialize in <strong>Russian manicure, smart pedicure, and licensed massage therapy</strong>.
-    All services are performed by experienced specialists using clean techniques and high-quality products.
-</p>
+<section class="section-padding" id="services">
+    <div class="container">
+        <h2 class="text-center" style="margin-bottom: 40px;">Nail & Massage Services</h2>
+        <p class="text-center" style="max-width:700px;margin:0 auto 40px;color:#666;">
+            At View Spa Aventura, we specialize in <strong>Russian manicure, smart pedicure, and licensed massage therapy</strong>. All services are performed by experienced specialists.
+        </p>
 
+        <div class="service-category">
+            <button class="accordion-btn active">Russian Manicure</button>
+            <div class="panel" style="display: block;">
+                <div class="service-item" style="background:#fafafa; justify-content: center; text-align: center;">
+                    <em>Clean Russian techniques focused on cuticle health and long-lasting results.</em>
+                </div>
 
-<div class="service-category">
-    <button class="accordion-btn active">Russian Manicure</button>
-    <div class="panel">
-        <div class="service-item" style="background:#fafafa; padding: 10px;">
-            <em>Clean Russian techniques focused on cuticle health and long-lasting results.</em>
+                <div class="service-item">
+                    <img src="img/rgm.jpg" alt="Russian gel manicure" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services?buttonTextColor=000000&color=d4af37&locale=en&referrer=so" class="service-title-link" target="_blank">
+                            <h4>Russian Gel Manicure</h4>
+                            <p class="service-meta">Precision That Lasts
+
+Meticulous cuticle work and clean gel application for a polished look that lasts weeks, not days.
+
+Benefit: long-lasting wear with clean cuticles and minimal regrowth</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/2S2PCROBXNSFZZQKO2JDL2OW" target="_blank" style="color:inherit;">Ksenia</a></span>
+                                <span class="tech-level">Top Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$95.00</span>
+                        </div>
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/C4U44YPNIKWZ7KWKY2OAG4YZ" target="_blank" style="color:inherit;">Anastasia</a></span>
+                                <span class="tech-level">Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$75.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 2 hr</span>
+                    </div>
+                </div>
+
+                <div class="service-item">
+                    <img src="img/hge.JPG" alt="Hard gel extension" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/JIPTOZWVYQZUE4OCPMASHWPK" class="service-title-link" target="_blank">
+                            <h4>Hard Gel Extension</h4>
+                            <p class="service-meta">Structured gel extensions designed to add length while reinforcing weak nails.
+
+Benefit: durable extensions with a balanced, natural feel.</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span class="staff-name">Ksenia</span>
+                            <span class="staff-cost">$130.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 2 hr 30 min</span>
+                    </div>
+                </div>
+
+                <div class="service-item">
+                    <img src="img/MRP.JPG" alt="Regular polish manicure" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" class="service-title-link" target="_blank">
+                            <h4>Manicure Regular Polish</h4>
+                            <p class="service-meta">Classic precision manicure featuring professional cuticle grooming and high-quality regular polish.</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/QRBKDUDM422HM5DOB6NBOQDD" target="_blank" style="color:inherit;">Ksenia</a></span>
+                                <span class="tech-level">Top Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$60.00</span>
+                        </div>
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/EN35N7KYE3G4RTMRWDPLSPQF" target="_blank" style="color:inherit;">Anastasia</a></span>
+                                <span class="tech-level">Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$50.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 1 hr</span>
+                    </div>
+                </div>
+
+                <div class="service-item">
+                    <img src="img/MNP.PNG" alt="No polish manicure" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" class="service-title-link" target="_blank">
+                            <h4>Manicure No Polish</h4>
+                            <p class="service-meta">Clean, minimalist aesthetic with professional cuticle therapy and a high-shine natural buff.</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/QWWL2UNUVEDJCU3XFTWCOO2G" target="_blank" style="color:inherit;">Ksenia</a></span>
+                                <span class="tech-level">Top Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$50.00</span>
+                        </div>
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/ETXYJ65INTCTTFM645HS3EU6" target="_blank" style="color:inherit;">Anastasia</a></span>
+                                <span class="tech-level">Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$40.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 45 min</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="service-item">
-            <img src="img/rgm.jpg" loading="lazy" alt="Professional Russian gel manicure in Aventura, FL" class="service-img">
-            <div class="service-info">
-                <a href="https://view-spa.square.site/" class="service-title-link"
-                target="_blank" 
-                rel="noopener">
-                <h4>Russian Gel Manicure</h4>
-                <p class="service-meta">Russian Gel manicure includes removing the previous material, nail shaping, cuticle cleaning, nail bed alignment, color polish, hand massage and cuticle oil application.
-Hard products like hard gel may be used to strengthen the nails.</p>
-                </a>
-            </div>
-<div class="service-price">
-    <span class="price">
-        Ksenia - Top Nail Tech — $95.00
-    </span>
 
-    <span class="price secondary">
-       Anastasia - Nail Tech — $75.00
-    </span>
-    <span class="duration">2 hr</span>
-</div>        </div> 
-<div class="service-item">
-            <img src="img/hge.JPG" loading="lazy" alt="Hard gel nail extension service in Aventura, Florida" class="service-img">
+        <div class="service-category">
+            <button class="accordion-btn">Extras (Removal & Design)</button>
+            <div class="panel">
+                <div class="service-item">
+                    <img src="img/HGR.PNG" alt="Gel removal" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/E6AD6JMRUQPKGDNFHMXESAM4" class="service-title-link" target="_blank">
+                            <h4>Gel Polish Removal</h4>
+                            <p class="service-meta">Safe removal of product not applied by us (Foreign removal). Free if applied by us.</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                         <div class="staff-price-row">
+                            
+                            <span class="staff-cost">$25.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 20 min</span>
+                    </div>
+                </div>
 
-            <div class="service-info">
-                <a href="https://view-spa.square.site/"
-                target="_blank" 
-                rel="noopener">
-                <h4>Hard Gel Extension</h4>
-                <p class="service-meta">Service includes proper Russian e-file manicure and extensions, which are created with the use of poly gel or hard gel. Extensions are perfect for clients who are looking to get longer nails, with desired shape or length.</p>
-                </a>
+                <div class="service-item">
+                    <img src="img/naildesigns.JPG" alt="Nail designs" class="service-img">
+                    <div class="service-info">
+                        <h4>Nail Designs</h4>
+                        <p class="service-meta">French tip, Ombre, Chrome, Stamping, or Simple Art. Please book extra time.</p>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span class="staff-cost">+$15.00</span>
+                        </div>
+                                               <span class="service-duration">⏱ +20 min</span>
+                    </div>
+                </div>
             </div>
-            <div class="service-price">
-                <span class="price">$130.00</span>
-                <span class="duration">2 hr 30 min</span>
-            </div>
-        </div> 
-<div class="service-item">
-            <img src="img/MRP.JPG" loading="lazy" alt="Professional manicure with regular polish in Aventura, FL" class="service-img">
-            <div class="service-info">
-                <a href="https://view-spa.square.site/"
-                target="_blank" 
-                rel="noopener">
-                <h4>Manicure Regular Polish</h4>
-                <p class="service-meta">Classic precision manicure featuring professional cuticle grooming and high-quality regular polish.</p>
-                </a>
-            </div>
-            <div class="service-price">
-                <span class="price">Ksenia - Top Nail Tech —$60.00</span>
-                <span class="price secondary">
-       Anastasia - Nail Tech — $50.00
-    </span>
+        </div>
 
-                <span class="duration">1 hr</span>
-            </div>
-        </div> 
-<div class="service-item">
-            <img src="img/MNP.PNG" loading="lazy" alt="Professional manicure without polish in Aventura, FL" class="service-img">
-            <div class="service-info">
-                <a href="https://view-spa.square.site/"
-                target="_blank" 
-                rel="noopener">
-                <h4>Manicure No Polish</h4>
-                <p class="service-meta">Experience the beauty of a clean, minimalist aesthetic with professional cuticle therapy and a high-shine natural buff.</p>
-                </a>
-            </div>
-            <div class="service-price">
-                <span class="price">
-        Ksenia - Top Nail Tech — $50.00
-    </span>
+        <div class="service-category">
+            <button class="accordion-btn active">Pedicure</button>
+            <div class="panel" style="display: block;">
 
-    <span class="price secondary">
-       Anastasia - Nail Tech — $40.00
-    </span>
-
-                <span class="duration">45 min</span>
-            </div>
-        </div> 
-<div class="service-item">
-            <img src="img/HGR.PNG" loading="lazy" alt="Gel polish removal service in Aventura" class="service-img">
-            <div class="service-info">
-                <a href="https://view-spa.square.site/"
-                target="_blank" 
-                rel="noopener">
-                <h4>Gel Polish Removal</h4>
-                <p class="service-meta">Safe, professional gel removal.</p>
-                </a>
-            </div>
-            <div class="service-price">
-                <span class="price">$25.00</span>
-                <span class="duration">20 min</span>
-            </div>
-        </div> 
-<div class="service-item">
-            <img src="img/naildesigns.JPG" loading="lazy" alt="Nail design service in Aventura" class="service-img">
-            <div class="service-info">
-                <h4>Nail Designs</h4>
-                <p class="service-meta">French, Ombre, Chrome, Stamping, Stickers.</p>
-            </div>
-            <div class="service-price">
-                <span class="price">+$15.00</span>
-                <span class="duration">+20 min</span>
-            </div>
-        </div> 
-
-</div> 
-</div> 
-            <div class="service-category">
-                <button class="accordion-btn active">Pedicure</button>
-                <div class="panel">
-                     <div class="service-item">
-            <img src="img/GPP.JPG" loading="lazy" alt="Russian smart gel pedicure service in Aventura, Florida" class="service-img">
-                        <div class="service-info">
-                <a href="https://view-spa.square.site/"
-                target="_blank" 
-                rel="noopener">
+                <div class="service-item">
+                    <img src="img/GPP.JPG" loading="lazy" alt="Russian smart gel pedicure service in Aventura, Florida" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" class="service-title-link" target="_blank">
                             <h4>Russian Smart Gel Pedicure</h4>
                             <p class="service-meta">Advanced Smart Pedicure featuring deep skin exfoliation and meticulous Russian-style cuticle work for long-lasting comfort.</p>
-               </a>
-                        </div>
-                        <div class="service-price">
-                            <span class="price">
-        Ksenia - Top Nail Tech — $95.00
-    </span>
-
-    <span class="price secondary">
-       Anastasia - Nail Tech — $75.00
-    </span>
-
-                            <span class="duration">1 hr 30 min</span>
-                        </div>
+                        </a>
                     </div>
-                    
-                    <div class="service-item">
-            <img src="img/PRP.JPG" loading="lazy" alt="Pedicure with regular polish service in Aventura, Florida" class="service-img">
-                        <div class="service-info">
-                <a href="https://view-spa.square.site/"
-                target="_blank" 
-                rel="noopener">
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/NE3QZ2MEPAHWPFUX7DT64XYX" target="_blank" style="color:inherit;">Ksenia</a></span>
+                                <span class="tech-level">Top Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$95.00</span>
+                        </div>
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/IMEOVHASXNBQYDR7Y3ZBNWXT" target="_blank" style="color:inherit;">Anastasia</a></span>
+                                <span class="tech-level">Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$75.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 2 hr</span>
+                    </div>
+                </div>
+
+
+
+                <div class="service-item">
+                    <img src="img/PRP.JPG" loading="lazy" alt="Pedicure with regular polish service in Aventura, Florida" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" class="service-title-link" target="_blank">
                             <h4>Pedicure with Regular Polish</h4>
-                            <p class="service-meta">
-Expert nail shaping and deep skin smoothing finished with premium long-wear <strong>regular polish</strong>.</p>
-               </a>
-                        </div>
-                        <div class="service-price">
-                            <span class="price">
-        Ksenia - Top Nail Tech — $85.00
-    </span>
-
-    <span class="price secondary">
-       Anastasia - Nail Tech — $75.00
-    </span>
-
-                            <span class="duration">1 hr 30 min</span>
-                        </div>
+                            <p class="service-meta">Expert nail shaping and deep skin smoothing finished with premium long-wear <strong>regular polish</strong>.</p>
+                        </a>
                     </div>
-                   <div class="service-item">
-            <img src="img/PNP.JPG" loading="lazy" alt="Professional pedicure without polish in Aventura, FL" class="service-img">
-                        <div class="service-info">
-                <a href="https://view-spa.square.site/"
-                target="_blank" 
-                rel="noopener">
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/SD25C45PCH77CYC3Q3VJRZ4I" target="_blank" style="color:inherit;">Ksenia</a></span>
+                                <span class="tech-level">Top Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$85.00</span>
+                        </div>
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/SYQZENEOARTU43YFIHWQTBNI" target="_blank" style="color:inherit;">Anastasia</a></span>
+                                <span class="tech-level">Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$75.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 1 hr 30 min</span>
+                    </div>
+                </div>
+
+
+
+                <div class="service-item">
+                    <img src="img/PNP.JPG" loading="lazy" alt="Professional pedicure without polish in Aventura, FL" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" class="service-title-link" target="_blank">
                             <h4>Pedicure No Polish</h4>
                             <p class="service-meta">Professional dry pedicure focused on deep skin exfoliation and precision shaping for naturally healthy, baby-soft feet.</p>
-                </a>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/BAPT7XJRLTICIKP5GK32ZJEQ" target="_blank" style="color:inherit;">Ksenia</a></span>
+                                <span class="tech-level">Top Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$75.00</span>
                         </div>
-                        <div class="service-price">
-                            <span class="price">
-        Ksenia - Top Nail Tech — $75.00
-    </span>
-
-    <span class="price secondary">
-       Anastasia - Nail Tech — $65.00
-    </span>
-
-                            <span class="duration">1 hr</span>
+                        <div class="staff-price-row">
+                            <span>
+                                <span class="staff-name"><a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/3RRXOA44EMRLZKKGVPKLPFOX" target="_blank" style="color:inherit;">Anastasia</a></span>
+                                <span class="tech-level">Nail Tech</span>
+                            </span>
+                            <span class="staff-cost">$65.00</span>
                         </div>
+                        <span class="service-duration">⏱ 1 hr</span>
                     </div>
                 </div>
             </div>
-
-            <div class="service-category">
-                <button class="accordion-btn active">Massage</button>
-                <div class="panel">
-                    <div class="service-item" style="background:#fafafa; padding: 10px;">
-    <em>All massage services are provided by <strong>licensed massage therapists</strong> and are strictly <strong>non-sexual</strong>. 
-Any inappropriate requests will result in immediate termination of the session without refund.</em>
-</div>
-
-                    <div class="service-item">
-            <img src="img/60.PNG" loading="lazy" alt="Professional therapeutic massage by licensed therapist in Aventura, FL" class="service-img">
-                <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/HO57BZIYWVBXHKKXZHL3UVAE"
-                target="_blank" 
-                rel="noopener">
-                        <div class="service-info">
-                            <h4>Massage 60 min</h4>
-                            <p class="service-meta">Back & Legs Balance: The perfect mid-length therapy for balanced recovery, focusing on the body’s primary tension points.</p>
-                </a>
-                        </div>
-                        <div class="service-price">
-                            <span class="price">$85.00</span>
-                            <span class="duration">1 hr</span>
-                        </div>
-                    </div>
-                    <div class="service-item">
-            <img src="img/90.JPG" loading="lazy" alt="Professional licensed massage therapy at View Spa in Aventura, Florida" class="service-img">
-                        <div class="service-info">
-                <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/TQXCTDLQIBMKSAJHBN6OOU2G"
-                target="_blank" 
-                rel="noopener">
-                            <h4>Massage 90 min</h4>
-                            <p class="service-meta">Advanced Deep Tissue: A premium, detailed session for total body restoration and specialized attention to chronic muscle tightness.</p>
-                </a>
-                        </div>
-                        <div class="service-price">
-                            <span class="price">$110.00</span>
-                            <span class="duration">1 hr 30 min</span>
-                        </div>
-                    </div>
-         <div class="service-item">
-            <img src="img/45.jpg" loading="lazy" alt="Professional licensed massage therapy at View Spa in Aventura, Florida" class="service-img">
-                        <div class="service-info">
-                <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/5GZCOCXG3A26S3EP4ZRWDOH5"
-                target="_blank" 
-                rel="noopener">
-                            <h4>Massage 45 min</h4>
-                            <p class="service-meta">45 min (Back & Shoulders): "Targeted deep-tissue recovery focused on the back, neck, and shoulders to release tension and melt away daily stress.</p>
-                </a>
-                        </div>
-                        <div class="service-price">
-                            <span class="price">$65.00</span>
-                            <span class="duration">45 min</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-<p class="text-center" style="font-size:14px;color:#777;">
-Serving clients in Aventura, Sunny Isles Beach, Hallandale Beach and North Miami.
-</p>
-
         </div>
-    </section>
 
+        <div class="service-category">
+            <button class="accordion-btn active">Massage</button>
+            <div class="panel" style="display: block;">
+                <div class="service-item" style="background:#fafafa; font-size: 0.85rem; color: #777;">
+                    <em>All massage services by <strong>licensed therapists</strong>. Strictly non-sexual.</em>
+                </div>
+
+                <div class="service-item">
+                    <img src="img/60.PNG" alt="Massage 60 min" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/HO57BZIYWVBXHKKXZHL3UVAE" class="service-title-link" target="_blank">
+                            <h4>60 min — Deep Tissue Balance (Optimal Choice)</h4>
+                            <p class="service-meta">The ideal session for both relief and recovery.
+This full-body massage addresses chronic tension while giving your nervous system time to reset.</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span class="staff-name">Ivan</span>
+                            <span class="staff-cost">$85.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 1 hr</span>
+                    </div>
+                </div>
+
+                <div class="service-item">
+                    <img src="img/90.JPG" loading="lazy" alt="Professional licensed massage therapy at View Spa in Aventura, Florida" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/TQXCTDLQIBMKSAJHBN6OOU2G" class="service-title-link" target="_blank">
+                            <h4>90 min — Deep Tissue Overhaul</h4>
+                            <p class="service-meta">For those who haven’t felt truly loose in years.
+Chronic tension builds deep and doesn’t respond to quick fixes. This 90-minute full-body session allows your nervous system to fully unwind while deep muscle layers are carefully released.</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span class="staff-name">Ivan</span>
+                            <span class="staff-cost">$115.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 1 hr 30</span>
+                    </div>
+                </div>
+
+                <div class="service-item">
+                    <img src="img/45.jpg" loading="lazy" alt="Professional licensed massage therapy at View Spa in Aventura, Florida" class="service-img">
+                    <div class="service-info">
+                        <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/5GZCOCXG3A26S3EP4ZRWDOH5" class="service-title-link" target="_blank">
+                            <h4>45 min — Targeted Reset (Express)</h4>
+                            <p class="service-meta">When time is limited, but the pain is not.
+This focused session targets one or two problem areas like neck, shoulders, or lower back.</p>
+                        </a>
+                    </div>
+                    <div class="price-container">
+                        <div class="staff-price-row">
+                            <span class="staff-name">Ivan</span>
+                            <span class="staff-cost">$65.00</span>
+                        </div>
+                        <span class="service-duration">⏱ 45 min</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <p class="text-center" style="font-size:14px;color:#777; margin-top: 30px;">
+            Serving Aventura, Sunny Isles Beach, Hallandale Beach and North Miami.
+        </p>
+    </div>
+</section>
     <section class="section-padding" id="faq" style="background:#fafafa;">
     <div class="container">
         <h2 class="text-center" style="margin-bottom:40px;">
@@ -1163,7 +1437,7 @@ Serving clients in Aventura, Sunny Isles Beach, Hallandale Beach and North Miami
     <button class="accordion-btn">Do you offer sensual or erotic massage?</button>
     <div class="panel">
         <div class="service-item faq-text">
-    No. View Spa provides <strong>professional therapeutic massage only</strong>.
+    No. View Spa provides professional therapeutic massage only.
     All treatments are strictly non-sexual and focused on health, recovery,
     and muscle relief. Any inappropriate requests will not be accepted.
 </div>
@@ -1329,69 +1603,6 @@ Ivan combines deep anatomical knowledge with advanced techniques to address musc
         </div>
     </section>
 
-<section class="section-padding" style="background: #fafafa;">
-    <div class="container">
-        <div class="text-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" style="height: 30px; margin-bottom: 10px;">
-            <h2>Reviews from Google</h2>
-        </div>
-
-        <div class="reviews-container" id="reviewsSlider">
-            <div class="review-card active">
-                <div class="review-header">
-                    <div class="review-avatar">S</div>
-                    <div class="review-info"><h4>Svetlana R.</h4><div class="stars">★★★★★</div></div>
-                </div>
-                <p class="review-text">"The best Russian manicure in Aventura! Extremely clean and the gel lasts for a full month without any chips. Highly recommend Ksenia!"</p>
-            </div>
-
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">M</div>
-                    <div class="review-info"><h4>Mark T.</h4><div class="stars">★★★★★</div></div>
-                </div>
-                <p class="review-text">"Ivan is a professional massage therapist. I had severe lower back pain and after a 60-minute session, I felt like a new person. Great studio atmosphere."</p>
-            </div>
-
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">N</div>
-                    <div class="review-info"><h4>Natalya S.</h4><div class="stars">★★★★★</div></div>
-                </div>
-                <p class="review-text">"In this very cozy place with a beautiful view of the city from the 11th floor, two professionals work: Ivan, a massage therapist who will find and fix any problem in your body without a word, and Ksenia, a master of her craft in manicure and pedicure. The prices here are reasonable for such skill. I highly recommend it; you will be happy with the work of these two."</p>
-            </div>
-
-               <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">I</div>
-                    <div class="review-info"><h4>Iana S.</h4><div class="stars">★★★★★</div></div>
-                </div>
-                <p class="review-text">"The best specialists work here—I went for a massage and had an incredibly enjoyable and relaxing experience.
-
-I only go to top specialist Ksenia for my nails. Every time, she creates a masterpiece. I am delighted!
-
-The location and design of the studio are top-notch!
-
-I recommend everyone visit View Spa!"</p>
-            </div>
-
-           <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">JB</div>
-                    <div class="review-info"><h4>Joshua B.</h4><div class="stars">★★★★★</div></div>
-                </div>
-                <p class="review-text">"Visiting for work and booked this on a bit of a whim; absolutely the right call.
-Quite possibly one of the best massages I’ve had in a very long time.
-Exactly what I needed after long days and travel.
-Professional, calming, and genuinely restorative. Huge thanks, Ivan! I’ll be back next time work brings me here."</p>
-            </div>
-        </div>
-
-        <div class="text-center" style="margin-top: 30px;">
-            <a href="https://g.page/r/Cc1wyWviJv5mEBM/review" target="_blank" class="btn" style="background:#4285F4; color:white; border:none;">Read More Google Reviews</a>
-        </div>
-    </div>
-</section>
 
     <section class="section-padding" style="background: white;" id="contact">
         <div class="container contact-grid">
@@ -1554,5 +1765,32 @@ document.addEventListener('click', function(event) {
 });
  </script>
              <script src="//code.tidio.co/v5eajerxxn0yjlbkzqqiwn6wdmff3g6e.js" async></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  var swiper = new Swiper(".mySwiper", {
+    slidesPerView: 1, /* На телефоне 1 отзыв */
+    spaceBetween: 20,
+    loop: true,
+    autoplay: {
+        delay: 7500,
+        disableOnInteraction: false,
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+    breakpoints: {
+      640: {
+        slidesPerView: 2, /* Планшет */
+        spaceBetween: 20,
+      },
+      1024: {
+        slidesPerView: 3, /* Компьютер */
+        spaceBetween: 30,
+      },
+    },
+  });
+</script>
 </body>
 </html>
