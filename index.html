@@ -298,12 +298,43 @@
     gap: 4px;
 }
 
+/* Обновленная кнопка Book Now */
 .btn-gold {
     background: var(--primary) !important;
     border-color: var(--primary) !important;
     color: white !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+    /* Анимация пульсации тени и размера */
+    animation: pulseGlow 2.5s infinite;
+}
+
+/* Эффект пробегающего блика (как на дорогих часах) */
+.btn-gold::after {
+    content: '';
+    position: absolute;
+    top: 0; 
+    left: -100%; 
+    width: 50%; 
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    animation: shineSweep 4s infinite;
+}
+
+/* Ключевые кадры для пульсации */
+@keyframes pulseGlow {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+    50% { transform: scale(1.03); box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+/* Ключевые кадры для блика */
+@keyframes shineSweep {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; }
 }
 
 .promo-badge {
@@ -794,6 +825,70 @@ h1 {
     @media(max-width: 768px) {
         .hook-title { font-size: 1.3rem; }
     }
+/* Липкая кнопка звонка */
+.sticky-call-btn {
+    position: fixed;
+    bottom: 25px;
+    left: 25px; /* Слева, чтобы не мешать Tidio справа */
+    background-color: var(--dark);
+    color: white;
+    border-radius: 50px;
+    padding: 12px 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 999; /* Поверх всего, но под меню */
+    transition: all 0.3s ease;
+}
+
+.sticky-call-btn:hover {
+    background-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+.sticky-call-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    /* Легкая вибрация трубки раз в 3 секунды */
+    animation: phoneRing 3s infinite;
+}
+
+@keyframes phoneRing {
+    0%, 100% { transform: rotate(0deg); }
+    5% { transform: rotate(15deg); }
+    10% { transform: rotate(-10deg); }
+    15% { transform: rotate(5deg); }
+    20% { transform: rotate(-5deg); }
+    25% { transform: rotate(0deg); }
+}
+
+/* Адаптация для телефонов: делаем кнопку круглой, чтобы экономить место */
+@media (max-width: 768px) {
+    .sticky-call-btn {
+        bottom: 20px;
+        left: 15px;
+        padding: 0;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        justify-content: center;
+    }
+    .sticky-call-text {
+        display: none; /* Прячем текст на мобильном */
+    }
+    .sticky-call-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
 </style>
 
     <style>
@@ -1943,5 +2038,11 @@ document.addEventListener('click', function(event) {
     },
   });
 </script>
+<a href="tel:+17542026666" class="sticky-call-btn" aria-label="Call View Spa">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+    </svg>
+    <span class="sticky-call-text">Call Now</span>
+</a>
 </body>
 </html>
