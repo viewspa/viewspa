@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="analytics.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Online | View Spa Aventura — Russian Manicure & Licensed Massage</title>
+<link rel="icon" type="image/jpeg" href="img/logo.jpg">
+<meta name="description" content="Book your appointment online at View Spa Aventura. Russian manicure, Smart Pedicure, therapeutic massage. Select your service, specialist and time.">
+<link rel="canonical" href="https://viewspa.miami/booking">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+
+</head>
+<body class="booking-page">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <button id="booking-back" type="button" class="top-bar-back" aria-label="Back to View Spa">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    <span>Back</span>
+  </button>
+  <div class="top-bar-center">
+    <a href="index.html" id="booking-home-link" class="top-bar-logo"><img src="img/logo.jpg" alt="View Spa"></a>
+  </div>
+  <div class="top-bar-meta">
+    <p class="top-bar-note">Book online</p>
+    <p class="top-bar-value">Secure checkout</p>
+  </div>
+</div>
+
+<!-- TRUST ROW -->
+<div class="trust-row">
+  <div class="tr-item"><span class="tr-dot"></span>100% Sterile Tools</div>
+  <div class="tr-item"><span class="tr-dot"></span>Licensed Therapist on Site</div>
+  <div class="tr-item"><span class="tr-dot"></span>Nailympia Champion 2025</div>
+  <div class="tr-item"><span class="tr-dot"></span>Free Parking · Aventura FL</div>
+</div>
+
+<!-- SERVICE PILLS — quick filter to pre-select service category -->
+<div class="svc-selector">
+  <span class="svc-selector-label">Quick select:</span>
+  <div class="svc-pills">
+    <button class="svc-pill active" data-service="all" data-url="https://app.squareup.com/appointments/book/98fw77ulsmdgb9/LRR0VEQVKE8BT/start">All Services</button>
+    <button class="svc-pill" data-service="massage" data-url="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/HO57BZIYWVBXHKKXZHL3UVAE">Massage 60 min</button>
+    <button class="svc-pill" data-service="massage-90" data-url="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/TQXCTDLQIBMKSAJHBN6OOU2G">Massage 90 min</button>
+    <button class="svc-pill" data-service="massage-45" data-url="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/5GZCOCXG3A26S3EP4ZRWDOH5">Massage 45 min</button>
+    <button class="svc-pill" data-service="manicure" data-url="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/2S2PCROBXNSFZZQKO2JDL2OW">Russian Manicure — Ksenia</button>
+    <button class="svc-pill" data-service="manicure-anastasia" data-url="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/C4U44YPNIKWZ7KWKY2OAG4YZ">Russian Manicure — Anastasia</button>
+    <button class="svc-pill" data-service="pedicure" data-url="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/NE3QZ2MEPAHWPFUX7DT64XYX">Smart Pedicure — Ksenia</button>
+    <button class="svc-pill" data-service="pedicure-anastasia" data-url="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/IMEOVHASXNBQYDR7Y3ZBNWXT">Smart Pedicure — Anastasia</button>
+  </div>
+</div>
+
+<!-- BOOKING FRAME -->
+<div class="booking-wrap">
+  <div class="sq-loading" id="sq-loading">
+    <div class="sq-spinner"></div>
+    <p class="booking-loading-title">Loading your booking calendar…</p>
+    <p class="booking-loading-note">Powered by Square · Secure checkout</p>
+  </div>
+  <iframe
+    id="sq-frame"
+    class="sq-frame"
+    src="https://app.squareup.com/appointments/book/98fw77ulsmdgb9/LRR0VEQVKE8BT/start"
+    title="View Spa Booking — Powered by Square"
+    allow="payment">
+  </iframe>
+</div>
+
+<!-- BOTTOM NOTE -->
+<div class="bottom-note">
+  <span class="bn-item">Secure booking · Powered by Square</span>
+  <span class="bn-item">+1 (754) 202-6666</span>
+  <span class="bn-item">Mon–Sat 9–8 · Aventura FL</span>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
+
+
