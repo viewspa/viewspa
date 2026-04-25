@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <script src="analytics.js"></script>
@@ -22,13 +22,13 @@
 
 <!-- LocalBusiness Schema -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BeautySalon","name":"View Spa","image":"https://viewspa.miami/img/logo.jpg","url":"https://viewspa.miami","telephone":"+17542026666","priceRange":"$$","address":{"@type":"PostalAddress","streetAddress":"20200 W Dixie Hwy, STE 1105B","addressLocality":"Aventura","addressRegion":"FL","postalCode":"33180","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":25.9629,"longitude":-80.1509},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"20:00"}],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Spa Services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Russian Manicure Aventura FL"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Deep Tissue Massage Miami"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Lymphatic Drainage Massage Aventura"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Sports Massage Aventura FL"}}]},"aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0","reviewCount":"47"}}
+{"@context":"https://schema.org","@type":"BeautySalon","name":"View Spa","image":"https://viewspa.miami/img/logo.jpg","url":"https://viewspa.miami","telephone":"+17542026666","priceRange":"$$","address":{"@type":"PostalAddress","streetAddress":"20200 W Dixie Hwy, STE 1105B","addressLocality":"Aventura","addressRegion":"FL","postalCode":"33180","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":25.9629,"longitude":-80.1509},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"20:00"}],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Spa Services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Russian Manicure Aventura FL"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Deep Tissue Massage Miami"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Lymphatic Drainage Massage Aventura"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Sports Massage Aventura FL"}}]},"aggregateRating":{"@type":"AggregateRating","ratingValue":"5.0"}}
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-<!-- Единый CSS — все стили страницы перенесены в shared.css -->
+<!-- Main CSS and mobile layout are in shared.css -->
 <link rel="stylesheet" href="shared.css">
 </head>
 <body>
@@ -36,7 +36,7 @@
 <header id="site-header">
   <div class="container hdr">
     <a href="index.html" class="logo">
-      <img src="img/logo.jpg" alt="View Spa Aventura — beauty and wellness studio logo" width="120" height="46">
+      <img src="img/logo.jpg" alt="View Spa Aventura - beauty and wellness studio logo" width="120" height="46">
     </a>
     <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navMenu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -50,8 +50,8 @@
       <a href="#team"         class="nav-link">Team</a>
       <a href="#contact"      class="nav-link">Contact</a>
       <div class="nav-footer">
-        <button class="btn btn-gold" data-book-action="open" data-close-menu="true" aria-label="Book appointment">
-          Book Appointment
+        <button class="btn btn-gold" data-book-action="open" data-close-menu="true" aria-label="Check availability">
+          Check Availability
         </button>
         <div class="nav-footer-contact">
           <a href="tel:+17542026666" aria-label="Call View Spa at 754-202-6666">(754) 202-6666</a>
@@ -60,7 +60,7 @@
       </div>
     </nav>
     <div class="hdr-cta">
-      <button class="btn btn-gold btn-compact" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+      <button class="btn btn-gold btn-compact" data-book-action="open" aria-label="Check availability">Check Availability</button>
       <span class="promo-badge">Book in 60 seconds</span>
     </div>
   </div>
@@ -68,23 +68,23 @@
 
 <section class="hero" id="home" aria-label="View Spa Aventura hero section">
   <div class="hero-bg" aria-hidden="true">
-    <img class="hero-bg-img" src="img/hero.jpg" alt="View Spa Aventura interior — luxury beauty and wellness studio" fetchpriority="high" width="1440" height="720">
+    <img class="hero-bg-img" src="img/hero.jpg" alt="View Spa Aventura interior – luxury beauty and wellness studio" fetchpriority="high" width="1440" height="720">
     <div class="hero-overlay"></div>
     <div class="hero-grain"></div>
   </div>
   <div class="hero-inner">
-    <span class="eyebrow">Aventura, FL · 5.0 Google rated</span>
+    <span class="eyebrow">Aventura, FL · 5.0 Google rating · Limited spots today</span>
     <h1 class="hero-h1">Nails that last 4 weeks.<br><em>Massage that actually fixes pain.</em></h1>
     <p class="hero-slogan">Russian manicure &amp; licensed therapeutic massage in Aventura.<br>Real results from your first visit.</p>
     <div class="hero-cta-block">
-      <button class="btn btn-gold hero-book-btn" data-book-action="open" aria-label="Book appointment">
+      <button class="btn btn-gold hero-book-btn" data-book-action="open" aria-label="Check Availability">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-        Book Appointment
+        Check Availability
       </button>
       <p class="hero-book-note">Book in 60 seconds · No calls · Instant confirmation</p>
     </div>
     <div class="hero-service-buttons">
-      <a href="massage.html" class="btn btn-outline-w" aria-label="Learn more about massage therapy services">Start Feeling Better</a>
+      <a href="massage.html" class="btn btn-outline-w" aria-label="Learn more about massage therapy services">Massage in Aventura</a>
       <a href="manicure.html" class="btn btn-outline-w" aria-label="Learn more about nail services">Get Perfect Nails</a>
     </div>
     <p class="hero-quote">There are 2 types of people:<br>those who already get results —<br>and those who are still trying random salons.</p>
@@ -107,12 +107,12 @@
   </div>
 </div>
 
-<!-- Mini CTA after strip — first dead zone -->
+<!-- Mini CTA after strip – first dead zone -->
 <div class="mini-cta-bar">
   <div class="mini-cta-text">
     <strong>Pick your service. Choose your time.</strong> <span>Book online in 60 seconds.</span>
   </div>
-  <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+  <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
 </div>
 
 <div class="trust-bar" role="list" aria-label="Key trust signals">
@@ -136,32 +136,32 @@
       <li>Neck & shoulder tension never really goes away</li>
       <li>You don’t trust how tools are cleaned</li>
       <li>You wait weeks just to get an appointment</li>
-      <li>Massage helps… for 1–2 days max</li>
+      <li>Massage helps — for 1-2 days max</li>
       <li>Cuticles look messy after a week</li>
     </ul>
-    <button class="btn btn-outline-w self-start" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+    <button class="btn btn-outline-w self-start" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
   </div>
   <div class="pg-panel">
     <span class="eyebrow">The View Spa standard</span>
     <h2 class="sec-title sec-title-panel">Here’s what’s <em>different</em></h2>
     <div class="rule"></div>
     <ul class="gain-list">
-      <li>Russian technique → gel lasts up to <strong>4 weeks</strong></li>
+      <li>Russian technique > gel lasts up to <strong>4 weeks</strong></li>
       <li>We fix the <strong>source</strong> of pain, not symptoms</li>
       <li>Tools are autoclave sterilized & opened in front of you</li>
       <li><strong>No waiting</strong> — private studio</li>
       <li>Feel real <strong>relief</strong> after your <strong>first session</strong></li>
       <li>Clean cuticles that stay perfect for weeks</li>
     </ul>
-    <button class="btn btn-dark self-start" data-book-action="open" aria-label="Book your first visit">Book Appointment</button>
+    <button class="btn btn-dark self-start" data-book-action="open" aria-label="Check availability">Check Availability</button>
   </div>
 </div>
 
-<!-- MID-PAGE CTA — после pain/gain, золотая полоса -->
+<!-- MID-PAGE CTA — after pain/gain, encourage booking -->
 <div class="mid-cta-strip">
   <p class="mid-cta-headline">If this sounds familiar, your first session is designed to fix exactly this.</p>
   <div class="mid-cta-btns">
-    <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+    <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
   </div>
 </div>
 
@@ -170,11 +170,11 @@
     <img class="svc-bg" src="img/Swedish.jpg" alt="Licensed therapeutic massage session at View Spa Aventura FL" loading="lazy" width="900" height="520">
     <div class="svc-split-overlay" aria-hidden="true"></div>
     <div class="svc-split-content">
-      <span class="svc-split-eyebrow">Licensed Massage Therapist · AMTA Member</span>
+      <span class="svc-split-eyebrow">Licensed Massage Therapist — AMTA Member</span>
       <h2 class="svc-split-title">Massage That Fixes Pain — Not Just Relaxes</h2>
       <p class="svc-split-desc">Deep tissue, sports recovery and trigger point work combined to eliminate the root cause — not temporary relief.</p>
       <p class="svc-split-price">From $65 · Choose 45, 60 or 90 minutes</p>
-      <span class="svc-split-btn" aria-hidden="true">View Massage Options →</span>
+      <span class="svc-split-btn" aria-hidden="true">View Massage Options ></span>
     </div>
   </a>
   <a href="manicure.html" class="svc-split-card" aria-label="Learn more about nail services">
@@ -185,12 +185,12 @@
       <h2 class="svc-split-title">Russian Manicure That Lasts 4 Weeks</h2>
       <p class="svc-split-desc">Precision cuticle work + proper structure = no chips, no lifting, clean look for weeks.</p>
       <p class="svc-split-price">From $40 · Manicure & Pedicure services</p>
-      <span class="svc-split-btn" aria-hidden="true">View Nail Services →</span>
+      <span class="svc-split-btn" aria-hidden="true">View Nail Services ></span>
     </div>
   </a>
 </div>
 
-<!-- VIDEO: poster = первый кадр, object-fit:cover, touch-action в CSS -->
+<!-- VIDEO: poster = static image, object-fit:cover, touch-action in CSS -->
 <section class="video-vibe-sec" aria-label="View Spa studio video tour">
   <video
     class="bg-video"
@@ -198,7 +198,7 @@
     poster="img/video-preview.jpg"
     preload="auto"
     aria-label="View Spa Aventura studio ambiance video"
-    title="View Spa Aventura — studio tour">
+    title="View Spa Aventura - studio tour">
     <source src="video/your-video.mp4" type="video/mp4">
   </video>
   <div class="video-overlay" aria-hidden="true">
@@ -207,12 +207,12 @@
   </div>
 </section>
 
-<!-- Mini CTA после видео — dead zone 2 -->
+<!-- Mini CTA before section gallery – dead zone 2 -->
 <div class="mini-cta-bar">
   <div class="mini-cta-text">
     <strong>Pick your service. Choose your time.</strong> <span>Book online in 60 seconds.</span>
   </div>
-  <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+  <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
 </div>
 
 <section class="sec section-gallery" aria-label="Photo gallery">
@@ -226,12 +226,12 @@
   </div>
 </section>
 
-<!-- Mini CTA после галереи — dead zone 3 -->
+<!-- Mini CTA before reviews – dead zone 3 -->
 <div class="mini-cta-bar">
   <div class="mini-cta-text">
     <strong>Pick your service. Choose your time.</strong> <span>Book online in 60 seconds.</span>
   </div>
-  <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+  <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
 </div>
 
 <section class="sec reviews-sec" aria-label="Client reviews">
@@ -248,25 +248,25 @@
         <div class="swiper-slide"><div class="rev-header"><div class="rev-avatar" aria-hidden="true">O</div><div><p class="rev-name">Olga K.</p><div class="stars" aria-label="5 out of 5 stars">★★★★★</div></div></div><p class="rev-text">"Ivan, thank you so much! You truly have a gift. After your massage I felt amazing — my body felt lighter and more mobile."</p></div>
         <div class="swiper-slide"><div class="rev-header"><div class="rev-avatar" aria-hidden="true">N</div><div><p class="rev-name">Natalya S.</p><div class="stars" aria-label="5 out of 5 stars">★★★★★</div></div></div><p class="rev-text">"Cozy place with a beautiful view! Ivan will fix any problem in your body, and Ksenia is a master of her craft."</p></div>
         <div class="swiper-slide"><div class="rev-header"><div class="rev-avatar" aria-hidden="true">JB</div><div><p class="rev-name">Joshua B.</p><div class="stars" aria-label="5 out of 5 stars">★★★★★</div></div></div><p class="rev-text">"One of the best massages I've had in a very long time. Exactly what I needed after travel. Professional and genuinely restorative."</p></div>
-        <div class="swiper-slide"><div class="rev-header"><div class="rev-avatar" aria-hidden="true">I</div><div><p class="rev-name">Iana S.</p><div class="stars" aria-label="5 out of 5 stars">★★★★★</div></div></div><p class="rev-text">"Amazing specialists and a truly relaxing massage experience. I trust Ksenia exclusively with my nails — she creates a masterpiece every time."</p></div>
-        <div class="swiper-slide"><div class="rev-header"><div class="rev-avatar" aria-hidden="true">F</div><div><p class="rev-name">Francy Q.</p><div class="stars" aria-label="5 out of 5 stars">★★★★★</div></div></div><p class="rev-text">"Excelente atención, super profesional! El masaje muy bien, de hecho volvería a ir!"</p></div>
+        <div class="swiper-slide"><div class="rev-header"><div class="rev-avatar" aria-hidden="true">I</div><div><p class="rev-name">Iana S.</p><div class="stars" aria-label="5 out of 5 stars">★★★★★</div></div></div><p class="rev-text">"Amazing specialists and a truly relaxing massage experience. I trust Ksenia exclusively with my nails - she creates a masterpiece every time."</p></div>
+        <div class="swiper-slide"><div class="rev-header"><div class="rev-avatar" aria-hidden="true">F</div><div><p class="rev-name">Francy Q.</p><div class="stars" aria-label="5 out of 5 stars">★★★★★</div></div></div><p class="rev-text">"Excelente atencion, super profesional! El masaje muy bien, de hecho volveria a ir!"</p></div>
       </div>
       <div class="swiper-pagination" aria-label="Review carousel navigation"></div>
       
       
     </div>
     <div class="tc mt-12">
-      <a href="https://g.page/r/Cc1wyWviJv5mEBM/review" target="_blank" rel="noopener" class="review-link" aria-label="Read all View Spa reviews on Google Maps">Read all reviews on Google Maps →</a>
+      <a href="https://g.page/r/Cc1wyWviJv5mEBM/review" target="_blank" rel="noopener" class="review-link" aria-label="Read all View Spa reviews on Google Maps">Read all reviews on Google Maps ></a>
     </div>
   </div>
 </section>
 
-<!-- Mini CTA после отзывов — dead zone 4: человек прочитал отзывы, он убеждён — поймай его сейчас -->
+<!-- Mini CTA before offers – keep urgency and avoid clutter -->
 <div class="mini-cta-bar mini-cta-gold">
   <div class="mini-cta-text">
     <strong>Pick your service. Choose your time.</strong> <span>Book online in 60 seconds.</span>
   </div>
-  <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+  <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
 </div>
 
 <section class="sec section-white" id="offers" aria-label="Special offers">
@@ -277,15 +277,15 @@
     <div class="offers-grid">
       <div class="offer-card">
         <span class="offer-tag">FIRST VISIT</span>
-        <h3>First Visit — Real Relief</h3>
-        <p>Not a “relaxing massage.” A result-driven session.</p>
+        <h3>First Visit - Real Relief</h3>
+        <p>Not a "relaxing massage." A result-driven session.</p>
         <ul class="offer-list">
           <li>45 min targeted work</li>
           <li>Focus on your problem areas</li>
           <li>Immediate relief after session</li>
         </ul>
-        <p class="offer-price">$59 — New clients only</p>
-        <button class="btn btn-dark" data-book-action="open" aria-label="Book your first massage session">Book Appointment</button>
+        <p class="offer-price">$59 - New clients only</p>
+        <button class="btn btn-dark" data-book-action="open" aria-label="Check availability">Check Availability</button>
       </div>
       <div class="offer-card">
         <span class="offer-tag">FULL RESET VISIT</span>
@@ -297,7 +297,7 @@
           <li>Perfect if you want both done at once</li>
         </ul>
         <p class="offer-price">$149</p>
-        <button class="btn btn-dark" data-book-action="open" aria-label="Book manicure and massage combo">Book Appointment</button>
+        <button class="btn btn-dark" data-book-action="open" aria-label="Check availability">Check Availability</button>
       </div>
     </div>
     <p class="section-copy-narrow mt-12">Offer discount is applied automatically at checkout.</p>
@@ -307,114 +307,114 @@
 <section class="sec section-beige" id="team" aria-label="Our team">
   <div class="container">
     <div class="tc">
-      <span class="eyebrow">Choose Your Specialist — Based on Results You Want</span>
+      <span class="eyebrow">Choose Your Specialist – Based on Results You Want</span>
       <h2 class="sec-title">Meet the <em>Experts</em></h2>
       <div class="rule c"></div>
-      <p class="section-copy-narrow">Results-driven beauty &amp; body studio — choose based on the result you want.</p>
+      <p class="section-copy-narrow">Results-driven beauty &amp; body studio – choose based on the result you want.</p>
     </div>
     <div class="team-grid">
       <div class="team-card">
         <div class="team-photo">
-          <img src="img/Kseniia.jpg" data-fallback-src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80&auto=format&fit=crop&crop=face" alt="Ksenia — Nailympia International Champion 2025 and Head Nail Artist at View Spa Aventura FL" loading="lazy" width="600" height="300">
+          <img src="img/Kseniia.jpg" data-fallback-src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80&auto=format&fit=crop&crop=face" alt="Ksenia - Nailympia International Champion 2025 and Head Nail Artist at View Spa Aventura FL" loading="lazy" width="600" height="300">
           <div class="team-photo-overlay" aria-hidden="true">
             <p class="team-photo-name">Ksenia</p>
-            <p class="team-photo-title">Head Nail Artist · Nailympia Champion 2025</p>
+            <p class="team-photo-title">Head Nail Artist - Nailympia Champion 2025</p>
           </div>
           <a href="https://instagram.com/kseni.nailartist" target="_blank" rel="noopener" class="team-insta" aria-label="Follow Ksenia on Instagram">
             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram icon" loading="lazy" width="16" height="16">
           </a>
-          <div class="team-badge-trophy" aria-hidden="true">🏆</div>
+          <div class="team-badge-trophy" aria-hidden="true">★</div>
         </div>
         <div class="team-body">
           <p>Award-winning Russian manicure specialist. Precision work. No chips for up to 4 weeks.</p>
           <div class="team-features">
-            <div class="team-feature">🏆 Nailympia Winner (Gel Polish)</div>
-            <div class="team-feature">📅 Typically booked 2–3 weeks ahead</div>
+            <div class="team-feature">★ Nailympia Winner (Gel Polish)</div>
+            <div class="team-feature">★ Typically booked 2-3 weeks ahead</div>
           </div>
           <p class="team-best-for">Best for: flawless, high-detail Russian manicure</p>
-          <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment with Ksenia">Book Appointment</button>
+          <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability with Ksenia">Check Availability</button>
         </div>
       </div>
 
       <div class="team-card">
         <div class="team-photo">
-          <img src="img/Ivan.jpg" data-fallback-src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80&auto=format&fit=crop&crop=face" alt="Ivan — Florida Licensed Massage Therapist and AMTA Member at View Spa Aventura FL" loading="lazy" width="600" height="300">
+          <img src="img/Ivan.jpg" data-fallback-src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&q=80&auto=format&fit=crop&crop=face" alt="Ivan - Florida Licensed Massage Therapist and AMTA Member at View Spa Aventura FL" loading="lazy" width="600" height="300">
           <div class="team-photo-overlay" aria-hidden="true">
             <p class="team-photo-name">Ivan</p>
-            <p class="team-photo-title">Licensed Massage Therapist · AMTA Member</p>
+            <p class="team-photo-title">Licensed Massage Therapist - AMTA Member</p>
           </div>
           <a href="https://instagram.com/science.of.touch" target="_blank" rel="noopener" class="team-insta" aria-label="Follow Ivan on Instagram">
             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram icon" loading="lazy" width="16" height="16">
           </a>
         </div>
         <div class="team-body">
-          <p>Focused on fixing pain, not just relaxing you. Most clients feel relief after 1–2 sessions.</p>
+          <p>Focused on fixing pain, not just relaxing you. Most clients feel relief after 1-2 sessions.</p>
           <div class="team-features">
-            <div class="team-feature">✔ Chronic neck & shoulder pain</div>
-            <div class="team-feature">✔ Sports recovery</div>
-            <div class="team-feature">📅 Available this week</div>
+            <div class="team-feature">★ Chronic neck & shoulder pain</div>
+            <div class="team-feature">★ Sports recovery</div>
+            <div class="team-feature">★ Available this week</div>
           </div>
           <p class="team-best-for">Best for: pain relief, posture issues, recurring tension</p>
-          <button class="btn btn-dark" data-book-action="open" aria-label="Book massage appointment with Ivan">Book Appointment</button>
+          <button class="btn btn-dark" data-book-action="open" aria-label="Check availability">Check Availability</button>
         </div>
       </div>
 
       <div class="team-card">
         <div class="team-photo">
-          <img src="img/Anastasia.jpg" alt="Anastasia — Nail Specialist at View Spa Aventura FL" loading="lazy" width="600" height="300">
+          <img src="img/Anastasia.jpg" alt="Anastasia - Nail Specialist at View Spa Aventura FL" loading="lazy" width="600" height="300">
           <div class="team-photo-overlay" aria-hidden="true">
             <p class="team-photo-name">Anastasia</p>
             <p class="team-photo-title">Nail Specialist</p>
           </div>
-          <div class="team-badge-fast" aria-hidden="true">⚡ Fast Booking</div>
+          <div class="team-badge-fast" aria-hidden="true">★ Fast Booking</div>
         </div>
         <div class="team-body">
-          <p>Same technique. Same standards. More availability — no waiting weeks.</p>
+          <p>Same technique. Same standards. More availability - no waiting weeks.</p>
           <div class="team-features">
-            <div class="team-feature">✔ Russian manicure & pedicure</div>
-            <div class="team-feature">📅 Faster availability this week</div>
+            <div class="team-feature">★ Russian manicure & pedicure</div>
+            <div class="team-feature">★ Faster availability this week</div>
           </div>
           <p class="team-best-for">Best for: premium nails without the wait</p>
-          <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment with Anastasia">Book Appointment</button>
+          <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability with Anastasia">Check Availability</button>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Mini CTA после команды — dead zone 5: увидел специалистов, хочет записаться -->
+<!-- Mini CTA before contact - keep urgency and avoid clutter -->
 <div class="mini-cta-bar">
   <div class="mini-cta-text">
     <strong>Pick your service. Choose your time.</strong> <span>Book online in 60 seconds.</span>
   </div>
-  <button class="btn btn-dark" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+  <button class="btn btn-dark" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
 </div>
 
 <section class="sec section-white" id="faq" aria-label="Frequently asked questions">
   <div class="container">
     <div class="faq-wrap">
       <div class="tc">
-        <span class="eyebrow">Before You Book — Read This First</span>
+        <span class="eyebrow">Before You Book - Read This First</span>
         <h2 class="sec-title">Questions, <em>answered</em></h2>
         <div class="rule c"></div>
         <p class="section-copy-narrow">Clear answers. No surprises. Just results you can trust.</p>
       </div>
       <ul class="faq-list" itemscope itemtype="https://schema.org/FAQPage">
         <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-          <button class="faq-q" aria-expanded="false"><span itemprop="name">What is a Russian manicure — and why does it last longer?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Russian manicure is a dry, precision technique that fully cleans the cuticle area using electric tools.<br><br>This allows gel to be applied closer to the skin — without flooding — which means:<br><br>✔ cleaner look<br>✔ no lifting<br>✔ up to 4 weeks wear</div></div>
+          <button class="faq-q" aria-expanded="false"><span itemprop="name">What is a Russian manicure - and why does it last longer?</span><span class="faq-icon" aria-hidden="true"></span></button>
+          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Russian manicure is a dry, precision technique that fully cleans the cuticle area using electric tools.<br><br>This allows gel to be applied closer to the skin - without flooding - which means:<br><br>- cleaner look<br>- no lifting<br>- up to 4 weeks wear</div></div>
         </li>
         <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
           <button class="faq-q" aria-expanded="false"><span itemprop="name">How do you sterilize your tools?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">We follow medical-grade sterilization standards:<br><br>✔ full disinfection after every client<br>✔ ultrasonic cleaning<br>✔ sealed sterilization pouches<br><br>No shortcuts. Ever.</div></div>
+          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">We follow medical-grade sterilization standards:<br><br>- full disinfection after every client<br>- ultrasonic cleaning<br>- sealed sterilization pouches<br><br>No shortcuts. Ever.</div></div>
         </li>
         <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
           <button class="faq-q" aria-expanded="false"><span itemprop="name">Does deep tissue massage hurt?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Yes — but it should never feel wrong.<br><br>We adjust pressure to your tolerance and focus on releasing tension, not causing pain.<br><br>Most clients feel noticeable relief after the session.</div></div>
+          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Yes - but it should never feel wrong.<br><br>We adjust pressure to your tolerance and focus on releasing tension, not causing pain.<br><br>Most clients feel noticeable relief after the session.</div></div>
         </li>
         <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
           <button class="faq-q" aria-expanded="false"><span itemprop="name">What types of massage do you offer?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">We focus on results-driven massage, not spa routines:<br><br>• Deep Tissue<br>• Sports Recovery<br>• Lymphatic Drainage<br>• Tension & Posture Correction<br>• Myofascial release<br>• Swedish<br>• Muscle knots therapy<br><br>Every session is customized to your body.</div></div>
+          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">We focus on results-driven massage, not spa routines:<br><br>- Deep Tissue<br>- Sports Recovery<br>- Lymphatic Drainage<br>- Tension & Posture Correction<br>- Myofascial release<br>- Swedish<br>- Muscle knots therapy<br><br>Every session is customized to your body.</div></div>
         </li>
         <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
           <button class="faq-q" aria-expanded="false"><span itemprop="name">How long does a session take?</span><span class="faq-icon" aria-hidden="true"></span></button>
@@ -422,16 +422,16 @@
         </li>
         <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
           <button class="faq-q" aria-expanded="false"><span itemprop="name">Do you accept walk-ins?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Usually no.<br><br>We work by appointment to maintain quality and timing.<br><br>Same-day bookings may be available depending on schedule.<br><br>👉 Check availability</div></div>
+          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Usually no.<br><br>We work by appointment to maintain quality and timing.<br><br>Same-day bookings may be available depending on schedule.<br><br>★ Check availability</div></div>
         </li>
         <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
           <button class="faq-q" aria-expanded="false"><span itemprop="name">Is the massage strictly professional?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Yes. Always.<br><br>This is a licensed, professional studio.<br>We do not offer any inappropriate or sexual services — under any circumstances.</div></div>
+          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Yes. Always.<br><br>This is a licensed, professional studio.<br>We do not offer any inappropriate or sexual services - under any circumstances.</div></div>
         </li>
       </ul>
       <div class="tc mt-40">
-        <p class="text-dark mb-16"><strong>Good time slots don’t stay open long.</strong></p>
-        <button class="btn btn-dark" data-book-action="open" aria-label="Book your appointment now">Book Appointment</button>
+        <p class="text-dark mb-16"><strong>Good time slots don't stay open long.</strong></p>
+        <button class="btn btn-dark" data-book-action="open" aria-label="Check availability">Check Availability</button>
       </div>
     </div>
   </div>
@@ -446,7 +446,7 @@
       <address class="contact-address">
         20200 W Dixie Hwy, STE 1105B<br>
         Aventura, FL 33180<br>
-        <strong class="text-dark">Mon–Sat: 9:00 AM – 8:00 PM</strong>
+        <strong class="text-dark">Mon-Sat: 9:00 AM - 8:00 PM</strong>
       </address>
       <div class="contact-phone">
         <a href="tel:+17542026666" aria-label="Call primary number">+1 (754) 202-6666</a><br>
@@ -457,8 +457,8 @@
         Message on WhatsApp
       </a>
       <div class="parking-box">
-        <h4>🅿️ Free Parking</h4>
-        <p>Free parking inside the building. Enter from the side. Park in any YELLOW spot.<br>Note: gate opens toward the car — don't pull up too close.</p>
+        <h4>★ Free Parking</h4>
+        <p>Free parking inside the building. Enter from the side. Park in any YELLOW spot.<br>Note: gate opens toward the car - don't pull up too close.</p>
       </div>
       <div class="social-row">
         <a href="https://instagram.com/viewspa.miami" target="_blank" rel="noopener" class="soc-btn ig" aria-label="Follow View Spa on Instagram">
@@ -489,7 +489,7 @@
           <img src="img/logo.jpg" alt="View Spa Aventura logo" loading="lazy" data-hide-on-error="true" width="120" height="46">
         </a>
         <p class="foot-tag">"Fix your pain.<br>Perfect your nails."</p>
-        <p class="foot-addr">20200 W Dixie Hwy, STE 1105B<br>Aventura, FL 33180<br>Mon–Sat 9:00 AM – 8:00 PM</p>
+        <p class="foot-addr">20200 W Dixie Hwy, STE 1105B<br>Aventura, FL 33180<br>Mon-Sat 9:00 AM - 8:00 PM</p>
       </div>
       <div>
         <p class="foot-head">Services</p>
@@ -508,13 +508,13 @@
         <div class="foot-links">
           <a href="tel:+17542026666" aria-label="Call View Spa primary number">+1 (754) 202-6666</a>
           <a href="tel:+17542026638" aria-label="Call View Spa secondary number">+1 (754) 202-6638</a>
-          <span class="mt-4">Mon–Sat: 9 AM – 8 PM</span>
+          <span class="mt-4">Mon-Sat: 9 AM - 8 PM</span>
         </div>
-        <button class="btn btn-gold btn-footer-alt" data-book-action="open" aria-label="Book appointment at View Spa">Book Appointment</button>
+        <button class="btn btn-gold btn-footer-alt" data-book-action="open" aria-label="Check Availability at View Spa">Check Availability</button>
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© 2026 View Spa — Aventura, Florida</span>
+      <span>© 2026 View Spa · Aventura, Florida</span>
       <span>Massage License: MM47261 · Nailympia Champion 2025</span>
     </div>
   </div>
@@ -525,7 +525,7 @@
     <p>Ready to book?</p>
     <span>Instant confirmation</span>
   </div>
-  <button class="btn btn-gold" data-book-action="open" aria-label="Book appointment now">Book Appointment</button>
+  <button class="btn btn-gold" data-book-action="open" aria-label="Check Availability now">Check Availability</button>
 </div>
 
 <a href="tel:+17542026666" class="sticky-call" aria-label="Call View Spa now">
