@@ -1,6 +1,6 @@
-(function(){
+﻿(function(){
   /* Shared constants */
-  const SQ_URL='https://app.squareup.com/appointments/book/98fw77ulsmdgb9/LRR0VEQVKE8BT/start';
+  const SQ_URL='https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services';
   const SQ_SERVICES={
     massage:'https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/HO57BZIYWVBXHKKXZHL3UVAE',
     manicure:'https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/2S2PCROBXNSFZZQKO2JDL2OW'
@@ -12,12 +12,15 @@
   function unlockBody(){document.body.style.position='';document.body.style.top='';document.body.style.width='';window.scrollTo(0,_scrollY);}
 
   function buildBookingUrl(service){
+    if(service && SQ_SERVICES[service]) {
+      return SQ_SERVICES[service];
+    }
     const currentPage = (window.location.pathname.split('/').pop() || 'index.html').replace(/^\//,'');
-    const params = new URLSearchParams();
-    const inferredService = service || (currentPage.includes('massage') ? 'massage' : currentPage.includes('manicure') ? 'manicure' : '');
-    if(inferredService) params.set('service', inferredService);
-    if(currentPage !== 'booking.html') params.set('return', currentPage);
-    return `booking.html${params.toString() ? `?${params.toString()}` : ''}`;
+    const inferredService = currentPage.includes('massage') ? 'massage' : currentPage.includes('manicure') ? 'manicure' : '';
+    if(inferredService && SQ_SERVICES[inferredService]) {
+      return SQ_SERVICES[inferredService];
+    }
+    return SQ_URL;
   }
 
   /* Header shadow */
@@ -100,7 +103,7 @@
   /* Booking routing */
   function initBookingModal(){
     function openBooking(service){
-      window.location.href = buildBookingUrl(service);
+      window.open(buildBookingUrl(service), '_blank', 'noopener');
     }
     function closeBooking(){}
 
@@ -110,7 +113,7 @@
 
   /* goToBooking for service pages */
   function goToBooking(service){
-    window.location.href = buildBookingUrl(service);
+    window.open(buildBookingUrl(service), '_blank', 'noopener');
   }
   window.goToBooking = goToBooking;
 
@@ -155,12 +158,12 @@
 
     if(day === 0){
       messages = [
-        { headline: `Tomorrow: Morning and afternoon openings`, sub: `${tomorrowName} booking is open now · Instant confirmation online` },
+        { headline: `Tomorrow: Morning and afternoon openings`, sub: `${tomorrowName} booking is open now В· Instant confirmation online` },
         { headline: `This week fills quickly`, sub: `Reserve your preferred time before evening spots are gone` }
       ];
     } else if(hour < 11){
       messages = [
-        { headline: `Today: Morning and afternoon availability`, sub: `Same-day massage may still be available · Book in 60 seconds` },
+        { headline: `Today: Morning and afternoon availability`, sub: `Same-day massage may still be available В· Book in 60 seconds` },
         { headline: `Tomorrow: Prime time opens now`, sub: `Secure a time that fits your schedule before it fills` }
       ];
     } else if(hour < 15){
@@ -176,7 +179,7 @@
     } else {
       messages = [
         { headline: `Tomorrow: Early availability is open`, sub: `Tonight is the best time to reserve before the day fills up` },
-        { headline: `This week: Limited evening spots`, sub: `Instant confirmation · Free parking · Easy online booking` }
+        { headline: `This week: Limited evening spots`, sub: `Instant confirmation В· Free parking В· Easy online booking` }
       ];
     }
 
