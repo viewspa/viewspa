@@ -1,4 +1,4 @@
-﻿(function(){
+(function(){
   /* Shared constants */
   const SQ_URL='https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services';
   const SQ_SERVICES={
@@ -21,6 +21,21 @@
       return SQ_SERVICES[inferredService];
     }
     return SQ_URL;
+  }
+
+  /* ── GA4 конверсия ── */
+  function trackBooking(service){
+    const label = service || (function(){
+      const p = (window.location.pathname.split('/').pop() || '').replace(/^\//,'');
+      return p.includes('massage') ? 'massage' : p.includes('manicure') ? 'manicure' : 'general';
+    })();
+    if(typeof window.gtag === 'function'){
+      window.gtag('event', 'square_booking_click', {
+        event_category: 'booking',
+        event_label: label,
+        page: window.location.pathname
+      });
+    }
   }
 
   /* Header shadow */
@@ -75,34 +90,15 @@
       }
     };
 
-    if(document.querySelector('.mySwiper')) {
-      new Swiper('.mySwiper', baseOptions);
-    }
-
-    if(document.querySelector('.nailSwiper')) {
-      new Swiper('.nailSwiper', {
-        ...baseOptions,
-        breakpoints: {
-          640: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 }
-        }
-      });
-    }
-
-    if(document.querySelector('.massageSwiper')) {
-      new Swiper('.massageSwiper', {
-        ...baseOptions,
-        breakpoints: {
-          640: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 }
-        }
-      });
-    }
+    if(document.querySelector('.mySwiper')) new Swiper('.mySwiper', baseOptions);
+    if(document.querySelector('.nailSwiper')) new Swiper('.nailSwiper', {...baseOptions, breakpoints:{640:{slidesPerView:2},1024:{slidesPerView:3}}});
+    if(document.querySelector('.massageSwiper')) new Swiper('.massageSwiper', {...baseOptions, breakpoints:{640:{slidesPerView:2},1024:{slidesPerView:3}}});
   }
 
   /* Booking routing */
   function initBookingModal(){
     function openBooking(service){
+      trackBooking(service);
       window.open(buildBookingUrl(service), '_blank', 'noopener');
     }
     function closeBooking(){}
@@ -113,6 +109,7 @@
 
   /* goToBooking for service pages */
   function goToBooking(service){
+    trackBooking(service);
     window.open(buildBookingUrl(service), '_blank', 'noopener');
   }
   window.goToBooking = goToBooking;
@@ -131,7 +128,6 @@
         if(!isOpen){
           item.classList.add('open');
           btn.setAttribute('aria-expanded','true');
-          // Force reflow and set max-height
           const b=item.querySelector('.faq-body');
           if(b){
             b.style.maxHeight = '0px';
@@ -158,12 +154,12 @@
 
     if(day === 0){
       messages = [
-        { headline: `Tomorrow: Morning and afternoon openings`, sub: `${tomorrowName} booking is open now В· Instant confirmation online` },
+        { headline: `Tomorrow: Morning and afternoon openings`, sub: `${tomorrowName} booking is open now · Instant confirmation online` },
         { headline: `This week fills quickly`, sub: `Reserve your preferred time before evening spots are gone` }
       ];
     } else if(hour < 11){
       messages = [
-        { headline: `Today: Morning and afternoon availability`, sub: `Same-day massage may still be available В· Book in 60 seconds` },
+        { headline: `Today: Morning and afternoon availability`, sub: `Same-day massage may still be available · Book in 60 seconds` },
         { headline: `Tomorrow: Prime time opens now`, sub: `Secure a time that fits your schedule before it fills` }
       ];
     } else if(hour < 15){
@@ -179,7 +175,7 @@
     } else {
       messages = [
         { headline: `Tomorrow: Early availability is open`, sub: `Tonight is the best time to reserve before the day fills up` },
-        { headline: `This week: Limited evening spots`, sub: `Instant confirmation В· Free parking В· Easy online booking` }
+        { headline: `This week: Limited evening spots`, sub: `Instant confirmation · Free parking · Easy online booking` }
       ];
     }
 
@@ -191,10 +187,7 @@
 
     renderMessage();
     if(messages.length > 1){
-      setInterval(()=>{
-        index = (index + 1) % messages.length;
-        renderMessage();
-      }, 5000);
+      setInterval(()=>{ index = (index + 1) % messages.length; renderMessage(); }, 5000);
     }
   }
 
@@ -256,6 +249,7 @@
       if(typeof window.openBooking === 'function'){
         window.openBooking(service);
       } else {
+        trackBooking(service);
         window.location.href = buildBookingUrl(service);
       }
     });
@@ -285,36 +279,18 @@
         kickerId: 'massage-video-kicker',
         headlineId: 'massage-video-headline',
         slides: [
-          {
-            kicker: 'Inside a real session',
-            headline: 'Targeted work.<br><em>Real relief.</em>'
-          },
-          {
-            kicker: 'Results-focused care',
-            headline: 'Less tension.<br><em>Better movement.</em>'
-          },
-          {
-            kicker: 'Professional therapeutic massage',
-            headline: 'Restore mobility.<br><em>Feel the difference.</em>'
-          }
+          { kicker: 'Inside a real session', headline: 'Targeted work.<br><em>Real relief.</em>' },
+          { kicker: 'Results-focused care', headline: 'Less tension.<br><em>Better movement.</em>' },
+          { kicker: 'Professional therapeutic massage', headline: 'Restore mobility.<br><em>Feel the difference.</em>' }
         ]
       },
       {
         kickerId: 'manicure-video-kicker',
         headlineId: 'manicure-video-headline',
         slides: [
-          {
-            kicker: 'Inside a real appointment',
-            headline: 'Clean work. Zero lifting.<br><em>Results that last.</em>'
-          },
-          {
-            kicker: 'Precision Russian technique',
-            headline: 'Clean cuticles.<br><em>4-week retention.</em>'
-          },
-          {
-            kicker: 'No shortcuts',
-            headline: 'Structured application.<br><em>Beautiful for weeks.</em>'
-          }
+          { kicker: 'Inside a real appointment', headline: 'Clean work. Zero lifting.<br><em>Results that last.</em>' },
+          { kicker: 'Precision Russian technique', headline: 'Clean cuticles.<br><em>4-week retention.</em>' },
+          { kicker: 'No shortcuts', headline: 'Structured application.<br><em>Beautiful for weeks.</em>' }
         ]
       }
     ];
@@ -335,58 +311,29 @@
         el.style.willChange = 'opacity, transform';
       });
 
-      function renderSlide(index){
-        kicker.textContent = slides[index].kicker;
-        headline.innerHTML = slides[index].headline;
-      }
+      function renderSlide(index){ kicker.textContent = slides[index].kicker; headline.innerHTML = slides[index].headline; }
 
       function swapSlide(nextIndex){
-        [kicker, headline].forEach((el) => {
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(8px)';
-        });
-
+        [kicker, headline].forEach((el) => { el.style.opacity = '0'; el.style.transform = 'translateY(8px)'; });
         window.setTimeout(() => {
           currentIndex = nextIndex;
           renderSlide(currentIndex);
-          [kicker, headline].forEach((el) => {
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-          });
+          [kicker, headline].forEach((el) => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
         }, 220);
       }
 
-      function startRotation(){
-        if(intervalId) return;
-        intervalId = window.setInterval(() => {
-          swapSlide((currentIndex + 1) % slides.length);
-        }, 4500);
-      }
-
-      function stopRotation(){
-        if(!intervalId) return;
-        window.clearInterval(intervalId);
-        intervalId = null;
-      }
+      function startRotation(){ if(intervalId) return; intervalId = window.setInterval(() => { swapSlide((currentIndex + 1) % slides.length); }, 4500); }
+      function stopRotation(){ if(!intervalId) return; window.clearInterval(intervalId); intervalId = null; }
 
       renderSlide(currentIndex);
-
-      try {
-        video.playbackRate = 0.95;
-      } catch (_) {}
+      try { video.playbackRate = 0.95; } catch (_) {}
 
       if('IntersectionObserver' in window){
         const observer = new IntersectionObserver((entries) => {
           const isVisible = entries.some((entry) => entry.isIntersecting);
-          if(isVisible){
-            video.play().catch(() => {});
-            startRotation();
-          } else {
-            video.pause();
-            stopRotation();
-          }
+          if(isVisible){ video.play().catch(() => {}); startRotation(); }
+          else { video.pause(); stopRotation(); }
         }, { threshold: 0.35 });
-
         observer.observe(section);
       } else {
         video.play().catch(() => {});
@@ -409,4 +356,3 @@
     initVideoRotators();
   });
 })();
-
