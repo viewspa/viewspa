@@ -232,25 +232,31 @@
   function initActionButtons(){
     document.addEventListener('click', (event) => {
       const trigger = event.target.closest('[data-book-action]');
-      if(!trigger) return;
+      if(trigger){
+        const action = (trigger.dataset.bookAction || 'open').toLowerCase();
+        const service = trigger.dataset.bookService || '';
 
-      const action = (trigger.dataset.bookAction || 'open').toLowerCase();
-      const service = trigger.dataset.bookService || '';
+        if(trigger.dataset.closeMenu === 'true' && typeof window.closeMenu === 'function'){
+          window.closeMenu();
+        }
 
-      if(trigger.dataset.closeMenu === 'true' && typeof window.closeMenu === 'function'){
-        window.closeMenu();
-      }
+        if(action === 'go'){
+          goToBooking(service);
+          return;
+        }
 
-      if(action === 'go'){
-        goToBooking(service);
+        if(typeof window.openBooking === 'function'){
+          window.openBooking(service);
+        } else {
+          trackBooking(service);
+          window.location.href = buildBookingUrl(service);
+        }
         return;
       }
 
-      if(typeof window.openBooking === 'function'){
-        window.openBooking(service);
-      } else {
-        trackBooking(service);
-        window.location.href = buildBookingUrl(service);
+      const linkTrigger = event.target.closest('[data-track="booking"]');
+      if(linkTrigger){
+        trackBooking();
       }
     });
   }
