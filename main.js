@@ -139,47 +139,76 @@
   }
 
   /* Massage availability / urgency */
+  function getAvailabilityMessages(){
+    const now=new Date();
+    const day=now.getDay();
+    const hour=now.getHours();
+    const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const tomorrowName=dayNames[(day + 1) % 7];
+
+    if(day === 0){
+      return [
+        { headline: `Tomorrow: Morning and afternoon openings`, sub: `${tomorrowName} booking is open now · Instant confirmation online` },
+        { headline: `This week fills quickly`, sub: `Reserve your preferred time before evening spots are gone` }
+      ];
+    }
+
+    if(hour < 11){
+      return [
+        { headline: `Today: Morning and afternoon availability`, sub: `Same-day massage may still be available · Book in 60 seconds` },
+        { headline: `Tomorrow: Prime time opens now`, sub: `Secure a time that fits your schedule before it fills` }
+      ];
+    }
+
+    if(hour < 15){
+      return [
+        { headline: `Today: Limited afternoon availability`, sub: `A good window for same-day neck, back, or shoulder relief` },
+        { headline: `Tomorrow: More flexible times available`, sub: `Reserve now for the best appointment options` }
+      ];
+    }
+
+    if(hour < 19){
+      return [
+        { headline: `Today: Final openings this evening`, sub: `If you want same-day relief, now is the time to book` },
+        { headline: `Tomorrow: Morning slots go first`, sub: `Book ahead to lock in a convenient time` }
+      ];
+    }
+
+    return [
+      { headline: `Tomorrow: Early availability is open`, sub: `Tonight is the best time to reserve before the day fills up` },
+      { headline: `This week: Limited evening spots`, sub: `Instant confirmation · Free parking · Easy online booking` }
+    ];
+  }
+
+  function getNextAvailableLabel(){
+    const now=new Date();
+    const day=now.getDay();
+    const hour=now.getHours();
+
+    if(day === 0 || hour >= 19){
+      return 'tomorrow';
+    }
+
+    return 'today';
+  }
+
+  function updateServiceAvailability(){
+    const label = getNextAvailableLabel();
+    const nodes = document.querySelectorAll('.svc-next-available');
+    nodes.forEach((node) => {
+      node.textContent = `Next available: ${label}`;
+    });
+  }
+
   function initAvailabilityBanner(){
     const banner=document.getElementById('availability-banner');
     const headline=document.getElementById('availability-headline');
     const sub=document.getElementById('availability-sub');
     if(!banner || !headline || !sub) return;
 
-    const now=new Date();
-    const day=now.getDay();
-    const hour=now.getHours();
-    const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const tomorrowName=dayNames[(day + 1) % 7];
-    let messages=[];
-
-    if(day === 0){
-      messages = [
-        { headline: `Tomorrow: Morning and afternoon openings`, sub: `${tomorrowName} booking is open now · Instant confirmation online` },
-        { headline: `This week fills quickly`, sub: `Reserve your preferred time before evening spots are gone` }
-      ];
-    } else if(hour < 11){
-      messages = [
-        { headline: `Today: Morning and afternoon availability`, sub: `Same-day massage may still be available · Book in 60 seconds` },
-        { headline: `Tomorrow: Prime time opens now`, sub: `Secure a time that fits your schedule before it fills` }
-      ];
-    } else if(hour < 15){
-      messages = [
-        { headline: `Today: Limited afternoon availability`, sub: `A good window for same-day neck, back, or shoulder relief` },
-        { headline: `Tomorrow: More flexible times available`, sub: `Reserve now for the best appointment options` }
-      ];
-    } else if(hour < 19){
-      messages = [
-        { headline: `Today: Final openings this evening`, sub: `If you want same-day relief, now is the time to book` },
-        { headline: `Tomorrow: Morning slots go first`, sub: `Book ahead to lock in a convenient time` }
-      ];
-    } else {
-      messages = [
-        { headline: `Tomorrow: Early availability is open`, sub: `Tonight is the best time to reserve before the day fills up` },
-        { headline: `This week: Limited evening spots`, sub: `Instant confirmation · Free parking · Easy online booking` }
-      ];
-    }
-
+    const messages=getAvailabilityMessages();
     let index=0;
+
     function renderMessage(){
       headline.textContent = messages[index].headline;
       sub.textContent = messages[index].sub;
@@ -189,6 +218,49 @@
     if(messages.length > 1){
       setInterval(()=>{ index = (index + 1) % messages.length; renderMessage(); }, 5000);
     }
+
+    updateServiceAvailability();
+  }
+
+  function getInitials(name){
+    const normalized = (name || '').trim();
+    if(!normalized) return '?';
+
+    const parts = normalized.split(/\s+/).filter(Boolean);
+    if(parts.length === 1){
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function getReviewTone(name){
+    let hash = 0;
+    for(let i = 0; i < name.length; i += 1){
+      hash = (hash << 5) - hash + name.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash) % 5;
+  }
+
+  function initReviewAvatars(){
+    document.querySelectorAll('.review-avatar').forEach((avatar) => {
+      const slide = avatar.closest('.swiper-slide');
+      const nameNode = slide ? slide.querySelector('.review-name') : null;
+      const name = nameNode ? nameNode.textContent.trim() : (avatar.dataset.reviewName || '').trim();
+      if(!name){
+        avatar.textContent = '?';
+        avatar.classList.add('is-initials');
+        avatar.style.background = 'linear-gradient(135deg, var(--gold), var(--gold-dk))';
+        return;
+      }
+
+      avatar.textContent = getInitials(name);
+      avatar.classList.add('is-initials');
+      avatar.classList.add(`avatar-tone-${getReviewTone(name) + 1}`);
+      avatar.setAttribute('aria-hidden', 'true');
+      avatar.setAttribute('title', name);
+    });
   }
 
   /* Booking page service pills (if present) */
@@ -358,6 +430,7 @@
     initImageFallbacks();
     initFAQ();
     initAvailabilityBanner();
+    initReviewAvatars();
     initBookingPills();
     initVideoRotators();
   });
