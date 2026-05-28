@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="analytics.js"></script>
 <meta charset="UTF-8">
+<script src="analytics.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Back & Neck Pain Relief Massage Aventura FL | View Spa</title>
 <link rel="icon" type="image/jpeg" href="img/logo.jpg">
@@ -10,7 +10,13 @@
 <meta property="og:title" content="45 min First Massage Session $59 | View Spa Aventura">
 <meta property="og:description" content="Book a focused 45-minute therapeutic session for back, neck or shoulder pain in Aventura, FL. Licensed therapist Ivan with athletic background.">
 <meta property="og:image" content="https://viewspa.miami/img/Ivan.jpg">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
 <meta property="og:url" content="https://viewspa.miami/massage">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="45 min First Massage Session $59 | View Spa Aventura">
+<meta name="twitter:description" content="Book a focused 45-minute therapeutic session for back, neck or shoulder pain in Aventura, FL. Licensed therapist Ivan with athletic background.">
+<meta name="twitter:image" content="https://viewspa.miami/img/Ivan.jpg">
 <link rel="canonical" href="https://viewspa.miami/massage">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,24 +27,82 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "@id": "https://viewspa.miami",
-  "name": "View Spa",
-  "description": "Professional therapeutic massage in Aventura, FL. Deep tissue, sports recovery, and lymphatic drainage by licensed massage therapist Ivan.",
-  "url": "https://viewspa.miami",
-  "image": "https://viewspa.miami/img/Ivan.jpg",
-  "telephone": "+17542026666",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "20200 W Dixie Hwy, STE 1105B",
-    "addressLocality": "Aventura",
-    "addressRegion": "FL",
-    "postalCode": "33180",
-    "addressCountry": "US"
-  },
-  "openingHours": "Mo-Sa 09:00-20:00",
-  "areaServed": "Aventura, FL",
-  "priceRange": "$$"
+  "@graph": [
+    {
+      "@type": ["HealthAndBeautyBusiness", "LocalBusiness"],
+      "@id": "https://viewspa.miami",
+      "name": "View Spa",
+      "description": "Professional therapeutic massage in Aventura, FL. Deep tissue, sports recovery, and lymphatic drainage by licensed massage therapist Ivan.",
+      "url": "https://viewspa.miami",
+      "image": "https://viewspa.miami/img/Ivan.jpg",
+      "telephone": "+17542026666",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "20200 W Dixie Hwy, STE 1105B",
+        "addressLocality": "Aventura",
+        "addressRegion": "FL",
+        "postalCode": "33180",
+        "addressCountry": "US"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+          "opens": "09:00",
+          "closes": "20:00"
+        }
+      ],
+      "areaServed": "Aventura, FL",
+      "priceRange": "$$",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "17",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    },
+    {
+      "@type": "Service",
+      "name": "Therapeutic Massage Aventura FL",
+      "provider": {"@id": "https://viewspa.miami"},
+      "serviceType": "Therapeutic Massage",
+      "description": "Licensed therapeutic massage in Aventura, FL for back, neck and shoulder pain relief. Deep tissue, sports recovery, trigger point and myofascial release by AMTA-member Ivan.",
+      "areaServed": "Aventura, FL",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Express Targeted Reset — 45 min first visit",
+          "price": "59",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "Full Body Reset — 60 min",
+          "price": "85",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "Total Body Restoration — 90 min",
+          "price": "110",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        }
+      ]
+    },
+    {
+      "@type": "VideoObject",
+      "name": "View Spa Aventura — Therapeutic Massage Session",
+      "description": "Real massage therapy session at View Spa Aventura, FL. Focused therapeutic work for back, neck and shoulder pain relief by licensed therapist Ivan.",
+      "thumbnailUrl": "https://viewspa.miami/img/qqq.jpg",
+      "uploadDate": "2025-01-01",
+      "contentUrl": "https://viewspa.miami/video/videom.mp4",
+      "publisher": {"@id": "https://viewspa.miami"}
+    }
+  ]
 }
 </script>
 </head>
@@ -57,7 +121,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="index.html" class="nav-link">Home</a>
       <a href="massage.html" class="nav-link active" aria-current="page">Massage</a>
       <a href="manicure.html" class="nav-link">Nail Services</a>
-      <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" class="nav-link" target="_blank">Book Online</a>
+      <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" class="nav-link" target="_blank" rel="noopener">Book Online</a>
       <a href="index.html#offers" class="nav-link">Offers</a>
       <a href="index.html#team" class="nav-link">Team</a>
       <a href="index.html#contact" class="nav-link">Contact</a>
@@ -80,14 +144,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section class="page-hero massage-hero" aria-label="Massage therapy hero">
   <div class="page-hero-inner container">
     <span class="eyebrow">Pain relief massage near Aventura, FL</span>
-    <h1>Therapeutic massage in Aventura for urgent pain and smart body maintenance.</h1>
-    <p>Fast relief when your back or neck locks up, and regular care that keeps small tension from turning into something worse.</p>
+    <h1>Therapeutic massage in Aventura — for when you're done settling for temporary relief.</h1>
+    <p>If you've tried massage before and it only helped for a day — that's not your body's fault. Generic relaxation work doesn't reach the root of chronic tension. Ivan's sessions are different: focused, therapeutic, and built around the exact issue your body is carrying right now.</p>
     <div class="page-hero-actions">
       <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" target="_blank" rel="noopener" class="btn btn-gold" data-track="booking" aria-label="Book your session">Book your session</a>
       <a href="#services" class="btn btn-outline-w" aria-label="See 60 & 90 min options">See 60 & 90 min options</a>
     </div>
+    <p class="hero-cancel-policy">Free cancellation up to 24 hours · No payment required to book</p>
     <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text" data-track="whatsapp" data-wa-location="hero" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'hero'}); }">💬 Have a question first? Text us on WhatsApp</a>
-    <p class="hero-note">45-minute first visit is $59. For urgent pain, 60- or 90-minute sessions are the better first step.</p>
+    <p class="hero-note">First visit 45 min — $59. Not sure which session fits? See all options below ↓</p>
     <ul class="page-hero-trust">
       <li>Acute care and preventive body maintenance</li>
       <li>Licensed Florida therapist</li>
@@ -102,7 +167,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="availability-copy">
       <span class="availability-kicker">Today / Tomorrow Availability</span>
       <h2 id="availability-headline">Today: Few spots left for back, neck or shoulder relief.</h2>
-      <p id="availability-sub">Claim your preferred time in under 60 seconds and start feeling better sooner. Prefer a smaller first step? The 45-minute first visit is $59.</p>
+      <p id="availability-sub">Claim your preferred time in under 60 seconds. First visit from $59 — free cancellation up to 24 hours, no payment to book.</p>
     </div>
     <div class="availability-actions">
       <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services" target="_blank" rel="noopener" class="btn btn-dark" data-track="booking" aria-label="Book your session">Book your session</a>
@@ -121,12 +186,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="tag">Licensed therapeutic massage specialist</span>
         <h2>Meet Your Therapist</h2>
         <p>Ivan has a sports background, so he understands how training, competition and repetitive movement create the kind of chronic neck, shoulder and back pain that won't go away on its own.</p>
-        <p>He is not selling a generic spa experience. He provides focused therapeutic work, tailored to the exact tension patterns and posture issues in your body.</p>
-        <p>Each session is adjusted in real time based on what your body needs that day. No fixed routines. No guesswork.</p>
+        <p>If you've been to other therapists and felt like they just worked through a preset routine — this is different. Ivan assesses your specific tension patterns before he begins and adjusts in real time based on what your body is doing that day.</p>
+        <p>He is not selling a generic spa experience. He provides focused therapeutic work, tailored to the exact issues in your body.</p>
+        <p>No fixed routines. No guesswork.</p>
         <p>The goal is simple: noticeable, measurable relief that helps you move better and sleep better.</p>
-        <p><strong>Most clients feel a clear difference after the first visit.</strong></p>
+        <p><strong>Most clients walk out with more range of motion than they walked in with — able to turn their head further, reach their arm higher, or breathe without that familiar tightness.</strong></p>
         <div class="amta-row">
-          <img src="img/amta-logo.jpg" alt="AMTA Member">
+          <img src="img/amta-logo.jpg" alt="American Massage Therapy Association (AMTA) Member logo">
           <span>Professional Member of American Massage Therapy Association</span>
         </div>
         <div class="trust-strip" aria-label="Female client trust signals">
@@ -151,7 +217,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="step-card">
       <span class="eyebrow">How it works</span>
-      <h3 class="sec-title sec-title-mid">We handle urgent relief and preventive care in different ways.</h3>
+      <h3 class="sec-title sec-title-mid">Not all pain is the same. Your session shouldn't be either.</h3>
       <p class="section-copy">If your body is already in pain, we take a different first step than when you want to stop tension from getting worse. Each path is built to give you faster relief and clearer results.</p>
       <div class="how-grid">
         <div class="how-card">
@@ -184,9 +250,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="eyebrow">Pain relief, not just relaxation</span>
       <h2>If Your Body Feels Off — There's a Reason</h2>
       <div class="gold-rule center"></div>
+      <p>You've probably tried massage before. It helped — for a day, maybe two. Then everything came back.</p>
       <p>You wake up already tight. By midday your neck is stiff. By evening your lower back reminds you it exists.</p>
       <p>Stretching helps for a few hours. Gym doesn't fix it. Rest doesn't fix it.</p>
-      <p>Because the problem isn't just tight muscles — it's overworked muscles, compensation patterns, and posture locked in over months or years. That's why generic relaxation doesn't touch it.</p>
+      <p>Because the problem isn't just tight muscles — it's overworked muscles, the way your body has learned to move around the pain, and posture locked in over months or years. That's why generic relaxation doesn't touch it. Therapeutic work does.</p>
       <p><strong>Most clients notice a real difference after the first session.</strong></p>
     </div>
   </div>
@@ -198,7 +265,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <span class="eyebrow">Massage Services & Pricing Near Me</span>
     <h2 class="sec-title">Choose your <em>session</em></h2>
     <div class="gold-rule"></div>
-    <p class="section-copy">Choose the right session for your situation: 60 and 90 minutes for deeper, urgent relief; 45 minutes for a first preventive visit or a targeted maintenance check.</p>
+    <p class="section-copy">Three sessions for three situations: 45 minutes to pinpoint 1–2 problem areas, 60 for a full reset, 90 for deeper and more detailed work across the whole body.</p>
     <div class="services-grid">
 
       <div class="svc-card">
@@ -264,7 +331,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <span class="eyebrow">Plans for lasting relief</span>
     <h2 class="sec-title">One session is a start.<br><em>Two or more is a plan.</em></h2>
     <div class="gold-rule center"></div>
-    <p class="section-copy-wide">Therapeutic change doesn't happen in one visit. Muscles, posture, and chronic tension need consistent, repeatable care to hold the improvement.</p>
+    <p class="section-copy-wide">One session starts the change. Two or three lock it in. That's not a sales pitch — that's how muscles actually work.</p>
     <div class="packages-grid">
       <div class="package-card">
         <span class="package-badge">Recommended plan</span>
@@ -299,7 +366,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="https://view-spa.square.site/product/8-massage-sessions/4QUGIWSCJ6PE6WFAEDMWF4HE" target="_blank" rel="noopener" class="btn btn-dark package-btn" data-track="package" data-package-id="8-massage-sessions">Buy 8-pack</a>
       </div>
     </div>
-    <p class="package-reassure">Packages are available through a quick WhatsApp conversation. Not ready to commit? Start with a single session.</p>
+    <p class="package-reassure">Not ready to commit to a package? Start with a single session — no strings attached.</p>
   </div>
 </section>
 
@@ -378,7 +445,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google Reviews" class="google-logo">
       <span class="eyebrow">Google Reviews</span>
       <h2 class="sec-title sec-title-sm">Real Clients.<br><em>Real Relief.</em></h2>
-      <p class="review-intro">People come in with pain — and leave feeling the difference.</p>
+      <p class="review-intro">The average client tries 2–3 therapists before they find Ivan. Most don't go anywhere else after.</p>
     </div>
     <div class="swiper massageSwiper">
       <div class="swiper-wrapper">
@@ -432,7 +499,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </li>
       <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <button class="faq-q"><span itemprop="name">Is it comfortable to book with a male massage therapist?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">It is completely understandable to pause when the therapist is male, and that concern is taken seriously. Many of our clients are women, the session is always fully draped, and the environment is strictly professional and focused on results. If you want to feel more at ease before booking, send me a message on WhatsApp and we can talk through what will make you most comfortable.</div></div>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">That hesitation is completely normal, and it is taken seriously. The honest answer: the majority of Ivan's regular clients are women — not in spite of his being male, but because they came once, felt safe, and kept coming back. Every session is fully draped and strictly professional. The focus is on results, not a spa performance. If you want to feel more comfortable before booking, send a quick message on WhatsApp — no commitment, just a conversation.</div></div>
       </li>
     </ul>
   </div>
@@ -455,17 +522,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="btn soft-whatsapp-btn" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'soft_cta'}); }">Message on WhatsApp</a>
       </div>
 
-      <div class="soft-contact-card soft-contact-form-card">
-        <div>
-          <p class="soft-contact-label">Request a callback</p>
-          <p class="soft-contact-subtext">Mon–Sat 9AM–8PM · Aventura FL</p>
-        </div>
-        <form id="softCallbackForm" class="soft-contact-form" novalidate>
-          <label for="softCallbackPhone" class="sr-only">Phone number</label>
-          <input id="softCallbackPhone" name="softCallbackPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Enter your phone number..." aria-label="Phone number" required>
-          <button type="submit" class="btn soft-callback-btn">Request a callback</button>
-        </form>
-      </div>
     </div>
   </div>
 </section>
@@ -473,9 +529,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- CTA BAND -->
 <div class="cta-band">
   <div class="container">
-    <h2>Stop Managing the Pain — Address the Cause</h2>
-    <p>One focused 45-minute session can give you a quick, professional starting point.</p>
+    <h2>Ready to fix the cause — not manage the symptoms?</h2>
+    <p>One focused session shows you what your body has been carrying — and starts actually moving it.</p>
     <a href="https://book.squareup.com/appointments/98fw77ulsmdgb9/location/LRR0VEQVKE8BT/services/5GZCOCXG3A26S3EP4ZRWDOH5" target="_blank" rel="noopener" class="btn" data-track="booking" aria-label="Book the first 45 minute session for 59 dollars">Book 45 min intro — $59</a>
+    <p class="cta-band-policy">Free cancellation up to 24 hours · Not satisfied? We'll make it right.</p>
   </div>
 </div>
 
@@ -487,8 +544,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h2 class="sec-title sec-title-contact">Aventura, <em>FL</em></h2>
       <div class="gold-rule"></div>
       <p class="contact-copy">20200 W Dixie Hwy, STE 1105B<br>Aventura, FL 33180</p>
-      <p class="phone-line mb-6"><a href="tel:+17542026666" class="phone-link">+1 (754) 202-6666</a></p>
-      <p class="phone-line"><a href="tel:+17542026638" class="phone-link">+1 (754) 202-6638</a></p>
+      <p class="phone-line"><a href="tel:+17542026666" class="phone-link">+1 (754) 202-6666</a></p>
       <div class="parking-box">
         <h4>🅿️ Free Parking</h4>
         <p>Free parking inside the building. Enter from the side. Park in any YELLOW spot. Gate opens toward the car — don't pull up too close.</p>
@@ -496,7 +552,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="text-mid mt-16">Mon – Sat: 9:00 AM – 8:00 PM</p>
     </div>
     <div class="map-wrap">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7174.310578815798!2d-80.15086328952484!3d25.96294697713106!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9ad02edfc1379%3A0x66fe26e26bc970cd!2sView%20Spa!5e0!3m2!1sen!2sus!4v1767899936839!5m2!1sen!2sus" loading="lazy" allowfullscreen></iframe>
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7174.310578815798!2d-80.15086328952484!3d25.96294697713106!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9ad02edfc1379%3A0x66fe26e26bc970cd!2sView%20Spa!5e0!3m2!1sen!2sus!4v1767899936839!5m2!1sen!2sus" loading="lazy" allowfullscreen title="View Spa Aventura FL location on Google Maps" aria-label="Google Maps showing View Spa location"></iframe>
     </div>
   </div>
 </section>
@@ -533,6 +589,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="footer-bottom">
       <span>© 2026 View Spa — Aventura, Florida</span>
       <span>Massage Establishment License: MM47261 | Licensed Massage Therapist on site</span>
+      <a href="/sitemap.xml" class="footer-sitemap-link">Sitemap</a>
     </div>
   </div>
 </footer>
@@ -551,19 +608,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
   (function () {
-    var form = document.getElementById('softCallbackForm');
-    if (!form) return;
-
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      if (window.gtag) {
-        gtag('event', 'callback_request', { event_category: 'lead', event_label: 'soft_cta' });
-      }
-
-      window.location.href = 'tel:+17542026666';
-    });
-
     var stickyWhatsapp = document.querySelector('.sticky-whatsapp');
     if (stickyWhatsapp) {
       window.setTimeout(function () {
