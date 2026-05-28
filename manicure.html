@@ -20,8 +20,11 @@
 <link rel="canonical" href="https://viewspa.miami/manicure">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
 <link rel="stylesheet" href="shared.css">
 
 <script type="application/ld+json">
@@ -138,6 +141,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </header>
 
+<main id="main-content">
 <!-- HERO -->
 <section class="page-hero page-hero-manicure" aria-label="Nail services hero">
   <div class="page-hero-inner container">
@@ -372,7 +376,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- VIDEO BREAK -->
 <section class="video-vibe-sec" aria-label="Russian manicure video showcase">
-  <video class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="img/naildesigns.jpg" preload="auto" aria-label="Russian manicure and nail work at View Spa Aventura" title="View Spa manicure session">
+  <video class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="img/naildesigns.jpg" preload="none" aria-label="Russian manicure and nail work at View Spa Aventura" title="View Spa manicure session">
     <source src="video/videoman.mp4" type="video/mp4">
   </video>
   <div class="video-overlay" aria-hidden="true">
@@ -483,6 +487,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </section>
+
+</main>
 
 <footer>
   <div class="container">

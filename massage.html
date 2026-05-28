@@ -20,8 +20,12 @@
 <link rel="canonical" href="https://viewspa.miami/massage">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="img/mass.jpg" as="image" fetchpriority="high">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
 <link rel="stylesheet" href="shared.css">
 
 <script type="application/ld+json">
@@ -140,6 +144,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </header>
 
+<main id="main-content">
 <!-- HERO -->
 <section class="page-hero massage-hero" aria-label="Massage therapy hero">
   <div class="page-hero-inner container">
@@ -379,22 +384,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="expect-grid">
       <div class="expect-item">
         <div class="expect-num">01</div>
-        <h4>Intake conversation</h4>
+        <h3>Intake conversation</h3>
         <p>Ivan spends a few minutes understanding where you carry tension, what's bothering you today, and what outcome you want to leave with.</p>
       </div>
       <div class="expect-item">
         <div class="expect-num">02</div>
-        <h4>Tailored session</h4>
+        <h3>Tailored session</h3>
         <p>No two sessions are identical. Techniques, pressure, and focus areas are chosen based on your body's condition that day.</p>
       </div>
       <div class="expect-item">
         <div class="expect-num">03</div>
-        <h4>Measurable relief</h4>
+        <h3>Measurable relief</h3>
         <p>Most clients notice a clear shift during the first session. Many describe the 24 hours after as the best sleep they've had in months.</p>
       </div>
       <div class="expect-item">
         <div class="expect-num">04</div>
-        <h4>A plan, not a transaction</h4>
+        <h3>A plan, not a transaction</h3>
         <p>Ivan may suggest a follow-up cadence based on what he finds. You're not just buying 60 minutes — you're investing in a result that holds.</p>
       </div>
     </div>
@@ -410,17 +415,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="expect-grid">
       <div class="expect-item">
         <div class="expect-num">01</div>
-        <h4>Listen and assess</h4>
+        <h3>Listen and assess</h3>
         <p>The first minutes are about your pain, your movement, and the exact spots that limit you.</p>
       </div>
       <div class="expect-item">
         <div class="expect-num">02</div>
-        <h4>Targeted relief</h4>
+        <h3>Targeted relief</h3>
         <p>Therapeutic massage work is directed only where your body needs it, not on a preset relaxation routine.</p>
       </div>
       <div class="expect-item">
         <div class="expect-num">03</div>
-        <h4>Clear next step</h4>
+        <h3>Clear next step</h3>
         <p>You leave with a realistic sense of what helped, what improved, and whether you need follow-up care.</p>
       </div>
     </div>
@@ -429,7 +434,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- VIDEO BREAK -->
 <section class="video-vibe-sec" aria-label="Massage therapy video">
-  <video class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="img/qqq.jpg" preload="auto" aria-label="Therapeutic massage session at View Spa Aventura" title="View Spa massage session">
+  <video class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="img/qqq.jpg" preload="none" aria-label="Therapeutic massage session at View Spa Aventura" title="View Spa massage session">
     <source src="video/videom.mp4" type="video/mp4">
   </video>
   <div class="video-overlay" aria-hidden="true">
@@ -546,7 +551,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="contact-copy">20200 W Dixie Hwy, STE 1105B<br>Aventura, FL 33180</p>
       <p class="phone-line"><a href="tel:+17542026666" class="phone-link">+1 (754) 202-6666</a></p>
       <div class="parking-box">
-        <h4>🅿️ Free Parking</h4>
+        <h3>🅿️ Free Parking</h3>
         <p>Free parking inside the building. Enter from the side. Park in any YELLOW spot. Gate opens toward the car — don't pull up too close.</p>
       </div>
       <p class="text-mid mt-16">Mon – Sat: 9:00 AM – 8:00 PM</p>
@@ -556,6 +561,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </section>
+
+</main>
 
 <footer>
   <div class="container">

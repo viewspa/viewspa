@@ -76,8 +76,12 @@
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="img/hero.jpg" as="image" fetchpriority="high">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
 <link rel="stylesheet" href="shared.css">
 </head>
 <body>
@@ -119,6 +123,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </header>
 
+<main id="main-content">
 <section class="hero" id="home" aria-label="View Spa Aventura hero section">
   <div class="hero-bg" aria-hidden="true">
     <img class="hero-bg-img" src="img/hero.jpg" alt="View Spa Aventura interior - luxury beauty and wellness studio" fetchpriority="high" width="1440" height="720">
@@ -247,7 +252,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <section class="video-vibe-sec" aria-label="View Spa studio video tour">
-  <video class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="img/video-preview.jpg" preload="auto" aria-label="View Spa Aventura studio ambiance video" title="View Spa Aventura - studio tour">
+  <video class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="img/video-preview.jpg" preload="none" aria-label="View Spa Aventura studio ambiance video" title="View Spa Aventura - studio tour">
     <source src="video/your-video.mp4" type="video/mp4">
   </video>
   <div class="video-overlay" aria-hidden="true">
@@ -561,6 +566,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </footer>
+
+</main>
 
 <div class="book-strip" id="bookStrip" aria-label="Mobile booking bar">
   <div class="book-strip-text">
