@@ -130,8 +130,9 @@
           btn.setAttribute('aria-expanded','true');
           const b=item.querySelector('.faq-body');
           if(b){
+            const targetHeight = b.scrollHeight + 'px'; // читаем ДО записи
             b.style.maxHeight = '0px';
-            setTimeout(() => { b.style.maxHeight = b.scrollHeight + 'px'; }, 10);
+            requestAnimationFrame(() => { b.style.maxHeight = targetHeight; });
           }
         }
       });
