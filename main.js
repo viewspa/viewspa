@@ -12,15 +12,8 @@
   function unlockBody(){document.body.style.position='';document.body.style.top='';document.body.style.width='';window.scrollTo(0,_scrollY);}
 
   function buildBookingUrl(service){
-    if(service && SQ_SERVICES[service]) {
-      return SQ_SERVICES[service];
-    }
-    const currentPage = (window.location.pathname.split('/').pop() || 'index.html').replace(/^\//,'');
-    const inferredService = currentPage.includes('massage') ? 'massage' : currentPage.includes('manicure') ? 'manicure' : '';
-    if(inferredService && SQ_SERVICES[inferredService]) {
-      return SQ_SERVICES[inferredService];
-    }
-    return SQ_URL;
+    // Свой букинг на сайте. (service сохраняем для будущего диплинка по услуге.)
+    return service ? `booking.html?service=${encodeURIComponent(service)}` : 'booking.html';
   }
 
   /* ── GA4 конверсия ── */
@@ -99,7 +92,7 @@
   function initBookingModal(){
     function openBooking(service){
       trackBooking(service);
-      window.open(buildBookingUrl(service), '_blank', 'noopener');
+      window.location.href = buildBookingUrl(service);
     }
     function closeBooking(){}
 
@@ -110,7 +103,7 @@
   /* goToBooking for service pages */
   function goToBooking(service){
     trackBooking(service);
-    window.open(buildBookingUrl(service), '_blank', 'noopener');
+    window.location.href = buildBookingUrl(service);
   }
   window.goToBooking = goToBooking;
 

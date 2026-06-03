@@ -1,0 +1,69 @@
+/* View Spa — booking widget styles. Использует токены из shared.css (--gold и т.п.). */
+
+.bk-wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+
+/* progress */
+.bk-progress { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 26px; flex-wrap: wrap; }
+.bk-pstep { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; }
+.bk-pstep.on { color: var(--gold-accessible); }
+.bk-pline { width: 16px; height: 1px; background: #ddd; }
+
+/* card */
+.bk-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 34px 30px; box-shadow: 0 10px 40px rgba(0,0,0,.05); position: relative; }
+.bk-title { font-size: 30px; margin: 6px 0 6px; }
+.bk-sub { color: #777; font-size: 14px; margin-bottom: 22px; }
+.bk-body { margin-top: 8px; }
+.bk-back { position: absolute; top: 18px; right: 20px; background: none; border: none; color: var(--gold-accessible); font-weight: 700; font-size: 13px; cursor: pointer; padding: 6px; }
+.bk-back:hover { color: var(--gold-dk); }
+
+/* tiles grid (category/subcategory) */
+.bk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bk-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 26px 22px; background: var(--beige); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; text-align: left; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.bk-tile:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+.bk-tile-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--dark); }
+.bk-tile-meta { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold-accessible); }
+
+/* service / master lists */
+.bk-list { display: flex; flex-direction: column; gap: 10px; }
+.bk-svc, .bk-master { display: flex; align-items: center; gap: 14px; width: 100%; padding: 16px 18px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; text-align: left; transition: border-color .2s, background .2s; }
+.bk-svc:hover, .bk-master:hover { border-color: var(--gold); background: var(--beige); }
+.bk-svc-main { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.bk-svc-name { font-size: 16px; font-weight: 700; color: var(--dark); }
+.bk-svc-dur { font-size: 12px; color: #888; }
+.bk-svc-price { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold-dk); white-space: nowrap; }
+
+.bk-master-av { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-dk)); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 20px; flex-shrink: 0; }
+.bk-master-body { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.bk-master-name { font-size: 16px; font-weight: 700; color: var(--dark); }
+.bk-master-role { font-size: 11px; color: #999; letter-spacing: .3px; }
+.bk-master-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold-dk); white-space: nowrap; }
+.bk-master-any .bk-master-av { background: var(--dark); }
+
+/* days + slots */
+.bk-days { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
+.bk-day { flex: 0 0 auto; padding: 10px 14px; border: 1px solid var(--border); border-radius: 999px; background: var(--white); cursor: pointer; font-size: 13px; font-weight: 700; color: #555; white-space: nowrap; }
+.bk-day.on { background: var(--gold); border-color: var(--gold); color: #fff; }
+.bk-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+.bk-slot { padding: 12px 6px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); cursor: pointer; font-size: 14px; font-weight: 700; color: var(--dark); display: flex; flex-direction: column; gap: 2px; align-items: center; transition: border-color .2s, background .2s; }
+.bk-slot:hover { border-color: var(--gold); background: var(--beige); }
+.bk-slot-who { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--gold-accessible); }
+
+/* summary + form */
+.bk-summary { background: var(--beige); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #444; margin-bottom: 20px; }
+.bk-summary b { font-size: 16px; color: var(--dark); }
+.bk-summary-done { border-color: var(--gold); }
+.bk-form { display: flex; flex-direction: column; gap: 14px; }
+.bk-form label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #666; }
+.bk-form input, .bk-form textarea { padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Lato', sans-serif; font-size: 15px; color: var(--dark); }
+.bk-form input:focus, .bk-form textarea:focus { outline: none; border-color: var(--gold); }
+.bk-submit { margin-top: 6px; }
+
+/* states */
+.bk-loading { text-align: center; color: #888; padding: 40px 0; }
+.bk-error { background: #fdf3f3; border: 1px solid #f0c9c9; color: #a33; padding: 14px 16px; border-radius: 8px; font-size: 14px; }
+
+@media (max-width: 560px) {
+  .bk-card { padding: 26px 18px; }
+  .bk-title { font-size: 25px; }
+  .bk-grid { grid-template-columns: 1fr; }
+}
