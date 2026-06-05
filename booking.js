@@ -258,6 +258,7 @@
          <label>Email<input name="email" type="email" required autocomplete="email"></label>
          <label>Phone (optional)<input name="phone" type="tel" autocomplete="tel"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
+         <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
          ${turnstile}
          <button type="submit" class="btn btn-gold bk-submit">Confirm booking</button>
          <div class="bk-error" id="bk-form-err" hidden></div>
@@ -282,6 +283,7 @@
         startAt: state.slot.startAt,
         serviceVariationVersion: state.slot.serviceVariationVersion,
         customer: { name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), note: fd.get('note') },
+        packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
         turnstileToken: tsToken,
       });
       renderDone(res);
@@ -311,11 +313,14 @@
       master: m ? m.name : '',
       source: 'site_booking',
     });
+    const payLine = res.paidWith === 'package'
+      ? `${m ? m.name : ''} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
+      : `${m ? m.name : ''} · ${fmtMoney(state.slot.price)} (pay in person)`;
     shell('You’re booked! 🎉', 'A confirmation email is on its way.',
       `<div class="bk-summary bk-summary-done">
          <div><b>${svc.name}</b></div>
          <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)}</div>
-         <div>${m ? m.name : ''} · ${fmtMoney(state.slot.price)} (pay in person)</div>
+         <div>${payLine}</div>
        </div>
        <a href="index.html" class="btn btn-dark" style="margin-top:18px;display:inline-block">Back to site</a>`,
       { eyebrow: 'Confirmed' });
