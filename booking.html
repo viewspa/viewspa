@@ -41,10 +41,27 @@
     <div id="booking-app">
       <div class="bk-card"><div class="bk-loading">Loading…</div></div>
     </div>
+    <div class="bk-fallback" id="bookingFallback" aria-live="polite">
+      <p class="bk-fallback-title">Having trouble loading? Book directly:</p>
+      <div class="bk-fallback-actions">
+        <a href="tel:+17542026666" class="btn btn-dark">Call (754) 202-6666</a>
+        <a href="https://wa.me/17542026666?text=Hi%2C%20I%27d%20like%20to%20book%20an%20appointment%20at%20View%20Spa" target="_blank" rel="noopener" class="btn btn-outline-d"><svg viewBox="0 0 24 24" fill="#25D366" width="16" height="16" style="flex-shrink:0;vertical-align:middle" aria-hidden="true"><path fill-rule="evenodd" d="M11.997 2C6.477 2 2 6.477 2 11.997c0 1.77.462 3.43 1.264 4.875L2 22l5.283-1.384A9.954 9.954 0 0011.997 22c5.52 0 9.997-4.477 9.997-9.997S17.517 2 11.997 2zM17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg> WhatsApp us</a>
+      </div>
+      <p class="bk-fallback-note">Mon–Sat: 9:00 AM – 8:00 PM · Instant response</p>
+    </div>
   </div>
 </main>
 
 <script src="main.js" defer></script>
 <script src="booking.js" defer></script>
+<script>
+  setTimeout(function() {
+    var app = document.getElementById('booking-app');
+    var fallback = document.getElementById('bookingFallback');
+    if (fallback && app && app.querySelector('.bk-loading')) {
+      fallback.classList.add('visible');
+    }
+  }, 5000);
+</script>
 </body>
 </html>

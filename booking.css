@@ -67,3 +67,48 @@
   .bk-title { font-size: 25px; }
   .bk-grid { grid-template-columns: 1fr; }
 }
+
+/* ── BOOKING FALLBACK ── */
+.bk-fallback {
+  display: none;
+  margin-top: 24px;
+  padding: 24px;
+  background: #FFFCF5;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  text-align: center;
+}
+.bk-fallback.visible { display: block; }
+.bk-fallback-title {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 16px;
+}
+.bk-fallback-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.bk-fallback-note {
+  font-size: 12px;
+  color: var(--mid);
+}
+.btn-outline-d {
+  border: 1.5px solid var(--dark);
+  color: var(--dark);
+  background: transparent;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background .2s, color .2s;
+}
+.btn-outline-d:hover { background: var(--dark); color: #fff; }
