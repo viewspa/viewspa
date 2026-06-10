@@ -22,8 +22,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="img/mass.jpg" as="image" fetchpriority="high">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet"></noscript>
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
 <link rel="stylesheet" href="shared.css">
@@ -126,7 +126,6 @@
       <a href="index.html#team" class="nav-link">Team</a>
       <a href="index.html#contact" class="nav-link">Contact</a>
       <div class="nav-footer">
-        <a href="booking.html?category=massage" class="btn btn-gold" data-track="booking" data-close-menu="true" aria-label="Book your session">Book Your Session</a>
         <div class="nav-footer-contact">
           <a href="tel:+17542026666" aria-label="Call View Spa at 754-202-6666">(754) 202-6666</a>
           <a href="https://wa.me/17542026666?text=Hi!%20I%20found%20you%20online%20and%20want%20to%20book%20an%20appointment." class="sticky-whatsapp" aria-label="Message View Spa on WhatsApp" target="_blank" rel="noopener" data-track="whatsapp" data-wa-location="sticky" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'sticky'}); }">
@@ -136,7 +135,7 @@
       </div>
     </nav>
     <div class="hdr-cta">
-      <a href="booking.html?category=massage" class="btn btn-gold btn-compact" data-track="booking" aria-label="Book your session">Book Your Session</a>
+      <a href="booking.html?category=massage" class="btn btn-gold btn-compact" data-track="booking" aria-label="Book in 60 Seconds">Book in 60 Seconds</a>
       <span class="promo-badge">Book in 60 seconds</span>
     </div>
   </div>
@@ -147,7 +146,7 @@
 <section class="page-hero massage-hero" aria-label="Massage therapy hero">
   <div class="page-hero-inner container">
     <span class="eyebrow">Massage therapy near me · Aventura, FL</span>
-    <h1>Therapeutic massage in Aventura — for when you're done settling for temporary relief.</h1>
+    <h1>Therapeutic massage in Aventura — for when the usual fixes stopped working.</h1>
     <div class="hero-price-callout">
       <div class="hero-price-grid">
         <span class="hero-price-item"><strong>$65</strong><span>45 min</span></span>
@@ -156,12 +155,12 @@
       </div>
       <span class="hero-price-sub">Free cancellation up to 24 hours</span>
     </div>
-    <p class="hero-hide-mob">If you've tried massage before and it only helped for a day — that's not your body's fault. Generic relaxation work doesn't reach the root of chronic tension. Ivan's sessions are different: focused, therapeutic, and built around the exact issue your body is carrying right now.</p>
+    <p class="hero-hide-mob">If you've tried massage before and felt fine for a day, then back to square one — that's not how it has to work. Ivan doesn't run through a routine. He figures out what your body is actually doing and works on that.</p>
     <div class="page-hero-actions">
-      <a href="booking.html?category=massage" class="btn btn-gold" data-track="booking" aria-label="Book your session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'hero'});}">Book your session</a>
+      <a href="booking.html?category=massage" class="btn btn-gold" data-track="booking" aria-label="Book in 60 Seconds" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'hero'});}">Book in 60 Seconds</a>
       <a href="#services" class="btn btn-outline-w" aria-label="See 60 & 90 min options">See 60 & 90 min options</a>
     </div>
-    <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text hero-hide-mob" data-track="whatsapp" data-wa-location="hero" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'hero'}); }">💬 Have a question first? Text us on WhatsApp</a>
+    <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text" data-track="whatsapp" data-wa-location="hero" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'hero'}); }">💬 Have a question first? Text us on WhatsApp</a>
     <ul class="page-hero-trust hero-hide-mob">
       <li>Acute care and preventive body maintenance</li>
       <li>Licensed Florida therapist</li>
@@ -179,9 +178,25 @@
       <p id="availability-sub">Claim your preferred time in under 60 seconds. From $65 per session — free cancellation up to 24 hours, no payment to book.</p>
     </div>
     <div class="availability-actions">
-      <a href="booking.html?category=massage" class="btn btn-dark" data-track="booking" aria-label="Book your session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'availability'});}">Book your session</a>
+      <a href="booking.html?category=massage" class="btn btn-dark" data-track="booking" aria-label="Book in 60 Seconds" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'availability'});}">Book in 60 Seconds</a>
       <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="availability-wa-link" data-track="whatsapp" data-wa-location="availability" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'availability'}); }">Or ask us anything on WhatsApp →</a>
       <a href="tel:+17542026666" class="availability-phone" aria-label="Call or text View Spa for availability">Call or Text (754) 202-6666</a>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN STATEMENT -->
+<section class="pain-bar">
+  <div class="container">
+    <div class="pain-inner">
+      <span class="eyebrow">Pain relief, not just relaxation</span>
+      <h2>If Your Body Feels Off — There's a Reason</h2>
+      <div class="gold-rule center"></div>
+      <p>You've probably tried massage before. It helped — for a day, maybe two. Then everything came back.</p>
+      <p>You wake up already tight. By midday your neck is stiff. By evening your lower back reminds you it exists.</p>
+      <p>Stretching helps for a few hours. Gym doesn't fix it. Rest doesn't fix it.</p>
+      <p>Because the problem isn't just tight muscles — it's overworked muscles, trigger points, and fascia that's stopped moving the way it should. Add posture locked in over months or years, and you understand why generic relaxation doesn't touch it. Deep tissue massage and myofascial release do.</p>
+      <p>Ivan works with people who've been through the usual options and are done guessing. <strong>Most notice the difference after the first visit.</strong></p>
     </div>
   </div>
 </section>
@@ -197,9 +212,9 @@
         <p>Ivan has a sports background, so he understands how training, competition and repetitive movement create the kind of chronic neck, shoulder and back pain that won't go away on its own. His primary tools are <strong>deep tissue massage</strong>, <strong>trigger point therapy</strong>, and <strong>myofascial release</strong> — techniques that address the actual source of tension, not just the surface symptoms.</p>
         <p>If you've been to other therapists and felt like they just worked through a preset routine — this is different. Ivan assesses your specific tension patterns before he begins and adjusts in real time based on what your body is doing that day.</p>
         <p>He is not selling a generic spa experience. He provides focused therapeutic work in Aventura tailored to the exact issues in your body — whether that's a locked-up lower back, a stiff neck from desk work, or recurring shoulder tension from training.</p>
-        <p>No fixed routines. No guesswork. Just clinical, results-driven massage therapy near you.</p>
-        <p>The goal is simple: noticeable, measurable relief that helps you move better and sleep better.</p>
-        <p><strong>Most clients walk out with more range of motion than they walked in with — able to turn their head further, reach their arm higher, or breathe without that familiar tightness.</strong></p>
+        <p>No preset routines. He figures out what your body is doing that day and works from there.</p>
+        <p>The goal isn't a nice hour on the table. It's leaving with less pain and more movement than you came in with.</p>
+        <p><strong>Most clients can turn their head further, reach higher, or breathe without that familiar knot — before they leave the room.</strong></p>
         <div class="amta-row">
           <img src="img/amta-logo.jpg" alt="American Massage Therapy Association (AMTA) Member logo" width="57" height="22" loading="lazy">
           <span>Professional Member of American Massage Therapy Association</span>
@@ -248,22 +263,6 @@
           </ul>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- PAIN STATEMENT -->
-<section class="pain-bar">
-  <div class="container">
-    <div class="pain-inner">
-      <span class="eyebrow">Pain relief, not just relaxation</span>
-      <h2>If Your Body Feels Off — There's a Reason</h2>
-      <div class="gold-rule center"></div>
-      <p>You've probably tried massage before. It helped — for a day, maybe two. Then everything came back.</p>
-      <p>You wake up already tight. By midday your neck is stiff. By evening your lower back reminds you it exists.</p>
-      <p>Stretching helps for a few hours. Gym doesn't fix it. Rest doesn't fix it.</p>
-      <p>Because the problem isn't just tight muscles — it's overworked muscles, trigger points, and fascia that's stopped moving the way it should. Add posture locked in over months or years, and you understand why generic relaxation doesn't touch it. Deep tissue massage and myofascial release do.</p>
-      <p>Ivan works in Aventura specifically with clients who've already tried the basic options and want something that actually holds. <strong>Most notice a real difference after the first session.</strong></p>
     </div>
   </div>
 </section>
@@ -409,32 +408,6 @@
   </div>
 </section>
 
-<!-- WHY 45 MINUTES WORKS -->
-<section class="sec section-white" aria-label="Why the first session works">
-  <div class="container text-center">
-    <span class="eyebrow">Why 45 minutes works</span>
-    <h2 class="sec-title">A focused first visit that finds the pain source fast</h2>
-    <div class="gold-rule center"></div>
-    <div class="expect-grid">
-      <div class="expect-item">
-        <div class="expect-num">01</div>
-        <h3>Listen and assess</h3>
-        <p>The first minutes are about your pain, your movement, and the exact spots that limit you.</p>
-      </div>
-      <div class="expect-item">
-        <div class="expect-num">02</div>
-        <h3>Targeted relief</h3>
-        <p>Therapeutic massage work is directed only where your body needs it, not on a preset relaxation routine.</p>
-      </div>
-      <div class="expect-item">
-        <div class="expect-num">03</div>
-        <h3>Clear next step</h3>
-        <p>You leave with a realistic sense of what helped, what improved, and whether you need follow-up care.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- VIDEO BREAK -->
 <section class="video-vibe-sec" aria-label="Massage therapy video">
   <video class="bg-video" autoplay muted loop playsinline webkit-playsinline poster="img/qqq.webp" preload="none" aria-label="Therapeutic massage session at View Spa Aventura" title="View Spa massage session">
@@ -458,13 +431,13 @@
     </div>
     <div class="swiper massageSwiper">
       <div class="swiper-wrapper">
-        <div class="swiper-slide"><div class="review-header"><div class="review-avatar"></div><div><p class="review-name">Olga K.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Ivan, thank you so much! You truly have a gift. After your massage I felt amazing — my body felt lighter and more mobile."</p></div>
-        <div class="swiper-slide"><div class="review-header"><div class="review-avatar"></div><div><p class="review-name">Michael R.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Couldn't turn my neck without pain before. After one session with Ivan, full range of motion back. This is real therapeutic work."</p></div>
-        <div class="swiper-slide"><div class="review-header"><div class="review-avatar"></div><div><p class="review-name">Natalya S.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Ivan will fix any problem in your body. Cozy place with a beautiful view. Reasonable prices for such skill."</p></div>
-        <div class="swiper-slide"><div class="review-header"><div class="review-avatar"></div><div><p class="review-name">David L.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Lower back pain that kept me up at night gone after 3 sessions. Ivan knows what he's doing. No spa music, just results."</p></div>
-        <div class="swiper-slide"><div class="review-header"><div class="review-avatar"></div><div><p class="review-name">Joshua B.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"One of the best massages I've had in a very long time. Exactly what I needed after travel. Professional and genuinely restorative."</p></div>
-        <div class="swiper-slide"><div class="review-header"><div class="review-avatar"></div><div><p class="review-name">Francy Q.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Excelente atencion, super profesional! El masaje muy bien, de hecho volveria a ir!"</p></div>
-        <div class="swiper-slide"><div class="review-header"><div class="review-avatar"></div><div><p class="review-name">Iana S.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Amazing specialists and a truly relaxing massage experience. Beautiful studio, great location."</p></div>
+        <div class="swiper-slide"><div class="review-header"><div class="rev-avatar rev-avatar-init" style="background:#534AB7" aria-hidden="true">OK</div><div><p class="review-name">Olga K.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Ivan, thank you so much! You truly have a gift. After your massage I felt amazing — my body felt lighter and more mobile."</p></div>
+        <div class="swiper-slide"><div class="review-header"><div class="rev-avatar rev-avatar-init" style="background:#1D9E75" aria-hidden="true">MR</div><div><p class="review-name">Michael R.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Couldn't turn my neck without pain before. After one session with Ivan, full range of motion back. This is real therapeutic work."</p></div>
+        <div class="swiper-slide"><div class="review-header"><div class="rev-avatar rev-avatar-init" style="background:#BA7517" aria-hidden="true">NS</div><div><p class="review-name">Natalya S.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Ivan will fix any problem in your body. Cozy place with a beautiful view. Reasonable prices for such skill."</p></div>
+        <div class="swiper-slide"><div class="review-header"><div class="rev-avatar rev-avatar-init" style="background:#185FA5" aria-hidden="true">DL</div><div><p class="review-name">David L.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Lower back pain that kept me up at night gone after 3 sessions. Ivan knows what he's doing. No spa music, just results."</p></div>
+        <div class="swiper-slide"><div class="review-header"><div class="rev-avatar rev-avatar-init" style="background:#993C1D" aria-hidden="true">JB</div><div><p class="review-name">Joshua B.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"One of the best massages I've had in a very long time. Exactly what I needed after travel. Professional and genuinely restorative."</p></div>
+        <div class="swiper-slide"><div class="review-header"><div class="rev-avatar rev-avatar-init" style="background:#3B6D11" aria-hidden="true">FQ</div><div><p class="review-name">Francy Q.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Excelente atencion, super profesional! El masaje muy bien, de hecho volveria a ir!"</p></div>
+        <div class="swiper-slide"><div class="review-header"><div class="rev-avatar rev-avatar-init" style="background:#4A6080" aria-hidden="true">IS</div><div><p class="review-name">Iana S.</p><div class="stars">★★★★★</div></div></div><p class="review-text">"Amazing specialists and a truly relaxing massage experience. Beautiful studio, great location."</p></div>
       </div>
       <div class="swiper-pagination"></div>
     </div>
@@ -476,7 +449,7 @@
   <div class="mini-cta-text">
     <strong>You've seen what clients experience. Now feel it yourself.</strong> <span>45 min · $65 · Instant confirmation.</span>
   </div>
-  <a href="booking.html?category=massage" class="btn btn-dark" data-track="booking" aria-label="Book a massage session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'cta'});}">Book a session</a>
+  <a href="booking.html?category=massage" class="btn btn-dark" data-track="booking" aria-label="Book a massage session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'cta'});}">Book in 60 Seconds</a>
 </div>
 
 <!-- FAQ -->
@@ -500,7 +473,7 @@
       </li>
       <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <button class="faq-q"><span itemprop="name">Is this a professional therapeutic massage?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">Yes. All sessions at View Spa are strictly professional and therapeutic. Ivan is a Florida Licensed Massage Therapist and a member of the AMTA.</div></div>
+        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">Yes. All sessions at <span class="brand-name">View Spa</span> are strictly professional and therapeutic. Ivan is a Florida Licensed Massage Therapist and a member of the AMTA.</div></div>
       </li>
       <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <button class="faq-q"><span itemprop="name">How often should I come in?</span><span class="faq-icon"></span></button>
@@ -540,7 +513,7 @@
   <div class="container">
     <h2>Ready to fix the cause — not manage the symptoms?</h2>
     <p>One focused session shows you what your body has been carrying — and starts actually moving it.</p>
-    <a href="booking.html?category=massage" class="btn" data-track="booking" aria-label="Book a massage session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'bottom_cta'});}">Book your session</a>
+    <a href="booking.html?category=massage" class="btn" data-track="booking" aria-label="Book a massage session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'bottom_cta'});}">Book in 60 Seconds</a>
     <p class="cta-band-policy">Free cancellation up to 24 hours · Not satisfied? We'll make it right.</p>
   </div>
 </div>
@@ -594,11 +567,11 @@
           <span>Mon–Sat: 9 AM – 8 PM</span>
           <a href="tel:+17542026666">+1 (754) 202-6666</a>
         </div>
-        <button class="btn btn-gold btn-footer" data-book-action="go" data-track="booking" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'footer'});}">Book Your Session</button>
+        <a href="booking.html?category=massage" class="btn btn-gold btn-footer" data-track="booking" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'footer'});}">Book in 60 Seconds</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 View Spa — Aventura, Florida</span>
+      <span>© 2026 <span class="brand-name">View Spa</span> — Aventura, Florida</span>
       <span>Massage Establishment License: MM47261 | Licensed Massage Therapist on site</span>
       <a href="/sitemap.xml" class="footer-sitemap-link">Sitemap</a>
     </div>
@@ -629,3 +602,4 @@
 <script src="main.js"></script>
 </body>
 </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

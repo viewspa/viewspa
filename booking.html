@@ -11,7 +11,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <link rel="stylesheet" href="booking.css">
 <!-- Turnstile (подключается; виджет рисуется только если задан site key в booking.js) -->
@@ -38,6 +38,46 @@
 
 <main id="main-content">
   <div class="bk-wrap">
+
+    <div class="bk-intro">
+      <h1 class="bk-intro-title">Book Your Appointment</h1>
+      <p class="bk-intro-sub">Takes 60 seconds · No payment to book · Instant confirmation</p>
+      <div class="bk-trust-strip">
+        <span>⭐ 5.0 Google</span>
+        <span class="bk-trust-dot">·</span>
+        <span>✓ No prepayment</span>
+        <span class="bk-trust-dot">·</span>
+        <span>✓ Free cancellation 24h</span>
+      </div>
+    </div>
+
+    <div class="bk-specialists">
+      <div class="bk-spec-card">
+        <img src="img/Kseniia.jpg" alt="Ksenia — Head Nail Artist" class="bk-spec-photo" loading="lazy" width="64" height="64">
+        <div class="bk-spec-body">
+          <strong class="bk-spec-name">Ksenia</strong>
+          <span class="bk-spec-role">Russian Manicure · Pedicure</span>
+          <span class="bk-spec-avail">★ Nailympia Champion · 2–3 weeks ahead</span>
+        </div>
+      </div>
+      <div class="bk-spec-card">
+        <img src="img/Ivan.jpg" alt="Ivan — Licensed Massage Therapist" class="bk-spec-photo" loading="lazy" width="64" height="64">
+        <div class="bk-spec-body">
+          <strong class="bk-spec-name">Ivan</strong>
+          <span class="bk-spec-role">Licensed Massage Therapist · AMTA Member</span>
+          <span class="bk-spec-avail">✓ Available this week</span>
+        </div>
+      </div>
+      <div class="bk-spec-card">
+        <img src="img/Anastasia.jpg" alt="Anastasia — Nail Specialist" class="bk-spec-photo" loading="lazy" width="64" height="64">
+        <div class="bk-spec-body">
+          <strong class="bk-spec-name">Anastasia</strong>
+          <span class="bk-spec-role">Russian Manicure · Pedicure</span>
+          <span class="bk-spec-avail">✓ Faster availability than Ksenia</span>
+        </div>
+      </div>
+    </div>
+
     <div id="booking-app">
       <div class="bk-card"><div class="bk-loading">Loading…</div></div>
     </div>

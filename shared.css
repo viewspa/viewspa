@@ -28,7 +28,10 @@ img { display: block; max-width: 100%; object-fit: cover; }
 .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 .sec { padding: 80px 0; }
 .tc { text-align: center; }
-.eyebrow { display: block; font-family: 'Lato', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: var(--gold-accessible); margin-bottom: 10px; }
+.eyebrow { display: block; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 900; letter-spacing: 3.5px; text-transform: uppercase; color: var(--gold-accessible); margin-bottom: 10px; }
+
+/* BRAND NAME — Montserrat Black, matches logo */
+.brand-name { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
 .sec-title { font-size: clamp(30px, 5vw, 52px); color: var(--dark); margin-bottom: 14px; }
 .sec-title em { font-style: italic; color: var(--gold); }
 .rule { width: 40px; height: 1px; background: var(--gold); margin: 18px 0; }
@@ -496,6 +499,8 @@ body.no-scroll { overflow: hidden; }
   height: 22px;
   background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%234285F4' d='M24 9.5c3.54 0 6.74 1.22 9.26 3.6l6.9-6.9C35.96 2.32 30.36 0 24 0 14.62 0 6.51 5.38 2.56 13.22l8.02 6.22C12.5 13.63 17.79 9.5 24 9.5Z'/%3E%3Cpath fill='%2334A853' d='M46.5 24.55c0-1.64-.15-3.22-.42-4.74H24v8.98h12.69c-.55 2.96-2.22 5.46-4.73 7.15l7.64 5.92c4.46-4.11 6.9-10.17 6.9-17.31Z'/%3E%3Cpath fill='%23FBBC05' d='M10.58 28.56A14.5 14.5 0 0 1 9.5 24c0-1.58.28-3.11.78-4.56l-8.02-6.22A23.93 23.93 0 0 0 0 24c0 3.84.92 7.47 2.56 10.78l8.02-6.22Z'/%3E%3Cpath fill='%23EA4335' d='M24 48c6.48 0 11.91-2.13 15.88-5.79l-7.64-5.92c-2.12 1.42-4.84 2.26-8.24 2.26-6.21 0-11.5-4.13-13.42-9.94l-8.02 6.22C6.51 42.62 14.62 48 24 48Z'/%3E%3C/svg%3E");
 }
+.rev-avatar-init { color: #fff !important; font-size: 14px !important; font-weight: 700; letter-spacing: .5px; border: none !important; box-shadow: none !important; background-image: none !important; }
+.rev-avatar-init::before { display: none !important; }
 .rev-name, .review-name { font-weight: 700; font-size: 13px; color: var(--dark); }
 .stars { color: #fbbc05; font-size: 12px; margin-bottom: 1px; }
 .rev-text, .review-text { font-size: 13px; color: var(--mid); line-height: 1.75; flex: 1; }
@@ -504,7 +509,7 @@ body.no-scroll { overflow: hidden; }
 .offers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 48px; }
 .offer-card { background: var(--white); border: 1px solid var(--gold); padding: 36px 28px; text-align: center; position: relative; transition: transform .3s, box-shadow .3s; }
 .offer-card:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,.07); }
-.offer-tag { position: absolute; top: 0; left: 50%; transform: translate(-50%,-50%); background: var(--gold); color: var(--white); padding: 5px 16px; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.offer-tag { position: absolute; top: 0; left: 50%; transform: translate(-50%,-50%); background: var(--gold); color: var(--white); padding: 5px 16px; font-size: 9px; font-family: 'Montserrat', sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
 .offer-card h3 { font-size: 24px; margin: 16px 0 10px; }
 .offer-card p { font-size: 14px; color: var(--mid); line-height: 1.65; margin-bottom: 22px; }
 .offer-card-featured { background: var(--dark); border-color: var(--dark); border-width: 2px; }
@@ -540,7 +545,7 @@ body.no-scroll { overflow: hidden; }
 
 /* New team styles */
 .team-badge-trophy { position: absolute; top: 12px; left: 12px; font-size: 24px; background: rgba(255,215,0,.9); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
-.team-badge-fast { position: absolute; top: 12px; left: 12px; background: #25D366; color: white; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 8px rgba(37,211,102,.3); }
+.team-badge-fast { position: absolute; top: 12px; left: 12px; background: #25D366; color: white; font-size: 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 8px rgba(37,211,102,.3); }
 .team-features { margin: 16px 0; }
 .team-feature { font-size: 12px; color: var(--mid); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
 .team-best-for { font-size: 13px; color: var(--dark); font-weight: 600; margin: 12px 0; }
@@ -568,7 +573,7 @@ body.no-scroll { overflow: hidden; }
 .master-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.07); }
 .master-card-avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--gold); }
 .master-card-body h3 { font-size: 24px; margin-bottom: 4px; }
-.master-card-body .tag { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-accessible); }
+.master-card-body .tag { font-size: 9px; font-family: 'Montserrat', sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-accessible); }
 .master-card-body p { font-size: 13px; color: var(--mid); line-height: 1.65; margin-top: 8px; }
 .master-card-body .avail { font-size: 11px; font-weight: 700; color: var(--gold); margin-top: 6px; display: block; }
 @media(max-width: 700px) { .masters-grid { grid-template-columns: 1fr; } .master-card-avatar { width: 160px; height: 160px; } }
@@ -579,7 +584,7 @@ body.no-scroll { overflow: hidden; }
 .master-avatar { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); flex-shrink: 0; }
 .master-text { flex: 1; min-width: 260px; }
 .master-text h2 { font-size: clamp(28px,4vw,42px); margin-bottom: 6px; }
-.master-text .tag { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold-accessible); }
+.master-text .tag { font-size: 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold-accessible); }
 .master-text p { font-size: 15px; color: var(--mid); line-height: 1.75; margin-top: 10px; }
 @media(max-width: 768px) { .master-avatar { width: 200px; height: 200px; } }
 .master-text ul { list-style: none; margin: 16px 0; padding: 0; }
@@ -671,7 +676,7 @@ body.no-scroll { overflow: hidden; }
 .award-bar { background: linear-gradient(135deg,#2C2C2C 0%,#1a1208 100%); padding: 32px 0; text-align: center; }
 .award-bar-inner { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; padding: 0 24px; }
 .award-text { text-align: left; }
-.award-text span { display: block; font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 4px; }
+.award-text span { display: block; font-size: 9px; font-family: 'Montserrat', sans-serif; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 4px; }
 .award-text p { font-size: 18px; font-family: 'Cormorant Garamond',serif; color: var(--white); }
 .award-trophy { font-size: 40px; }
 

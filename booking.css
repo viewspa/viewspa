@@ -2,6 +2,28 @@
 
 .bk-wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
 
+/* ── BOOKING INTRO ── */
+.bk-intro { text-align: center; margin-bottom: 28px; }
+.bk-intro-title { font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 900; color: var(--dark); margin: 0 0 8px; letter-spacing: 2px; text-transform: uppercase; }
+.bk-intro-sub { font-size: 14px; color: #777; margin: 0 0 14px; }
+.bk-trust-strip { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--gold-accessible); }
+.bk-trust-dot { color: #ccc; font-weight: 400; }
+
+/* ── SPECIALIST CARDS ── */
+.bk-specialists { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+.bk-spec-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--beige); border: 1px solid var(--border); border-radius: 8px; }
+.bk-spec-photo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.bk-spec-body { display: flex; flex-direction: column; gap: 2px; }
+.bk-spec-name { font-size: 15px; font-weight: 700; color: var(--dark); }
+.bk-spec-role { font-size: 11px; color: #888; }
+.bk-spec-avail { font-size: 11px; font-weight: 700; color: var(--gold-accessible); }
+
+@media (max-width: 600px) {
+  .bk-intro-title { font-size: 28px; }
+  .bk-specialists { grid-template-columns: 1fr; }
+  .bk-spec-card { padding: 12px; }
+}
+
 /* progress */
 .bk-progress { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 26px; flex-wrap: wrap; }
 .bk-pstep { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; }

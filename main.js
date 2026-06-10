@@ -418,7 +418,7 @@
   function initScrollReveal() {
     if (!window.IntersectionObserver) return;
     const targets = document.querySelectorAll(
-      '.team-card, .offer-card, .svc-split-card, .pain-gain, .sec-title, .nw-item, .swiper-slide'
+      '.team-card, .offer-card, .svc-split-card, .pain-gain, .sec-title, .nw-item, .swiper-slide, .pain-bar, .master-bar, .bk-spec-card, .trust-item, .faq-item, .sterile-item, .master-card, .how-card, .svc-item, .pg-panel, .mini-cta-bar, .award-card'
     );
     targets.forEach(el => {
       el.style.opacity = '0';
