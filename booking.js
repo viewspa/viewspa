@@ -81,18 +81,66 @@
     };
   }
 
+  // Состояние Turnstile для текущей формы (виджет одноразовый — токен живёт до одной отправки).
+  const ts = { widgetId: null, token: null, failed: false };
+
+  // Не блокирующее предупреждение в #bk-form-err: капча сбоит, но форму не запираем.
+  function formNotice(msg, show = true) {
+    const e = document.getElementById('bk-form-err');
+    if (!e) return;
+    if (msg != null) e.textContent = msg;
+    e.hidden = !show;
+  }
+
+  // Текущий токен капчи: из callback, либо напрямую из виджета / скрытого поля.
+  function turnstileToken(form) {
+    if (ts.token) return ts.token;
+    try {
+      if (window.turnstile && ts.widgetId != null) {
+        const t = window.turnstile.getResponse(ts.widgetId);
+        if (t) return t;
+      }
+    } catch (_) {}
+    return form?.querySelector('[name="cf-turnstile-response"]')?.value || '';
+  }
+
+  // Сброс виджета после неудачной отправки — иначе одноразовый токен «протух».
+  function resetTurnstile() {
+    ts.token = null;
+    try { if (window.turnstile && ts.widgetId != null) window.turnstile.reset(ts.widgetId); }
+    catch (_) {}
+  }
+
   // Рендер Turnstile с ожиданием загрузки скрипта (виджет на динамической форме).
+  // appearance:'interaction-only' — чекбокс не показываем, пока он реально не нужен.
   function renderTurnstile() {
     if (!CONFIG.turnstileSiteKey) return;
     const el = root.querySelector('.cf-turnstile');
     if (!el || el.dataset.rendered === '1') return;
+    ts.widgetId = null; ts.token = null; ts.failed = false;
     let tries = 0;
+    const fail = (msg) => {
+      ts.failed = true;
+      formNotice(msg || 'Security check is slow to load. You can still tap Confirm — if it doesn’t go through, call or WhatsApp us and we’ll book you in.');
+    };
     const tryRender = () => {
       if (window.turnstile && window.turnstile.render) {
-        try { window.turnstile.render(el, { sitekey: CONFIG.turnstileSiteKey }); el.dataset.rendered = '1'; }
-        catch (_) {}
+        try {
+          ts.widgetId = window.turnstile.render(el, {
+            sitekey: CONFIG.turnstileSiteKey,
+            appearance: 'interaction-only',
+            callback: (token) => { ts.token = token; ts.failed = false; formNotice(null, false); },
+            'error-callback': () => { fail('Couldn’t verify you’re human. Tap Confirm to retry, or call/WhatsApp us to book.'); return true; },
+            'expired-callback': () => { resetTurnstile(); },
+            'timeout-callback': () => { fail(); },
+          });
+          el.dataset.rendered = '1';
+        } catch (_) { fail(); }
       } else if (tries++ < 60) {
         setTimeout(tryRender, 100);
+      } else {
+        // Скрипт Cloudflare так и не загрузился (блокировщик/сеть) — не запираем форму.
+        fail('Security check couldn’t load (it may be blocked by your browser). Tap Confirm to try anyway, or call/WhatsApp us to book.');
       }
     };
     tryRender();
@@ -255,8 +303,8 @@
       `${summary}
        <form id="bk-form" class="bk-form">
          <label>Full name<input name="name" required autocomplete="name"></label>
-         <label>Email<input name="email" type="email" required autocomplete="email"></label>
-         <label>Phone (optional)<input name="phone" type="tel" autocomplete="tel"></label>
+         <label>Phone<input name="phone" type="tel" required autocomplete="tel"></label>
+         <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
          <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
          ${turnstile}
@@ -276,7 +324,6 @@
     btn.disabled = true; btn.textContent = 'Booking…';
     try {
       const fd = new FormData(form);
-      const tsToken = form.querySelector('[name="cf-turnstile-response"]')?.value;
       const res = await api('/api/book', {
         serviceId: state.serviceId,
         masterId: state.slot.masterId,
@@ -284,11 +331,17 @@
         serviceVariationVersion: state.slot.serviceVariationVersion,
         customer: { name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), note: fd.get('note') },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
-        turnstileToken: tsToken,
+        turnstileToken: turnstileToken(form),
       });
       renderDone(res);
     } catch (e2) {
-      err.textContent = e2.message; err.hidden = false;
+      // Капча одноразовая — после ошибки берём свежий токен, иначе повтор «протухнет».
+      resetTurnstile();
+      const spam = /turnstile|spam check/i.test(e2.message || '');
+      err.textContent = spam
+        ? 'Couldn’t verify you’re human. Please tap Confirm to try again — or call/WhatsApp us and we’ll book you in.'
+        : e2.message;
+      err.hidden = false;
       btn.disabled = false; btn.textContent = 'Confirm booking';
     }
   }
@@ -316,7 +369,7 @@
     const payLine = res.paidWith === 'package'
       ? `${m ? m.name : ''} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
       : `${m ? m.name : ''} · ${fmtMoney(state.slot.price)} (pay in person)`;
-    shell('You’re booked! 🎉', 'A confirmation email is on its way.',
+    shell('You’re booked! 🎉', 'We’ll confirm your appointment shortly.',
       `<div class="bk-summary bk-summary-done">
          <div><b>${svc.name}</b></div>
          <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)}</div>
