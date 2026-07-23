@@ -102,6 +102,26 @@
       fallback.classList.add('visible');
     }
   }, 5000);
+
+  // GA4: generate_lead — клиент связался напрямую через fallback (виджет не загрузился)
+  (function() {
+    var fb = document.getElementById('bookingFallback');
+    if (!fb) return;
+    fb.addEventListener('click', function(e) {
+      var link = e.target.closest('a[href]');
+      if (!link || typeof window.gtag !== 'function') return;
+      var href = link.getAttribute('href') || '';
+      var source = href.indexOf('wa.me') !== -1 ? 'booking_fallback_whatsapp'
+                 : href.indexOf('tel:') === 0 ? 'booking_fallback_call' : null;
+      if (!source) return;
+      try {
+        window.gtag('event', 'generate_lead', {
+          lead_source: source,
+          timestamp: new Date().toISOString()
+        });
+      } catch (_) {}
+    });
+  })();
 </script>
 </body>
 </html>

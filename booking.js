@@ -358,8 +358,9 @@
       items: [gaItem()],
     });
     track('booking_completed', {
+      transaction_id: res.bookingId,
       currency: 'USD',
-      value: state.slot.price,
+      value: Number(state.slot.price) || 0,
       booking_id: res.bookingId,
       service_id: svc.id,
       service_name: svc.name,
