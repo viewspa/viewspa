@@ -18,28 +18,38 @@
 <meta name="twitter:description" content="Book a focused 45-minute therapeutic session for back, neck or shoulder pain in Aventura, FL. Licensed therapist Ivan with athletic background.">
 <meta name="twitter:image" content="https://viewspa.miami/img/Ivan.jpg">
 <link rel="canonical" href="https://viewspa.miami/massage">
+<link rel="alternate" hreflang="en" href="https://viewspa.miami/massage">
+<link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage">
+<link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage">
+<link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="img/mass.jpg" as="image" fetchpriority="high">
+<link rel="preload" href="img/mass.webp" as="image" type="image/webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet"></noscript>
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
 <link rel="stylesheet" href="shared.css">
+<style>
+  .related-block{margin-top:32px;text-align:center}
+  .related-label{margin-bottom:16px;font-weight:700}
+  .related-links{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+  .related-links .btn{margin:0}
+</style>
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": ["HealthAndBeautyBusiness", "LocalBusiness"],
-      "@id": "https://viewspa.miami",
+      "@type": "DaySpa",
+      "@id": "https://viewspa.miami/#business",
       "name": "View Spa",
       "description": "Professional therapeutic massage in Aventura, FL. Deep tissue, sports recovery, and lymphatic drainage by licensed massage therapist Ivan.",
-      "url": "https://viewspa.miami",
+      "url": "https://viewspa.miami/",
       "image": "https://viewspa.miami/img/Ivan.jpg",
-      "telephone": "+17542026666",
+      "telephone": ["+17542026666", "+17542026638"],
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "20200 W Dixie Hwy, STE 1105B",
@@ -47,6 +57,11 @@
         "addressRegion": "FL",
         "postalCode": "33180",
         "addressCountry": "US"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 25.962947,
+        "longitude": -80.148283
       },
       "openingHoursSpecification": [
         {
@@ -57,19 +72,13 @@
         }
       ],
       "areaServed": "Aventura, FL",
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "5.0",
-        "reviewCount": "18",
-        "bestRating": "5",
-        "worstRating": "1"
-      }
+      "priceRange": "$$"
     },
     {
       "@type": "Service",
+      "@id": "https://viewspa.miami/massage#service",
       "name": "Therapeutic Massage Aventura FL",
-      "provider": {"@id": "https://viewspa.miami"},
+      "provider": {"@id": "https://viewspa.miami/#business"},
       "serviceType": "Therapeutic Massage",
       "description": "Licensed therapeutic massage in Aventura, FL for back, neck and shoulder pain relief. Deep tissue, sports recovery, trigger point and myofascial release by AMTA-member Ivan.",
       "areaServed": "Aventura, FL",
@@ -94,6 +103,20 @@
           "price": "110",
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "Recovery Plan — 4 sessions × 60 min",
+          "price": "300",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "Consistency Plan — 8 sessions × 60 min",
+          "price": "590",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
         }
       ]
     },
@@ -104,7 +127,88 @@
       "thumbnailUrl": "https://viewspa.miami/img/qqq.jpg",
       "uploadDate": "2025-01-01",
       "contentUrl": "https://viewspa.miami/video/videom.mp4",
-      "publisher": {"@id": "https://viewspa.miami"}
+      "publisher": {"@id": "https://viewspa.miami/#business"}
+    },
+    {
+      "@type": "Person",
+      "@id": "https://viewspa.miami/#ivan",
+      "name": "Ivan",
+      "jobTitle": "Licensed Massage Therapist",
+      "image": "https://viewspa.miami/img/Ivan.jpg",
+      "worksFor": {"@id": "https://viewspa.miami/#business"},
+      "memberOf": {
+        "@type": "Organization",
+        "name": "American Massage Therapy Association"
+      },
+      "hasCredential": {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "license",
+        "name": "Florida Licensed Massage Therapist (LMT)",
+        "identifier": "MA107225"
+      },
+      "sameAs": ["https://instagram.com/science.of.touch"]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://viewspa.miami/massage#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does deep tissue massage hurt?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Deep tissue massage should feel like productive pressure — never sharp pain. Ivan works with your body's response in real time and adjusts depth throughout the session. You are always in control: just speak up and the pressure changes immediately."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the difference between therapeutic and relaxation massage?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Relaxation massage focuses on comfort during the session. Therapeutic massage focuses on a measurable outcome — reduced pain, restored range of motion, corrected postural imbalance. Ivan's sessions can combine both."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does a session cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Session lengths are 45, 60 and 90 minutes. The value is in focused therapeutic work that targets pain and improves mobility, not just time on the table. Prices are listed in the service section above, and each session is built around the result you want."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this a professional therapeutic massage?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. All sessions at View Spa are strictly professional and therapeutic. Ivan is a Florida Licensed Massage Therapist and a member of the AMTA."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How often should I come in?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For chronic tension, once every 2–4 weeks delivers meaningful, compounding results. For general maintenance, once a month is usually sufficient. Ivan will give you an honest recommendation after your first session."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it comfortable to book with a male massage therapist?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "That hesitation is completely normal, and it is taken seriously. The honest answer: the majority of Ivan's regular clients are women — not in spite of his being male, but because they came once, felt safe, and kept coming back. Every session is fully draped and strictly professional. The focus is on results, not a spa performance. If you want to feel more comfortable before booking, send a quick message on WhatsApp — no commitment, just a conversation."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://viewspa.miami/massage#breadcrumb",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://viewspa.miami/"},
+        {"@type": "ListItem", "position": 2, "name": "Massage", "item": "https://viewspa.miami/massage"}
+      ]
     }
   ]
 }
@@ -132,8 +236,10 @@
   <svg viewBox="0 0 24 24" fill="white" width="22" height="22" aria-hidden="true"><path fill-rule="evenodd" d="M11.997 2C6.477 2 2 6.477 2 11.997c0 1.77.462 3.43 1.264 4.875L2 22l5.283-1.384A9.954 9.954 0 0011.997 22c5.52 0 9.997-4.477 9.997-9.997S17.517 2 11.997 2zM17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path></svg>
 </a>
         </div>
+        <span class="lang-switch"><span class="lang-cur">EN</span><span class="lang-sep">|</span><a href="ru/massage.html" hreflang="ru" lang="ru" aria-label="Перейти на русскую версию страницы">RU</a><span class="lang-sep">|</span><a href="es/massage.html" hreflang="es" lang="es" aria-label="Cambiar a la versión en español">ES</a></span>
       </div>
     </nav>
+    <span class="lang-switch"><span class="lang-cur">EN</span><span class="lang-sep">|</span><a href="ru/massage.html" hreflang="ru" lang="ru" aria-label="Перейти на русскую версию страницы">RU</a><span class="lang-sep">|</span><a href="es/massage.html" hreflang="es" lang="es" aria-label="Cambiar a la versión en español">ES</a></span>
     <div class="hdr-cta">
       <a href="booking.html?category=massage" class="btn btn-gold btn-compact" data-track="booking" aria-label="Book in 60 Seconds">Book in 60 Seconds</a>
       <span class="promo-badge">Book in 60 seconds</span>
@@ -153,14 +259,14 @@
         <span class="hero-price-item"><strong>$85</strong><span>60 min</span></span>
         <span class="hero-price-item"><strong>$110</strong><span>90 min</span></span>
       </div>
-      <span class="hero-price-sub">Free cancellation up to 24 hours</span>
+      <span class="hero-price-sub">Licensed FL therapist · LMT MA107225 · 5.0 ★ Google</span>
     </div>
-    <p class="hero-hide-mob">If you've tried massage before and felt fine for a day, then back to square one — that's not how it has to work. Ivan doesn't run through a routine. He figures out what your body is actually doing and works on that.</p>
+    <p class="hero-hide-mob">If you've tried massage before and felt fine for a day, then back to square one — that's not how it has to work. Ivan doesn't run a routine. He finds what's actually holding the tension and works there.</p>
     <div class="page-hero-actions">
       <a href="booking.html?category=massage" class="btn btn-gold" data-track="booking" aria-label="Book in 60 Seconds" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'hero'});}">Book in 60 Seconds</a>
       <a href="#services" class="btn btn-outline-w" aria-label="See 60 & 90 min options">See 60 & 90 min options</a>
     </div>
-    <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text" data-track="whatsapp" data-wa-location="hero" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'hero'}); }">💬 Have a question first? Text us on WhatsApp</a>
+    <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text hero-hide-mob" data-track="whatsapp" data-wa-location="hero" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'hero'}); }">💬 Have a question first? Text us on WhatsApp</a>
     <ul class="page-hero-trust hero-hide-mob">
       <li>Acute care and preventive body maintenance</li>
       <li>Licensed Florida therapist</li>
@@ -193,8 +299,8 @@
       <h2>If Your Body Feels Off — There's a Reason</h2>
       <div class="gold-rule center"></div>
       <p>You've probably tried massage before. It helped — for a day, maybe two. Then everything came back.</p>
-      <p>You wake up already tight. By midday your neck is stiff. By evening your lower back reminds you it exists.</p>
-      <p>Stretching helps for a few hours. Gym doesn't fix it. Rest doesn't fix it.</p>
+      <p>You wake up already tight, but you move around and it loosens — so you tell yourself it's fine. By midday your neck has locked again. By evening your lower back reminds you it exists, and you're back where you started this morning.</p>
+      <p>Stretching buys a few hours. The gym doesn't touch it. Rest doesn't either. So you adapt — you stop lifting your kid the usual way, you skip the tennis game, you take the aisle seat so you can stand up mid-flight. That's the real cost: not the pain, but the list of things you quietly stopped doing.</p>
       <p>Because the problem isn't just tight muscles — it's overworked muscles, trigger points, and fascia that's stopped moving the way it should. Add posture locked in over months or years, and you understand why generic relaxation doesn't touch it. Deep tissue massage and myofascial release do.</p>
       <p>Ivan works with people who've been through the usual options and are done guessing. <strong>Most notice the difference after the first visit.</strong></p>
     </div>
@@ -209,12 +315,11 @@
       <div class="master-text">
         <span class="tag">Licensed therapeutic massage specialist</span>
         <h2>Meet Your Therapist</h2>
-        <p>Ivan has a sports background, so he understands how training, competition and repetitive movement create the kind of chronic neck, shoulder and back pain that won't go away on its own. His primary tools are <strong>deep tissue massage</strong>, <strong>trigger point therapy</strong>, and <strong>myofascial release</strong> — techniques that address the actual source of tension, not just the surface symptoms.</p>
+        <p>Most people who end up on Ivan's table have already tried three things. A chiropractor. A gym program. The massage place with the nice music. Each one helped for about a day. Ivan has a sports background — he's had the same pain, and he knows why the usual fixes keep sliding off it. His primary tools are <strong>deep tissue massage</strong>, trigger point therapy, and myofascial release: techniques that reach the actual source of tension instead of smoothing over the symptom.</p>
         <p>If you've been to other therapists and felt like they just worked through a preset routine — this is different. Ivan assesses your specific tension patterns before he begins and adjusts in real time based on what your body is doing that day.</p>
         <p>He is not selling a generic spa experience. He provides focused therapeutic work in Aventura tailored to the exact issues in your body — whether that's a locked-up lower back, a stiff neck from desk work, or recurring shoulder tension from training.</p>
-        <p>No preset routines. He figures out what your body is doing that day and works from there.</p>
         <p>The goal isn't a nice hour on the table. It's leaving with less pain and more movement than you came in with.</p>
-        <p><strong>Most clients can turn their head further, reach higher, or breathe without that familiar knot — before they leave the room.</strong></p>
+        <p>Michael came in unable to turn his head without pain. He left the first session with full range of motion — his words: <em>"This is real therapeutic work."</em> <strong>That's the normal outcome here, not the exceptional one.</strong></p>
         <div class="amta-row">
           <img src="img/amta-logo.jpg" alt="American Massage Therapy Association (AMTA) Member logo" width="57" height="22" loading="lazy">
           <span>Professional Member of American Massage Therapy Association</span>
@@ -452,36 +557,61 @@
   <a href="booking.html?category=massage" class="btn btn-dark" data-track="booking" aria-label="Book a massage session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'cta'});}">Book in 60 Seconds</a>
 </div>
 
+<!-- TECHNIQUES -->
+<section class="sec section-beige" id="techniques" aria-label="Massage techniques">
+  <div class="container container-narrow">
+    <span class="eyebrow">Techniques</span>
+    <h2 class="sec-title">Massage techniques at <em>View Spa</em></h2>
+    <div class="gold-rule"></div>
+    <p class="section-copy">View Spa provides deep tissue massage in Aventura, Florida. Deep tissue massage uses slow strokes and firm pressure to reach deeper layers of muscle and connective tissue. It addresses chronic tension in the back, neck and shoulders.</p>
+    <p class="section-copy">View Spa provides trigger point therapy in Aventura, Florida. Trigger point therapy targets contracted knots in muscle that cause local and referred pain. Releasing a trigger point reduces pain and restores normal muscle function.</p>
+    <p class="section-copy">View Spa provides myofascial release in Aventura, Florida. Myofascial release applies sustained pressure to the connective tissue that surrounds muscles. It restores mobility when fascia becomes stiff and restricts movement.</p>
+    <p class="section-copy">View Spa provides sports massage in Aventura, Florida. Sports massage supports recovery from training and repetitive movement. It combines deeper work and stretching to reduce soreness and maintain range of motion.</p>
+    <p class="section-copy">View Spa provides lymphatic drainage massage in Aventura, Florida. Lymphatic drainage massage uses light rhythmic strokes to move lymph fluid. It reduces swelling and fluid retention.</p>
+    <p class="section-copy">View Spa provides Swedish massage in Aventura, Florida. Swedish massage uses long flowing strokes with light to medium pressure. It lowers overall muscle tension and supports relaxation.</p>
+    <p class="section-copy">You do not need to choose a technique before booking. Ivan selects and combines techniques during the session based on what your body needs that day.</p>
+    <div class="related-block">
+      <p class="section-copy related-label">Book by concern — see how each session works:</p>
+      <div class="related-links">
+        <a href="massage-lower-back-pain.html" class="btn btn-outline">Lower back pain</a>
+        <a href="massage-neck-shoulder.html" class="btn btn-outline">Neck &amp; shoulder from desk work</a>
+        <a href="massage-sports-recovery.html" class="btn btn-outline">Sports recovery</a>
+        <a href="massage-lymphatic-drainage.html" class="btn btn-outline">Lymphatic drainage</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FAQ -->
 <section class="sec section-white">
   <div class="container container-narrow">
     <span class="eyebrow">Massage FAQ</span>
     <h2 class="sec-title">Everything you want to <em>know</em></h2>
     <div class="gold-rule"></div>
-    <ul class="faq-list" itemscope itemtype="https://schema.org/FAQPage">
-      <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <button class="faq-q"><span itemprop="name">Does deep tissue massage hurt?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">Deep tissue massage should feel like productive pressure — never sharp pain. Ivan works with your body's response in real time and adjusts depth throughout the session. You are always in control: just speak up and the pressure changes immediately.</div></div>
+    <ul class="faq-list">
+      <li class="faq-item">
+        <button class="faq-q"><span>Does deep tissue massage hurt?</span><span class="faq-icon"></span></button>
+        <div class="faq-body"><div class="faq-body-inner">Deep tissue massage should feel like productive pressure — never sharp pain. Ivan works with your body's response in real time and adjusts depth throughout the session. You are always in control: just speak up and the pressure changes immediately.</div></div>
       </li>
-      <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <button class="faq-q"><span itemprop="name">What's the difference between therapeutic and relaxation massage?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">Relaxation massage focuses on comfort during the session. Therapeutic massage focuses on a measurable outcome — reduced pain, restored range of motion, corrected postural imbalance. Ivan's sessions can combine both.</div></div>
+      <li class="faq-item">
+        <button class="faq-q"><span>What's the difference between therapeutic and relaxation massage?</span><span class="faq-icon"></span></button>
+        <div class="faq-body"><div class="faq-body-inner">Relaxation massage focuses on comfort during the session. Therapeutic massage focuses on a measurable outcome — reduced pain, restored range of motion, corrected postural imbalance. Ivan's sessions can combine both.</div></div>
       </li>
-      <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <button class="faq-q"><span itemprop="name">How much does a session cost?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">Session lengths are 45, 60 and 90 minutes. The value is in focused therapeutic work that targets pain and improves mobility, not just time on the table. Prices are listed in the service section above, and each session is built around the result you want.</div></div>
+      <li class="faq-item">
+        <button class="faq-q"><span>How much does a session cost?</span><span class="faq-icon"></span></button>
+        <div class="faq-body"><div class="faq-body-inner">Session lengths are 45, 60 and 90 minutes. The value is in focused therapeutic work that targets pain and improves mobility, not just time on the table. Prices are listed in the service section above, and each session is built around the result you want.</div></div>
       </li>
-      <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <button class="faq-q"><span itemprop="name">Is this a professional therapeutic massage?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">Yes. All sessions at <span class="brand-name">View Spa</span> are strictly professional and therapeutic. Ivan is a Florida Licensed Massage Therapist and a member of the AMTA.</div></div>
+      <li class="faq-item">
+        <button class="faq-q"><span>Is this a professional therapeutic massage?</span><span class="faq-icon"></span></button>
+        <div class="faq-body"><div class="faq-body-inner">Yes. All sessions at <span class="brand-name">View Spa</span> are strictly professional and therapeutic. Ivan is a Florida Licensed Massage Therapist and a member of the AMTA.</div></div>
       </li>
-      <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <button class="faq-q"><span itemprop="name">How often should I come in?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">For chronic tension, once every 2–4 weeks delivers meaningful, compounding results. For general maintenance, once a month is usually sufficient. Ivan will give you an honest recommendation after your first session.</div></div>
+      <li class="faq-item">
+        <button class="faq-q"><span>How often should I come in?</span><span class="faq-icon"></span></button>
+        <div class="faq-body"><div class="faq-body-inner">For chronic tension, once every 2–4 weeks delivers meaningful, compounding results. For general maintenance, once a month is usually sufficient. Ivan will give you an honest recommendation after your first session.</div></div>
       </li>
-      <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <button class="faq-q"><span itemprop="name">Is it comfortable to book with a male massage therapist?</span><span class="faq-icon"></span></button>
-        <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-body-inner" itemprop="text">That hesitation is completely normal, and it is taken seriously. The honest answer: the majority of Ivan's regular clients are women — not in spite of his being male, but because they came once, felt safe, and kept coming back. Every session is fully draped and strictly professional. The focus is on results, not a spa performance. If you want to feel more comfortable before booking, send a quick message on WhatsApp — no commitment, just a conversation.</div></div>
+      <li class="faq-item">
+        <button class="faq-q"><span>Is it comfortable to book with a male massage therapist?</span><span class="faq-icon"></span></button>
+        <div class="faq-body"><div class="faq-body-inner">That hesitation is completely normal, and it is taken seriously. The honest answer: the majority of Ivan's regular clients are women — not in spite of his being male, but because they came once, felt safe, and kept coming back. Every session is fully draped and strictly professional. The focus is on results, not a spa performance. If you want to feel more comfortable before booking, send a quick message on WhatsApp — no commitment, just a conversation.</div></div>
       </li>
     </ul>
   </div>
@@ -511,8 +641,8 @@
 <!-- CTA BAND -->
 <div class="cta-band">
   <div class="container">
-    <h2>Ready to fix the cause — not manage the symptoms?</h2>
-    <p>One focused session shows you what your body has been carrying — and starts actually moving it.</p>
+    <h2>What did you stop doing because of it?</h2>
+    <p>Most people can name it in two seconds. That's what one focused session is for.</p>
     <a href="booking.html?category=massage" class="btn" data-track="booking" aria-label="Book a massage session" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'bottom_cta'});}">Book in 60 Seconds</a>
     <p class="cta-band-policy">Free cancellation up to 24 hours · Not satisfied? We'll make it right.</p>
   </div>
@@ -573,7 +703,7 @@
     <div class="footer-bottom">
       <span>© 2026 <span class="brand-name">View Spa</span> — Aventura, Florida</span>
       <span>Massage Establishment License: MM47261 | Licensed Massage Therapist on site</span>
-      <a href="/sitemap.xml" class="footer-sitemap-link">Sitemap</a>
+      <a href="sitemap.xml" class="footer-sitemap-link">Sitemap</a>
     </div>
   </div>
 </footer>
@@ -602,4 +732,3 @@
 <script src="main.js"></script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

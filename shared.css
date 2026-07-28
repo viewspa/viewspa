@@ -114,9 +114,12 @@ nav { display: flex; gap: 28px; align-items: center; }
   .nav-link { padding: 14px 24px; border-bottom: 1px solid var(--border); width: 100%; font-size: 14px; }
   .nav-submenu { padding-left: 24px; background: var(--beige); }
   .nav-submenu .nav-link { font-size: 12px; color: var(--mid); border-bottom: none; padding: 10px 24px; }
-  .hamburger { display: flex; }
+  .logo { margin-right: auto; }
+  .hamburger { display: flex; order: 3; }
+  .hdr-cta { order: 1; }
   .btn-gold { padding: 9px 16px !important; font-size: 10px !important; }
-  .promo-badge { font-size: 8px; }
+  .hdr-cta .btn-gold { padding: 8px 11px !important; font-size: 9px !important; letter-spacing: .5px !important; }
+  .promo-badge { display: none; }
   .nav-footer {
     display: flex; flex-direction: column; align-items: center; gap: 12px;
     padding: 20px 24px max(24px, env(safe-area-inset-bottom));
@@ -127,6 +130,22 @@ nav { display: flex; gap: 28px; align-items: center; }
   .nav-footer-contact a { color: var(--mid); }
 }
 body.no-scroll { overflow: hidden; }
+
+/* Language switcher (EN | RU) */
+.lang-switch {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Lato', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap;
+}
+.lang-switch a { color: var(--mid); opacity: .65; transition: opacity .25s, color .25s; }
+.lang-switch a:hover { opacity: 1; color: var(--gold-accessible); }
+.lang-switch .lang-cur { color: var(--dark); }
+.lang-switch .lang-sep { color: var(--border); font-weight: 400; }
+.hdr .lang-switch { margin-left: auto; }
+@media(max-width: 900px) {
+  .hdr .lang-switch { display: inline-flex; margin-left: 0; order: 2; gap: 6px; font-size: 11px; }
+  .nav-footer .lang-switch { display: none; }
+}
 
 /* в”Ђв”Ђ HERO (index) в”Ђв”Ђ */
 .hero { position: relative; min-height: clamp(340px, 54vh, 520px); display: flex; flex-direction: column; overflow: hidden; }
@@ -212,6 +231,11 @@ body.no-scroll { overflow: hidden; }
   color: var(--gold-lt);
   line-height: 1.5;
 }
+.hero-award-verify {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: rgba(255,255,255,.65); text-decoration: underline; text-underline-offset: 2px; white-space: nowrap;
+}
+.hero-award-verify:hover { color: var(--gold-lt); }
 @media(max-width: 860px) {
   .hero-award-text { font-size: 10px; letter-spacing: .8px; }
 }
@@ -308,8 +332,8 @@ body.no-scroll { overflow: hidden; }
 .page-hero-trust li:last-child { margin-bottom: 0; }
 .massage-hero {
   background-image: url('img/mass.jpg');
-  background-image: -webkit-image-set(url('img/mass.jpg') 1x);
-  background-image: image-set(url('img/mass.jpg') type('image/jpeg'));
+  background-image: -webkit-image-set(url('img/mass.webp') type('image/webp'), url('img/mass.jpg') type('image/jpeg'));
+  background-image: image-set(url('img/mass.webp') type('image/webp'), url('img/mass.jpg') type('image/jpeg'));
   background-position: center; background-size: cover; background-repeat: no-repeat;
 }
 @media(max-width: 600px) {
@@ -565,6 +589,13 @@ body.no-scroll { overflow: hidden; }
 .staff-level { font-size: 10px; color: #aaa; display: block; font-weight: 400; }
 .staff-p { font-weight: 700; font-size: 1rem; color: var(--dark); }
 .svc-dur { display: block; margin-top: 8px; font-size: 10px; color: #aaa; letter-spacing: 1px; text-transform: uppercase; }
+/* Ценовое подменю по длине (Short/Medium/Long) */
+.staff-p-range { font-weight: 400; font-size: 12px; color: var(--mid); }
+.price-sub { margin: 2px 0 8px; padding-left: 10px; border-left: 2px solid var(--gold-lt); }
+.price-sub-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; padding: 3px 0; text-decoration: none; }
+.price-sub-row .len { color: var(--mid); }
+.price-sub-row .staff-p { font-size: 13px; color: var(--gold); text-decoration: underline; }
+.price-sub-row:hover .len { color: var(--dark); }
 @media(max-width: 600px) { .svc-item { flex-direction: column; } .svc-pricing { width: 100%; } }
 
 /* в”Ђв”Ђ MASTERS GRID (manicure) в”Ђв”Ђ */

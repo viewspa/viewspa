@@ -19,19 +19,24 @@
 <meta name="twitter:title" content="View Spa Aventura | Russian Manicure & Deep Tissue Massage">
 <meta name="twitter:description" content="Russian manicure, smart pedicure and licensed massage in Aventura, FL. Book online 24/7.">
 <link rel="canonical" href="https://viewspa.miami/">
+<link rel="alternate" hreflang="en" href="https://viewspa.miami/">
+<link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/">
+<link rel="alternate" hreflang="es" href="https://viewspa.miami/es/">
+<link rel="alternate" hreflang="x-default" href="https://viewspa.miami/">
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": ["BeautySalon", "LocalBusiness"],
-      "@id": "https://viewspa.miami",
+      "@type": "DaySpa",
+      "@id": "https://viewspa.miami/#business",
       "name": "View Spa",
       "image": "https://viewspa.miami/img/logo.jpg",
-      "url": "https://viewspa.miami",
-      "telephone": "+17542026666",
+      "url": "https://viewspa.miami/",
+      "telephone": ["+17542026666", "+17542026638"],
       "priceRange": "$$",
+      "knowsLanguage": ["en", "ru"],
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "20200 W Dixie Hwy, STE 1105B",
@@ -42,9 +47,17 @@
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 25.9629,
-        "longitude": -80.1509
+        "latitude": 25.962947,
+        "longitude": -80.148283
       },
+      "hasMap": "https://www.google.com/maps/search/?api=1&query=View+Spa+20200+W+Dixie+Hwy+STE+1105B+Aventura+FL+33180",
+      "sameAs": [
+        "https://instagram.com/viewspa.miami",
+        "https://instagram.com/science.of.touch",
+        "https://instagram.com/kseni.nailartist",
+        "https://www.facebook.com/share/1DCXD5G6Wo/",
+        "https://g.page/r/Cc1wyWviJv5mEBM/review"
+      ],
       "openingHoursSpecification": [
         {
           "@type": "OpeningHoursSpecification",
@@ -70,6 +83,94 @@
           {"@type":"Offer","itemOffered":{"@type":"Service","name":"Sports Massage Aventura FL"}}
         ]
       }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://viewspa.miami/#ksenia",
+      "name": "Ksenia",
+      "jobTitle": "Head Nail Artist",
+      "worksFor": {"@id": "https://viewspa.miami/#business"},
+      "award": "1st Place, Gel Polish — Nailympia International Championship 2025 (Orlando)",
+      "sameAs": [
+        "https://instagram.com/kseni.nailartist",
+        "https://www.nailympia.com/news/winners-nailympia-orlando-2025/"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://viewspa.miami/#ivan",
+      "name": "Ivan",
+      "jobTitle": "Licensed Massage Therapist",
+      "worksFor": {"@id": "https://viewspa.miami/#business"},
+      "memberOf": {"@type": "Organization", "name": "American Massage Therapy Association"},
+      "hasCredential": {
+        "@type": "EducationalOccupationalCredential",
+        "credentialCategory": "license",
+        "name": "Florida Licensed Massage Therapist (LMT)",
+        "identifier": "MA107225"
+      },
+      "sameAs": ["https://instagram.com/science.of.touch"]
+    },
+    {
+        "@type": "FAQPage",
+        "@id": "https://viewspa.miami/#faq",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is a Russian manicure - and why does it last longer?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Russian manicure is a dry, precision technique that fully cleans the cuticle area using electric tools. This allows gel to be applied closer to the skin — without flooding — which means: cleaner look, no lifting, up to 5 weeks wear."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do you sterilize your tools?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "We follow medical-grade sterilization standards: full disinfection after every client, ultrasonic cleaning, sealed sterilization pouches. No shortcuts. Ever."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does deep tissue massage hurt?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes - but it should never feel wrong. We adjust pressure to your tolerance and focus on releasing tension, not causing pain. Most clients feel noticeable relief after the session."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What types of massage do you offer?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "We focus on results-driven massage: Deep Tissue, Sports Recovery, Lymphatic Drainage, Tension & Posture Correction, Myofascial Release, Swedish, Muscle Knots therapy. Every session is customized to your body."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How long does a session take?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Russian Manicure: 90-120 minutes. Massage: 45, 60, or 90 minutes. We never rush. Quality takes time."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do you accept walk-ins?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Usually no. We work by appointment to maintain quality and timing. Same-day bookings may be available depending on schedule."
+                }
+            }
+        ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://viewspa.miami/#breadcrumb",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://viewspa.miami/"}
+      ]
     }
   ]
 }
@@ -77,7 +178,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="img/hero.jpg" as="image" fetchpriority="high">
+<link rel="preload" href="img/hero.webp" as="image" type="image/webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet"></noscript>
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -107,8 +208,10 @@
           <a href="tel:+17542026666" aria-label="Call View Spa at 754-202-6666">(754) 202-6666</a>
           <a href="https://wa.me/17542026666" target="_blank" rel="noopener" aria-label="Message View Spa on WhatsApp">WhatsApp</a>
         </div>
+        <span class="lang-switch"><span class="lang-cur">EN</span><span class="lang-sep">|</span><a href="ru/index.html" hreflang="ru" lang="ru" aria-label="Перейти на русскую версию сайта">RU</a><span class="lang-sep">|</span><a href="es/index.html" hreflang="es" lang="es" aria-label="Cambiar a la versión en español">ES</a></span>
       </div>
     </nav>
+    <span class="lang-switch"><span class="lang-cur">EN</span><span class="lang-sep">|</span><a href="ru/index.html" hreflang="ru" lang="ru" aria-label="Перейти на русскую версию сайта">RU</a><span class="lang-sep">|</span><a href="es/index.html" hreflang="es" lang="es" aria-label="Cambiar a la versión en español">ES</a></span>
     <div class="hdr-cta">
       <a href="booking.html" class="btn btn-gold btn-compact" data-track="booking" aria-label="Check availability">Book in 60 Seconds</a>
       <span class="promo-badge">Book in 60 seconds</span>
@@ -119,7 +222,10 @@
 <main id="main-content">
 <section class="hero" id="home" aria-label="View Spa Aventura hero section">
   <div class="hero-bg" aria-hidden="true">
-    <img class="hero-bg-img" src="img/hero.jpg" alt="View Spa Aventura interior - luxury beauty and wellness studio" fetchpriority="high" width="1440" height="720">
+    <picture>
+      <source srcset="img/hero.webp" type="image/webp">
+      <img class="hero-bg-img" src="img/hero.jpg" alt="View Spa Aventura interior - luxury beauty and wellness studio" fetchpriority="high" width="1440" height="720">
+    </picture>
     <div class="hero-overlay"></div>
     <div class="hero-grain"></div>
   </div>
@@ -128,25 +234,25 @@
     <h1 class="hero-h1">Nails that last 5 weeks.<br><em>Massage that actually fixes pain.</em></h1>
     <div class="hero-award" aria-label="Award">
       <span class="hero-award-icon" aria-hidden="true">🏆</span>
-      <span class="hero-award-text">2025 Nailympia International Champion &mdash; 1st Place, Gel Polish · World's largest nail competition</span>
+      <span class="hero-award-text">2025 Nailympia International Champion &mdash; 1st Place, Gel Polish</span>
+      <a href="https://www.nailympia.com/news/winners-nailympia-orlando-2025/" target="_blank" rel="noopener" class="hero-award-verify" aria-label="Verify Nailympia 2025 award on nailympia.com">verify ↗</a>
     </div>
-    <p class="hero-slogan">Russian manicure and licensed therapeutic massage in Aventura.<br>Most clients notice the difference before they leave.</p>
+    <p class="hero-slogan">Russian manicure and licensed therapeutic massage in Aventura.</p>
     <div class="hero-cta-block">
       <a href="booking.html" class="btn btn-gold hero-book-btn" data-track="booking" aria-label="Book in 60 Seconds">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
         Book in 60 Seconds
       </a>
-      <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text" data-track="whatsapp" data-wa-location="hero" onclick="if(window.gtag){gtag('event','whatsapp_click',{event_category:'engagement',event_label:'hero'});}">💬 Have a question? Text us on WhatsApp</a>
-      <p class="hero-book-note">✓ No payment to book · Ksenia: next opening 2+ weeks out</p>
-      <p class="hero-cancel-policy">Free cancellation up to 24 hours</p>
+      <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text hero-hide-mob" data-track="whatsapp" data-wa-location="hero" onclick="if(window.gtag){gtag('event','whatsapp_click',{event_category:'engagement',event_label:'hero'});}">💬 Have a question? Text us on WhatsApp</a>
+      <p class="hero-book-note">✓ No payment to book</p>
     </div>
-    <div class="hero-service-links">
+    <div class="hero-service-links hero-hide-mob">
       <span class="hero-service-label">or explore:</span>
       <a href="massage.html" class="hero-svc-link" aria-label="Learn more about massage therapy services">Massage &rarr;</a>
       <a href="manicure.html" class="hero-svc-link" aria-label="Learn more about nail services">Nail Services &rarr;</a>
     </div>
-    <p class="hero-quote">Most people try two or three places first.<br>Then they find this one<br>and stop looking.</p>
-    <p class="hero-meta" aria-label="Trust signals">Licensed LMT · Nailympia Champion · 20200 W Dixie Hwy</p>
+    <p class="hero-quote hero-hide-mob">Most people try two or three places first.<br>Then they find this one<br>and stop looking.</p>
+    <p class="hero-meta" aria-label="Trust signals">Licensed LMT · FL MA107225 · 20200 W Dixie Hwy</p>
   </div>
 </section>
 
@@ -172,9 +278,9 @@
     <span class="eyebrow text-gold-lt">Still dealing with this?</span>
     <div class="rule rule-soft"></div>
     <ul class="pain-list">
-      <li>Your gel chips in a week — every time</li>
-      <li>You don't trust how tools are cleaned</li>
-      <li>Massage helps — for 1–2 days max</li>
+      <li>Your gel chips by day six — and you've stopped being surprised</li>
+      <li>You watch them open the tools and you're still not sure</li>
+      <li>The massage felt great. By the next day it was like it never happened</li>
     </ul>
   </div>
   <div class="pg-panel">
@@ -184,7 +290,7 @@
     <ul class="gain-list">
       <li>Russian technique — gel lasts up to <strong>5 weeks</strong></li>
       <li>Tools are autoclave sterilized &amp; opened in front of you</li>
-      <li>Feel real <strong>relief</strong> after your <strong>first session</strong></li>
+      <li>Turn your head further on the way out than you could on the way in</li>
     </ul>
   </div>
 </div>
@@ -196,7 +302,7 @@
     <div class="svc-split-content">
       <span class="svc-split-eyebrow">Licensed Massage Therapist — AMTA Member</span>
       <h2 class="svc-split-title">Massage That Fixes Pain — Not Just Relaxes</h2>
-      <p class="svc-split-desc">Deep tissue, trigger point and sports recovery work. Focused on where the pain starts — not just where it shows up.</p>
+      <p class="svc-split-desc">Deep tissue, trigger point and sports recovery. We work where the pain starts, not where it shows up — so you get back the things you've been avoiding.</p>
       <p class="svc-split-price">From $65 · 45, 60 or 90 min</p>
       <span class="svc-split-btn" aria-hidden="true">View Massage Options ></span>
     </div>
@@ -338,7 +444,7 @@
 
 <div class="mini-cta-bar mini-cta-gold">
   <div class="mini-cta-text">
-    <strong>5.0 on Google · 30+ reviews · Real clients.</strong> <span>Book in 60 seconds — instant confirmation.</span>
+    <strong>5.0 on Google · 18 reviews · Real clients.</strong> <span>Book in 60 seconds — instant confirmation.</span>
   </div>
   <button class="btn btn-dark" data-book-action="open" data-track="booking" aria-label="Book in 60 Seconds now">Book in 60 Seconds</button>
 </div>
@@ -391,34 +497,34 @@
         <div class="rule c"></div>
         <p class="section-copy-narrow">Clear answers. No surprises. Just results you can trust.</p>
       </div>
-      <ul class="faq-list" itemscope itemtype="https://schema.org/FAQPage">
-        <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-          <button class="faq-q" aria-expanded="false"><span itemprop="name">What is a Russian manicure - and why does it last longer?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Russian manicure is a dry, precision technique that fully cleans the cuticle area using electric tools. This allows gel to be applied closer to the skin — without flooding — which means: cleaner look, no lifting, up to 5 weeks wear.</div></div>
+      <ul class="faq-list">
+        <li class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>What is a Russian manicure - and why does it last longer?</span><span class="faq-icon" aria-hidden="true"></span></button>
+          <div class="faq-body"><div class="faq-ans">Russian manicure is a dry, precision technique that fully cleans the cuticle area using electric tools. This allows gel to be applied closer to the skin — without flooding — which means: cleaner look, no lifting, up to 5 weeks wear.</div></div>
         </li>
-        <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-          <button class="faq-q" aria-expanded="false"><span itemprop="name">How do you sterilize your tools?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">We follow medical-grade sterilization standards: full disinfection after every client, ultrasonic cleaning, sealed sterilization pouches. No shortcuts. Ever.</div></div>
+        <li class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>How do you sterilize your tools?</span><span class="faq-icon" aria-hidden="true"></span></button>
+          <div class="faq-body"><div class="faq-ans">We follow medical-grade sterilization standards: full disinfection after every client, ultrasonic cleaning, sealed sterilization pouches. No shortcuts. Ever.</div></div>
         </li>
-        <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-          <button class="faq-q" aria-expanded="false"><span itemprop="name">Does deep tissue massage hurt?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Yes - but it should never feel wrong. We adjust pressure to your tolerance and focus on releasing tension, not causing pain. Most clients feel noticeable relief after the session.</div></div>
+        <li class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Does deep tissue massage hurt?</span><span class="faq-icon" aria-hidden="true"></span></button>
+          <div class="faq-body"><div class="faq-ans">Yes - but it should never feel wrong. We adjust pressure to your tolerance and focus on releasing tension, not causing pain. Most clients feel noticeable relief after the session.</div></div>
         </li>
-        <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-          <button class="faq-q" aria-expanded="false"><span itemprop="name">What types of massage do you offer?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">We focus on results-driven massage: Deep Tissue, Sports Recovery, Lymphatic Drainage, Tension & Posture Correction, Myofascial Release, Swedish, Muscle Knots therapy. Every session is customized to your body.</div></div>
+        <li class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>What types of massage do you offer?</span><span class="faq-icon" aria-hidden="true"></span></button>
+          <div class="faq-body"><div class="faq-ans">We focus on results-driven massage: Deep Tissue, Sports Recovery, Lymphatic Drainage, Tension & Posture Correction, Myofascial Release, Swedish, Muscle Knots therapy. Every session is customized to your body.</div></div>
         </li>
-        <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-          <button class="faq-q" aria-expanded="false"><span itemprop="name">How long does a session take?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Russian Manicure: 90-120 minutes. Massage: 45, 60, or 90 minutes. We never rush. Quality takes time.</div></div>
+        <li class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>How long does a session take?</span><span class="faq-icon" aria-hidden="true"></span></button>
+          <div class="faq-body"><div class="faq-ans">Russian Manicure: 90-120 minutes. Massage: 45, 60, or 90 minutes. We never rush. Quality takes time.</div></div>
         </li>
-        <li class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-          <button class="faq-q" aria-expanded="false"><span itemprop="name">Do you accept walk-ins?</span><span class="faq-icon" aria-hidden="true"></span></button>
-          <div class="faq-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div class="faq-ans" itemprop="text">Usually no. We work by appointment to maintain quality and timing. Same-day bookings may be available depending on schedule.</div></div>
+        <li class="faq-item">
+          <button class="faq-q" aria-expanded="false"><span>Do you accept walk-ins?</span><span class="faq-icon" aria-hidden="true"></span></button>
+          <div class="faq-body"><div class="faq-ans">Usually no. We work by appointment to maintain quality and timing. Same-day bookings may be available depending on schedule.</div></div>
         </li>
       </ul>
       <div class="tc mt-40">
-        <p class="text-dark mb-16"><strong>Good time slots don't stay open long.</strong></p>
+        <p class="text-dark mb-16"><strong>Still deciding? The honest question is simple: how long have you been putting up with it?</strong></p>
       </div>
     </div>
   </div>
@@ -501,7 +607,7 @@
     <div class="foot-bottom">
       <span>© 2026 <span class="brand-name">View Spa</span> · Aventura, Florida</span>
       <span>Massage License: MM47261 · Nailympia Champion 2025</span>
-      <a href="/sitemap.xml" class="footer-sitemap-link">Sitemap</a>
+      <a href="sitemap.xml" class="footer-sitemap-link">Sitemap</a>
     </div>
   </div>
 </footer>
@@ -529,4 +635,3 @@
 <script src="main.js"></script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                          

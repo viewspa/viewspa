@@ -25,6 +25,7 @@
     subcategoryId: null,
     serviceId: null,
     masterId: null, // null = «любой/сравнить»
+    length: null,   // выбранная длина (short/medium/long) для услуг с длинами
     slot: null,
     slotsByDay: null,
     selectedDay: null,
@@ -161,7 +162,7 @@
   const STEPS = ['category', 'service', 'master', 'time', 'details', 'done'];
   function progressHtml() {
     const labels = { category: 'Service', service: 'Choose', master: 'Specialist', time: 'Time', details: 'Details', done: 'Done' };
-    const cur = STEPS.indexOf(state.step === 'subcategory' ? 'category' : state.step);
+    const cur = STEPS.indexOf(state.step === 'subcategory' ? 'category' : (state.step === 'length' ? 'master' : state.step));
     return `<div class="bk-progress">${STEPS.map((s, i) =>
       `<span class="bk-pstep ${i <= cur ? 'on' : ''}">${labels[s]}</span>`).join('<span class="bk-pline"></span>')}</div>`;
   }
@@ -217,12 +218,42 @@
     shell(sub.name, 'Select a service.', `<div class="bk-list">${rows}</div>`, { back: true });
   }
 
+  // Длины услуги для мастера (или null, если у услуги нет тарифов по длине).
+  function lengthsFor(serviceId, masterId) {
+    if (!masterId) return null;
+    const svc = getService(serviceId);
+    const entry = svc && svc.masters.find((m) => m.masterId === masterId);
+    return entry && Array.isArray(entry.lengths) && entry.lengths.length ? entry.lengths : null;
+  }
+  // После выбора мастера: если есть длины и она ещё не выбрана — показать шаг длины.
+  function maybeLengthThenTime() {
+    const lengths = lengthsFor(state.serviceId, state.masterId);
+    if (lengths && !state.length) return renderLength();
+    return loadTime();
+  }
+  function renderLength() {
+    state.step = 'length';
+    const svc = getService(state.serviceId);
+    const lengths = lengthsFor(state.serviceId, state.masterId) || [];
+    const cards = lengths.map((L) =>
+      `<button class="bk-master" data-act="length" data-id="${L.id}">
+         <span class="bk-master-body">
+           <span class="bk-master-name">${L.name} length</span>
+           <span class="bk-master-role">${svc.name}</span>
+         </span>
+         <span class="bk-master-price">${fmtMoney(L.price)} ›</span>
+       </button>`).join('');
+    shell('Choose nail length', `${svc.name} · ${state.masters[state.masterId].name}`,
+      `<div class="bk-list">${cards}</div>`, { back: true });
+  }
+
   function renderMaster() {
     state.step = 'master';
+    state.length = null;
     const svc = getService(state.serviceId);
     const masters = svc.masters.map((m) => ({ ...state.masters[m.masterId], price: m.price }));
     // один мастер — пропускаем выбор
-    if (masters.length === 1) { state.masterId = masters[0].id; return loadTime(); }
+    if (masters.length === 1) { state.masterId = masters[0].id; return maybeLengthThenTime(); }
     const cards = masters.map((m) =>
       `<button class="bk-master" data-act="master" data-id="${m.id}">
          <span class="bk-master-av">${m.name[0]}</span>
@@ -253,6 +284,7 @@
       const to = new Date(Date.now() + CONFIG.daysToShow * 86400000);
       const { slots } = await api('/api/availability', {
         serviceId: state.serviceId, masterId: state.masterId || undefined,
+        length: state.length || undefined,
         from: from.toISOString(), to: to.toISOString(),
       });
       const byDay = {};
@@ -290,10 +322,12 @@
     state.step = 'details';
     const svc = getService(state.serviceId);
     const m = state.masters[state.slot.masterId];
+    const _ls = lengthsFor(state.serviceId, state.slot.masterId);
+    const _lenName = _ls && state.length ? (_ls.find((L) => L.id === state.length) || {}).name : null;
     track('begin_checkout', { currency: 'USD', value: state.slot.price, items: [gaItem()] });
     const summary = `
       <div class="bk-summary">
-        <div><b>${svc.name}</b></div>
+        <div><b>${svc.name}${_lenName ? ' · ' + _lenName + ' length' : ''}</b></div>
         <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)} · ${fmtDur(svc.durationMin)}</div>
         <div>${m ? m.name : ''} · ${fmtMoney(state.slot.price)}</div>
       </div>`;
@@ -327,6 +361,7 @@
       const res = await api('/api/book', {
         serviceId: state.serviceId,
         masterId: state.slot.masterId,
+        length: state.length || undefined,
         startAt: state.slot.startAt,
         serviceVariationVersion: state.slot.serviceVariationVersion,
         customer: { name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), note: fd.get('note') },
@@ -384,7 +419,10 @@
   function back() {
     const order = ['category', 'subcategory', 'service', 'master', 'time', 'details'];
     const map = {
-      details: 'time', time: 'master', master: 'service',
+      details: 'time',
+      time: () => (lengthsFor(state.serviceId, state.masterId) ? 'length' : 'master'),
+      length: 'master',
+      master: 'service',
       service: () => {
         const cat = state.categories.find((c) => c.id === state.categoryId);
         return cat.subcategories.length === 1 ? 'category' : 'subcategory';
@@ -398,7 +436,7 @@
       const svc = getService(state.serviceId);
       if (svc.masters.length === 1) prev = 'service';
     }
-    ({ category: renderCategory, subcategory: renderSubcategory, service: renderService, master: renderMaster, time: loadTime, details: renderDetails }[prev] || renderCategory)();
+    ({ category: renderCategory, subcategory: renderSubcategory, service: renderService, master: renderMaster, length: renderLength, time: loadTime, details: renderDetails }[prev] || renderCategory)();
   }
 
   // ── click delegation ───────────────────────────────────────────────
@@ -410,11 +448,12 @@
     if (act === 'cat') { state.categoryId = t.dataset.id; state.subcategoryId = null; return renderSubcategory(); }
     if (act === 'sub') { state.subcategoryId = t.dataset.id; return renderService(); }
     if (act === 'svc') {
-      state.serviceId = t.dataset.id; state.masterId = null; state.slot = null;
+      state.serviceId = t.dataset.id; state.masterId = null; state.slot = null; state.length = null;
       track('select_item', { items: [gaItem()] });
       return renderMaster();
     }
-    if (act === 'master') { state.masterId = t.dataset.id || null; return loadTime(); }
+    if (act === 'master') { state.masterId = t.dataset.id || null; return maybeLengthThenTime(); }
+    if (act === 'length') { state.length = t.dataset.id; return loadTime(); }
     if (act === 'day') { state.selectedDay = t.dataset.id; return renderTime(); }
     if (act === 'slot') {
       const s = state.slotsByDay[t.dataset.day][+t.dataset.i];
@@ -430,6 +469,7 @@
     const p = new URLSearchParams(location.search);
     const serviceId = p.get('service');
     const masterId = p.get('master');
+    const lengthParam = p.get('length');
     const subId = p.get('subcategory');
     const catId = p.get('category');
 
@@ -440,8 +480,12 @@
         state.subcategoryId = svc.sub.id;
         state.serviceId = serviceId;
         if (masterId && svc.masters.some((m) => m.masterId === masterId)) state.masterId = masterId;
+        if (lengthParam) {
+          const ls = lengthsFor(serviceId, state.masterId);
+          if (ls && ls.some((L) => L.id === lengthParam)) state.length = lengthParam;
+        }
         track('select_item', { items: [gaItem()] });
-        return state.masterId ? loadTime() : renderMaster();
+        return state.masterId ? maybeLengthThenTime() : renderMaster();
       }
     }
     if (subId) {
