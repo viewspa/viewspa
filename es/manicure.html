@@ -52,7 +52,7 @@
         "postalCode": "33180",
         "addressCountry": "US"
       },
-      "geo": {"@type": "GeoCoordinates", "latitude": 25.962947, "longitude": -80.148283},
+      "geo": {"@type": "GeoCoordinates", "latitude": 25.963015, "longitude": -80.147936},
       "openingHoursSpecification": [
         {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "09:00", "closes": "20:00"}
       ]
@@ -218,6 +218,7 @@
             <a href="../booking.html?service=gel-manicure&master=ksenia&length=medium" class="price-sub-row" data-track="booking"><span class="len">Largo medio</span><span class="staff-p">$100</span></a>
             <a href="../booking.html?service=gel-manicure&master=ksenia&length=long" class="price-sub-row" data-track="booking"><span class="len">Largo largo</span><span class="staff-p">$110</span></a>
           </div>
+          <label for="lenGuideChk" class="len-hint" aria-label="Largo de uña — S / M / L">📏 ¿Qué es S / M / L?</label>
           <div class="price-row"><span class="staff-n">Anastasia</span><a href="../booking.html?service=gel-manicure&master=anastasia" class="staff-p price-link" data-track="booking">$85</a></div>
           <span class="svc-dur">⏱ 2 h</span>
         </div>
@@ -236,6 +237,7 @@
             <a href="../booking.html?service=hard-gel-extension&master=ksenia&length=medium" class="price-sub-row" data-track="booking"><span class="len">Largo medio</span><span class="staff-p">$140</span></a>
             <a href="../booking.html?service=hard-gel-extension&master=ksenia&length=long" class="price-sub-row" data-track="booking"><span class="len">Largo largo</span><span class="staff-p">$150</span></a>
           </div>
+          <label for="lenGuideChk" class="len-hint" aria-label="Largo de uña — S / M / L">📏 ¿Qué es S / M / L?</label>
           <span class="svc-dur">⏱ 2 h 30 min</span>
         </div>
       </div>
@@ -484,6 +486,27 @@
   </div>
 </section>
 
+
+<input type="checkbox" id="lenGuideChk" class="len-modal-toggle" aria-hidden="true">
+<div class="len-modal" role="dialog" aria-modal="true" aria-label="Largo de uña — S / M / L">
+  <label for="lenGuideChk" class="len-modal-overlay" aria-label="Cerrar"></label>
+  <div class="len-modal-card">
+    <label for="lenGuideChk" class="len-modal-x" aria-label="Cerrar" role="button">&times;</label>
+    <div class="len-modal-head">
+      <img src="../img/nail-length-guide.jpg" alt="Guía de largo de uña — corta, media, larga" width="150" height="225" loading="lazy">
+      <div>
+        <p class="len-modal-title">Largo de uña — S / M / L</p>
+        <p class="len-modal-sub">El precio de Ksenia depende del largo del borde libre</p>
+      </div>
+    </div>
+    <ul class="len-modal-legend">
+          <li><b>S</b> Corta — borde libre corto, apenas pasando la yema</li>
+          <li><b>M</b> Media — borde libre moderado</li>
+          <li><b>L</b> Larga — borde libre pronunciado</li>
+    </ul>
+    <p class="len-modal-note">¿No sabes cuál es la tuya? Confirmamos el largo al inicio de la cita.</p>
+  </div>
+</div>
 </main>
 
 <footer>

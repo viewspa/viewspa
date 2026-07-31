@@ -53,8 +53,8 @@
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 25.962947,
-        "longitude": -80.148283
+        "latitude": 25.963015,
+        "longitude": -80.147936
       },
       "openingHoursSpecification": [
         {
@@ -302,6 +302,7 @@
             <a href="booking.html?service=gel-manicure&master=ksenia&length=medium" class="price-sub-row" data-track="booking"><span class="len">Medium length</span><span class="staff-p">$100</span></a>
             <a href="booking.html?service=gel-manicure&master=ksenia&length=long" class="price-sub-row" data-track="booking"><span class="len">Long length</span><span class="staff-p">$110</span></a>
           </div>
+          <label for="lenGuideChk" class="len-hint" aria-label="Nail length — S / M / L">📏 What’s S / M / L?</label>
           <div class="price-row"><span class="staff-n">Anastasia</span><a href="booking.html?service=gel-manicure&master=anastasia" class="staff-p price-link" data-track="booking">$85</a></div>
           <span class="svc-dur">⏱ 2 hrs</span>
         </div>
@@ -320,6 +321,7 @@
             <a href="booking.html?service=hard-gel-extension&master=ksenia&length=medium" class="price-sub-row" data-track="booking"><span class="len">Medium length</span><span class="staff-p">$140</span></a>
             <a href="booking.html?service=hard-gel-extension&master=ksenia&length=long" class="price-sub-row" data-track="booking"><span class="len">Long length</span><span class="staff-p">$150</span></a>
           </div>
+          <label for="lenGuideChk" class="len-hint" aria-label="Nail length — S / M / L">📏 What’s S / M / L?</label>
           <span class="svc-dur">⏱ 2 hr 30 min</span>
         </div>
       </div>
@@ -568,6 +570,27 @@
   </div>
 </section>
 
+
+<input type="checkbox" id="lenGuideChk" class="len-modal-toggle" aria-hidden="true">
+<div class="len-modal" role="dialog" aria-modal="true" aria-label="Nail length — S / M / L">
+  <label for="lenGuideChk" class="len-modal-overlay" aria-label="Close"></label>
+  <div class="len-modal-card">
+    <label for="lenGuideChk" class="len-modal-x" aria-label="Close" role="button">&times;</label>
+    <div class="len-modal-head">
+      <img src="img/nail-length-guide.jpg" alt="Nail length guide — Short, Medium, Long" width="150" height="225" loading="lazy">
+      <div>
+        <p class="len-modal-title">Nail length — S / M / L</p>
+        <p class="len-modal-sub">Ksenia’s price depends on the free-edge length</p>
+      </div>
+    </div>
+    <ul class="len-modal-legend">
+          <li><b>S</b> Short — a short free edge just past the fingertip</li>
+          <li><b>M</b> Medium — a moderate free edge</li>
+          <li><b>L</b> Long — a pronounced free edge</li>
+    </ul>
+    <p class="len-modal-note">Not sure which you are? We’ll confirm your length at the start of the appointment.</p>
+  </div>
+</div>
 </main>
 
 <footer>

@@ -82,6 +82,42 @@
     };
   }
 
+  // ── Захват gclid/gbraid/wbraid (для офлайн-конверсий Google Ads) ────
+  function captureClickIds() {
+    try {
+      const p = new URLSearchParams(location.search);
+      ['gclid', 'gbraid', 'wbraid'].forEach((k) => {
+        const v = p.get(k);
+        if (v) localStorage.setItem('vs_' + k, JSON.stringify({ v, t: Date.now() }));
+      });
+    } catch (_) {}
+  }
+  function storedClickId(k) {
+    try {
+      const o = JSON.parse(localStorage.getItem('vs_' + k) || 'null');
+      if (!o || Date.now() - o.t > 90 * 86400000) return null; // окно 90 дней
+      return o.v;
+    } catch (_) { return null; }
+  }
+
+  // Конверсия «бронь создана» — строго один раз на booking_id (дедупликация).
+  // GTM-контейнера на сайте нет → GA4 через gtag.js напрямую. Пушим и в dataLayer
+  // (на случай появления GTM), и через gtag; если GTM есть — gtag не дублируем.
+  function trackBookingCompleted(d) {
+    if (!d.booking_id) return;
+    try {
+      const done = JSON.parse(sessionStorage.getItem('vs_bk_done') || '[]');
+      if (done.includes(d.booking_id)) return;
+      done.push(d.booking_id);
+      sessionStorage.setItem('vs_bk_done', JSON.stringify(done.slice(-30)));
+    } catch (_) {}
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({ event: 'booking_completed' }, d));
+    if (!window.google_tag_manager && typeof window.gtag === 'function') {
+      try { window.gtag('event', 'booking_completed', d); } catch (_) {}
+    }
+  }
+
   // Состояние Turnstile для текущей формы (виджет одноразовый — токен живёт до одной отправки).
   const ts = { widgetId: null, token: null, failed: false };
 
@@ -366,6 +402,9 @@
         serviceVariationVersion: state.slot.serviceVariationVersion,
         customer: { name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), note: fd.get('note') },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
+        gclid: storedClickId('gclid') || undefined,
+        gbraid: storedClickId('gbraid') || undefined,
+        wbraid: storedClickId('wbraid') || undefined,
         turnstileToken: turnstileToken(form),
       });
       renderDone(res);
@@ -385,22 +424,18 @@
     state.step = 'done';
     const svc = getService(state.serviceId);
     const m = state.masters[state.slot.masterId];
-    // GA4 конверсия по услуге (импортируется в Google Ads)
-    track('purchase', {
-      transaction_id: res.bookingId,
-      currency: 'USD',
-      value: state.slot.price,
-      items: [gaItem()],
-    });
-    track('booking_completed', {
-      transaction_id: res.bookingId,
-      currency: 'USD',
+    // Конверсия «бронь создана» — отдельно по категории услуги (nails/massage),
+    // строго после успешного ответа воркера. Значения — из каталога и выбранного слота.
+    const _catId = svc.cat && svc.cat.id;
+    const _ls = lengthsFor(state.serviceId, state.slot.masterId);
+    const _lenName = _ls && state.length ? (_ls.find((L) => L.id === state.length) || {}).name : null;
+    trackBookingCompleted({
+      service_category: _catId === 'massage' ? 'massage' : 'nails',
+      service_name: svc.name + (_lenName ? ' · ' + _lenName : ''),
+      specialist: m ? m.name : '',
       value: Number(state.slot.price) || 0,
+      currency: 'USD',
       booking_id: res.bookingId,
-      service_id: svc.id,
-      service_name: svc.name,
-      master: m ? m.name : '',
-      source: 'site_booking',
     });
     const payLine = res.paidWith === 'package'
       ? `${m ? m.name : ''} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
@@ -503,6 +538,7 @@
 
   // ── boot ───────────────────────────────────────────────────────────
   (async function init() {
+    captureClickIds();
     try {
       const cat = await api('/api/catalog');
       state.business = cat.business; state.masters = cat.masters; state.categories = cat.categories;

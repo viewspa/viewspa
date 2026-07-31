@@ -54,8 +54,8 @@
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": 25.962947,
-        "longitude": -80.148283
+        "latitude": 25.963015,
+        "longitude": -80.147936
       },
       "openingHoursSpecification": [
         {
@@ -234,6 +234,7 @@
             <a href="../booking.html?service=gel-manicure&master=ksenia&length=medium" class="price-sub-row" data-track="booking"><span class="len">Средние</span><span class="staff-p">$100</span></a>
             <a href="../booking.html?service=gel-manicure&master=ksenia&length=long" class="price-sub-row" data-track="booking"><span class="len">Длинные</span><span class="staff-p">$110</span></a>
           </div>
+          <label for="lenGuideChk" class="len-hint" aria-label="Длина ногтя — S / M / L">📏 Что такое S / M / L?</label>
           <div class="price-row"><span class="staff-n">Анастасия</span><a href="../booking.html?service=gel-manicure&master=anastasia" class="staff-p price-link" data-track="booking">$85</a></div>
           <span class="svc-dur">⏱ 2 часа</span>
         </div>
@@ -252,6 +253,7 @@
             <a href="../booking.html?service=hard-gel-extension&master=ksenia&length=medium" class="price-sub-row" data-track="booking"><span class="len">Средние</span><span class="staff-p">$140</span></a>
             <a href="../booking.html?service=hard-gel-extension&master=ksenia&length=long" class="price-sub-row" data-track="booking"><span class="len">Длинные</span><span class="staff-p">$150</span></a>
           </div>
+          <label for="lenGuideChk" class="len-hint" aria-label="Длина ногтя — S / M / L">📏 Что такое S / M / L?</label>
           <span class="svc-dur">⏱ 2 ч 30 мин</span>
         </div>
       </div>
@@ -500,6 +502,27 @@
   </div>
 </section>
 
+
+<input type="checkbox" id="lenGuideChk" class="len-modal-toggle" aria-hidden="true">
+<div class="len-modal" role="dialog" aria-modal="true" aria-label="Длина ногтя — S / M / L">
+  <label for="lenGuideChk" class="len-modal-overlay" aria-label="Закрыть"></label>
+  <div class="len-modal-card">
+    <label for="lenGuideChk" class="len-modal-x" aria-label="Закрыть" role="button">&times;</label>
+    <div class="len-modal-head">
+      <img src="../img/nail-length-guide.jpg" alt="Схема длины ногтя — короткая, средняя, длинная" width="150" height="225" loading="lazy">
+      <div>
+        <p class="len-modal-title">Длина ногтя — S / M / L</p>
+        <p class="len-modal-sub">Цена у Ксении зависит от длины свободного края</p>
+      </div>
+    </div>
+    <ul class="len-modal-legend">
+          <li><b>S</b> Короткая — короткий свободный край сразу за кончиком пальца</li>
+          <li><b>M</b> Средняя — умеренный свободный край</li>
+          <li><b>L</b> Длинная — выраженный свободный край</li>
+    </ul>
+    <p class="len-modal-note">Не уверены, какая у вас? Определим длину в начале приёма.</p>
+  </div>
+</div>
 </main>
 
 <footer>
