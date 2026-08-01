@@ -381,7 +381,12 @@
       `${summary}
        <form id="bk-form" class="bk-form">
          <label>Full name<input name="name" required autocomplete="name"></label>
-         <label>Phone <span class="bk-hint">— with country code, e.g. +1 305 555 1234</span><input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="+13055551234" pattern="\+[0-9]{7,15}" title="Include your country code, e.g. +13055551234"></label>
+         <label>Phone <span class="bk-hint">— country code first, e.g. +1 for the US</span>
+           <span class="bk-phone-field">
+             <span class="bk-phone-plus" aria-hidden="true">+</span>
+             <input name="phone" type="tel" inputmode="numeric" required autocomplete="tel" placeholder="1 305 555 1234" pattern="[0-9]{7,15}" title="Type digits with your country code, e.g. 1 305 555 1234">
+           </span>
+         </label>
          <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
          <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
@@ -394,10 +399,7 @@
     // Телефон в формате E.164: держим ведущий «+» и только цифры (Square требует код страны).
     const _phone = _form.querySelector('input[name="phone"]');
     if (_phone) {
-      const normPhone = () => {
-        const digits = _phone.value.replace(/[^\d]/g, '');
-        _phone.value = digits ? '+' + digits : '';
-      };
+      const normPhone = () => { _phone.value = _phone.value.replace(/[^\d]/g, ''); };
       _phone.addEventListener('input', normPhone);
       _phone.addEventListener('blur', normPhone);
     }
@@ -413,13 +415,14 @@
     btn.disabled = true; btn.textContent = 'Booking…';
     try {
       const fd = new FormData(form);
+      const phoneDigits = String(fd.get('phone') || '').replace(/[^\d]/g, '');
       const res = await api('/api/book', {
         serviceId: state.serviceId,
         masterId: state.slot.masterId,
         length: state.length || undefined,
         startAt: state.slot.startAt,
         serviceVariationVersion: state.slot.serviceVariationVersion,
-        customer: { name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), note: fd.get('note') },
+        customer: { name: fd.get('name'), email: fd.get('email'), phone: phoneDigits ? '+' + phoneDigits : '', note: fd.get('note') },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
         gclid: storedClickId('gclid') || undefined,
         gbraid: storedClickId('gbraid') || undefined,
