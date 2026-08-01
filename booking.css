@@ -76,6 +76,7 @@
 .bk-summary-done { border-color: var(--gold); }
 .bk-form { display: flex; flex-direction: column; gap: 14px; }
 .bk-form label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #666; }
+.bk-form label .bk-hint { text-transform: none; font-weight: 400; letter-spacing: 0; font-size: 11px; color: #9a9a9a; }
 .bk-form input, .bk-form textarea { padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Lato', sans-serif; font-size: 15px; color: var(--dark); }
 .bk-form input:focus, .bk-form textarea:focus { outline: none; border-color: var(--gold); }
 .bk-submit { margin-top: 6px; }

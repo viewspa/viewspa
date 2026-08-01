@@ -101,20 +101,28 @@
   }
 
   // Конверсия «бронь создана» — строго один раз на booking_id (дедупликация).
-  // GTM-контейнера на сайте нет → GA4 через gtag.js напрямую. Пушим и в dataLayer
-  // (на случай появления GTM), и через gtag; если GTM есть — gtag не дублируем.
+  // GA4 на сайте подключён напрямую через gtag.js — поэтому шлём событие через gtag
+  // (как и все остальные события). НЕ проверяем window.google_tag_manager: gtag.js сам
+  // создаёт этот объект, из-за чего раньше событие не отправлялось. Дедуп по booking_id.
+  // Обёрнуто целиком: сбой трекинга не должен ломать экран «You're booked!».
   function trackBookingCompleted(d) {
-    if (!d.booking_id) return;
     try {
-      const done = JSON.parse(sessionStorage.getItem('vs_bk_done') || '[]');
-      if (done.includes(d.booking_id)) return;
-      done.push(d.booking_id);
-      sessionStorage.setItem('vs_bk_done', JSON.stringify(done.slice(-30)));
-    } catch (_) {}
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(Object.assign({ event: 'booking_completed' }, d));
-    if (!window.google_tag_manager && typeof window.gtag === 'function') {
-      try { window.gtag('event', 'booking_completed', d); } catch (_) {}
+      if (!d || !d.booking_id) return;
+      try {
+        const done = JSON.parse(sessionStorage.getItem('vs_bk_done') || '[]');
+        if (done.includes(d.booking_id)) return; // уже засчитано
+        done.push(d.booking_id);
+        sessionStorage.setItem('vs_bk_done', JSON.stringify(done.slice(-30)));
+      } catch (_) {}
+      try { console.log('booking_completed →', d); } catch (_) {}
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'booking_completed', d);
+      }
+      // На случай, если позже появится GTM-контейнер — продублируем в dataLayer как custom event.
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: 'booking_completed' }, d));
+    } catch (err) {
+      try { console.error('booking_completed failed', err); } catch (_) {}
     }
   }
 
@@ -373,7 +381,7 @@
       `${summary}
        <form id="bk-form" class="bk-form">
          <label>Full name<input name="name" required autocomplete="name"></label>
-         <label>Phone<input name="phone" type="tel" required autocomplete="tel"></label>
+         <label>Phone <span class="bk-hint">— with country code, e.g. +1 305 555 1234</span><input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="+13055551234" pattern="\+[0-9]{7,15}" title="Include your country code, e.g. +13055551234"></label>
          <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
          <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
@@ -382,7 +390,18 @@
          <div class="bk-error" id="bk-form-err" hidden></div>
        </form>`, { back: true });
     renderTurnstile();
-    document.getElementById('bk-form').addEventListener('submit', submitBooking);
+    const _form = document.getElementById('bk-form');
+    // Телефон в формате E.164: держим ведущий «+» и только цифры (Square требует код страны).
+    const _phone = _form.querySelector('input[name="phone"]');
+    if (_phone) {
+      const normPhone = () => {
+        const digits = _phone.value.replace(/[^\d]/g, '');
+        _phone.value = digits ? '+' + digits : '';
+      };
+      _phone.addEventListener('input', normPhone);
+      _phone.addEventListener('blur', normPhone);
+    }
+    _form.addEventListener('submit', submitBooking);
   }
 
   async function submitBooking(e) {
@@ -425,18 +444,28 @@
     const svc = getService(state.serviceId);
     const m = state.masters[state.slot.masterId];
     // Конверсия «бронь создана» — отдельно по категории услуги (nails/massage),
-    // строго после успешного ответа воркера. Значения — из каталога и выбранного слота.
-    const _catId = svc.cat && svc.cat.id;
-    const _ls = lengthsFor(state.serviceId, state.slot.masterId);
-    const _lenName = _ls && state.length ? (_ls.find((L) => L.id === state.length) || {}).name : null;
-    trackBookingCompleted({
-      service_category: _catId === 'massage' ? 'massage' : 'nails',
-      service_name: svc.name + (_lenName ? ' · ' + _lenName : ''),
-      specialist: m ? m.name : '',
-      value: Number(state.slot.price) || 0,
-      currency: 'USD',
-      booking_id: res.bookingId,
-    });
+    // строго после успешного ответа воркера. Параметры собираем защищённо: отсутствие
+    // любого необязательного поля не должно помешать отправке события.
+    try {
+      const _cat = svc && svc.cat;
+      const _catId = _cat && _cat.id;
+      const _catName = (_cat && _cat.name) || '';
+      // Категория из id ('nail'/'massage'); фолбэк — по имени.
+      const _serviceCategory = _catId === 'massage' || /massage/i.test(_catName) ? 'massage' : 'nails';
+      const _slot = state.slot || {};
+      const _ls = lengthsFor(state.serviceId, _slot.masterId);
+      const _lenName = _ls && state.length ? ((_ls.find((L) => L.id === state.length) || {}).name) : null;
+      trackBookingCompleted({
+        service_category: _serviceCategory,
+        service_name: ((svc && svc.name) || state.serviceId || '') + (_lenName ? ' · ' + _lenName : ''),
+        specialist: (m && m.name) || '',
+        value: Number(_slot.price) || 0,
+        currency: 'USD',
+        booking_id: (res && res.bookingId) || '',
+      });
+    } catch (err) {
+      try { console.error('tracking build failed', err); } catch (_) {}
+    }
     const payLine = res.paidWith === 'package'
       ? `${m ? m.name : ''} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
       : `${m ? m.name : ''} · ${fmtMoney(state.slot.price)} (pay in person)`;
