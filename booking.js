@@ -100,12 +100,34 @@
     } catch (_) { return null; }
   }
 
-  // Конверсия «бронь создана» — строго один раз на booking_id (дедупликация).
-  // GA4 на сайте подключён напрямую через gtag.js — поэтому шлём событие через gtag
-  // (как и все остальные события). НЕ проверяем window.google_tag_manager: gtag.js сам
-  // создаёт этот объект, из-за чего раньше событие не отправлялось. Дедуп по booking_id.
+  // Логируем РЕАЛЬНУЮ потерю денежной конверсии — громко в консоль и best-effort в воркер.
+  // sendBeacon переживает уход со страницы и не блокирует UI. Тихие потери — ровно то,
+  // из-за чего выручка приходила в GA4 без источника; пусть каждая падает в лог.
+  function logConvIssue(reason, d, err) {
+    try { console.error('CONVERSION_ISSUE:', reason, d || {}, err || ''); } catch (_) {}
+    try {
+      const payload = JSON.stringify({
+        reason,
+        booking_id: (d && d.booking_id) || null,
+        value: (d && d.value) || null,
+        message: (err && err.message) || undefined,
+        url: location.href,
+        ua: navigator.userAgent,
+        t: Date.now(),
+      });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(CONFIG.apiBase + '/api/log-conversion', new Blob([payload], { type: 'application/json' }));
+      }
+    } catch (_) {}
+  }
+
+  // Конверсии по факту успешной брони — строго один раз на booking_id (дедупликация).
+  // Шлём три события с клиента, где живёт настоящая кука _ga (правильная атрибуция к google/cpc):
+  //   1) booking_completed — GA4 key event (отчёты по услугам)
+  //   2) purchase          — GA4 ecommerce (серверный Measurement Protocol отключён)
+  //   3) conversion        — Google Ads, привязка к gclid из куки _gcl_aw
   // Обёрнуто целиком: сбой трекинга не должен ломать экран «You're booked!».
-  function trackBookingCompleted(d) {
+  function trackBookingCompleted(d, item) {
     try {
       if (!d || !d.booking_id) return;
       try {
@@ -114,15 +136,56 @@
         done.push(d.booking_id);
         sessionStorage.setItem('vs_bk_done', JSON.stringify(done.slice(-30)));
       } catch (_) {}
+
+      // Оплата подтверждена — грузим gtag немедленно, не ждём 3-сек таймер, иначе
+      // денежная конверсия может не успеть уйти до ухода со страницы.
+      try { if (typeof window.vsEnsureAnalytics === 'function') window.vsEnsureAnalytics(); } catch (_) {}
+
       try { console.log('booking_completed →', d); } catch (_) {}
+
+      // 1) GA4 key event
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'booking_completed', d);
+      } else {
+        logConvIssue('gtag_unavailable_booking_completed', d);
       }
       // На случай, если позже появится GTM-контейнер — продублируем в dataLayer как custom event.
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push(Object.assign({ event: 'booking_completed' }, d));
+
+      // 2) GA4 purchase — на клиенте. transaction_id = booking_id (дедуп с любым серверным событием).
+      try {
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'purchase', {
+            transaction_id: d.booking_id,
+            value: Number(d.value) || 0,
+            currency: d.currency || 'USD',
+            items: item ? [item] : undefined,
+          });
+        } else {
+          logConvIssue('gtag_unavailable_purchase', d);
+        }
+      } catch (err) { logConvIssue('purchase_threw', d, err); }
+
+      // 3) Google Ads конверсия — привязка к gclid из куки _gcl_aw.
+      try {
+        const sendTo = window.VS_ADS_CONVERSION;
+        if (!sendTo) {
+          // Тег ещё не заведён маркетологом — ожидаемое состояние, не потеря конверсии.
+          try { console.info('ads conversion skipped: VS_ADS_CONVERSION not set yet →', d.booking_id); } catch (_) {}
+        } else if (typeof window.gtag === 'function') {
+          window.gtag('event', 'conversion', {
+            send_to: sendTo,
+            value: Number(d.value) || 0,
+            currency: d.currency || 'USD',
+            transaction_id: d.booking_id,
+          });
+        } else {
+          logConvIssue('gtag_unavailable_ads_conversion', d);
+        }
+      } catch (err) { logConvIssue('ads_conversion_threw', d, err); }
     } catch (err) {
-      try { console.error('booking_completed failed', err); } catch (_) {}
+      logConvIssue('track_booking_completed_threw', d, err);
     }
   }
 
@@ -458,14 +521,25 @@
       const _slot = state.slot || {};
       const _ls = lengthsFor(state.serviceId, _slot.masterId);
       const _lenName = _ls && state.length ? ((_ls.find((L) => L.id === state.length) || {}).name) : null;
+      const _fullName = ((svc && svc.name) || state.serviceId || '') + (_lenName ? ' · ' + _lenName : '');
+      const _value = Number(_slot.price) || 0;
+      // Товар для GA4 purchase — тот же, что в booking_completed.
+      const _item = {
+        item_id: (svc && svc.id) || state.serviceId || undefined,
+        item_name: _fullName,
+        item_category: (_cat && _cat.name) || undefined,
+        item_variant: (m && m.name) || undefined,
+        price: _value,
+        quantity: 1,
+      };
       trackBookingCompleted({
         service_category: _serviceCategory,
-        service_name: ((svc && svc.name) || state.serviceId || '') + (_lenName ? ' · ' + _lenName : ''),
+        service_name: _fullName,
         specialist: (m && m.name) || '',
-        value: Number(_slot.price) || 0,
+        value: _value,
         currency: 'USD',
         booking_id: (res && res.bookingId) || '',
-      });
+      }, _item);
     } catch (err) {
       try { console.error('tracking build failed', err); } catch (_) {}
     }
