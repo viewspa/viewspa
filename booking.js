@@ -425,6 +425,19 @@
       `<div class="bk-days">${dayTabs}</div><div class="bk-slots">${slots}</div>`, { back: true });
   }
 
+  // Приводим телефон к E.164 (Square требует код страны), но даём вводить как удобно.
+  // 10 цифр → US (+1); 11 с ведущей «1» → +1…; ввод, начатый с «+» → как есть;
+  // иначе считаем, что код страны клиент уже указал.
+  function normalizePhone(raw) {
+    const s = String(raw || '').trim();
+    const d = s.replace(/[^\d]/g, '');
+    if (!d) return '';
+    if (s[0] === '+') return '+' + d;
+    if (d.length === 10) return '+1' + d;
+    if (d.length === 11 && d[0] === '1') return '+' + d;
+    return '+' + d;
+  }
+
   function renderDetails() {
     state.step = 'details';
     const svc = getService(state.serviceId);
@@ -444,11 +457,8 @@
       `${summary}
        <form id="bk-form" class="bk-form">
          <label>Full name<input name="name" required autocomplete="name"></label>
-         <label>Phone <span class="bk-hint">— country code first, e.g. +1 for the US</span>
-           <span class="bk-phone-field">
-             <span class="bk-phone-plus" aria-hidden="true">+</span>
-             <input name="phone" type="tel" inputmode="numeric" required autocomplete="tel" placeholder="1 305 555 1234" pattern="[0-9]{7,15}" title="Type digits with your country code, e.g. 1 305 555 1234">
-           </span>
+         <label>Phone
+           <input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(305) 555-1234" title="Your mobile number — we’ll text your confirmation">
          </label>
          <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
@@ -459,13 +469,8 @@
        </form>`, { back: true });
     renderTurnstile();
     const _form = document.getElementById('bk-form');
-    // Телефон в формате E.164: держим ведущий «+» и только цифры (Square требует код страны).
-    const _phone = _form.querySelector('input[name="phone"]');
-    if (_phone) {
-      const normPhone = () => { _phone.value = _phone.value.replace(/[^\d]/g, ''); };
-      _phone.addEventListener('input', normPhone);
-      _phone.addEventListener('blur', normPhone);
-    }
+    // Телефон нормализуем при отправке (см. normalizePhone), а НЕ по ходу ввода — чтобы
+    // клиент мог писать привычно: (305) 555-1234. Код страны (+1) подставляется сам.
     _form.addEventListener('submit', submitBooking);
   }
 
@@ -478,14 +483,14 @@
     btn.disabled = true; btn.textContent = 'Booking…';
     try {
       const fd = new FormData(form);
-      const phoneDigits = String(fd.get('phone') || '').replace(/[^\d]/g, '');
+      const phone = normalizePhone(fd.get('phone'));
       const res = await api('/api/book', {
         serviceId: state.serviceId,
         masterId: state.slot.masterId,
         length: state.length || undefined,
         startAt: state.slot.startAt,
         serviceVariationVersion: state.slot.serviceVariationVersion,
-        customer: { name: fd.get('name'), email: fd.get('email'), phone: phoneDigits ? '+' + phoneDigits : '', note: fd.get('note') },
+        customer: { name: fd.get('name'), email: fd.get('email'), phone, note: fd.get('note') },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
         gclid: storedClickId('gclid') || undefined,
         gbraid: storedClickId('gbraid') || undefined,
