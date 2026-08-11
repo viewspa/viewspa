@@ -54,6 +54,7 @@
     return null;
   }
   function priceRange(svc) {
+    if (svc.dualMaster) return fmtMoney(svc.price);
     const ps = svc.masters.map((m) => m.price);
     const lo = Math.min(...ps), hi = Math.max(...ps);
     return lo === hi ? fmtMoney(lo) : `${fmtMoney(lo)}–${fmtMoney(hi)}`;
@@ -442,6 +443,9 @@
     state.step = 'details';
     const svc = getService(state.serviceId);
     const m = state.masters[state.slot.masterId];
+    const masterLabel = svc.dualMaster
+      ? svc.dualMaster.map((s) => (state.masters[s.masterId] || {}).name).filter(Boolean).join(' + ')
+      : (m ? m.name : '');
     const _ls = lengthsFor(state.serviceId, state.slot.masterId);
     const _lenName = _ls && state.length ? (_ls.find((L) => L.id === state.length) || {}).name : null;
     track('begin_checkout', { currency: 'USD', value: state.slot.price, items: [gaItem()] });
@@ -449,7 +453,7 @@
       <div class="bk-summary">
         <div><b>${svc.name}${_lenName ? ' · ' + _lenName + ' length' : ''}</b></div>
         <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)} · ${fmtDur(svc.durationMin)}</div>
-        <div>${m ? m.name : ''} · ${fmtMoney(state.slot.price)}</div>
+        <div>${masterLabel} · ${fmtMoney(state.slot.price)}</div>
       </div>`;
     const turnstile = CONFIG.turnstileSiteKey
       ? `<div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>` : '';
@@ -514,6 +518,9 @@
     state.step = 'done';
     const svc = getService(state.serviceId);
     const m = state.masters[state.slot.masterId];
+    const masterLabel = svc && svc.dualMaster
+      ? svc.dualMaster.map((s) => (state.masters[s.masterId] || {}).name).filter(Boolean).join(' + ')
+      : (m ? m.name : '');
     // Конверсия «бронь создана» — отдельно по категории услуги (nails/massage),
     // строго после успешного ответа воркера. Параметры собираем защищённо: отсутствие
     // любого необязательного поля не должно помешать отправке события.
@@ -549,8 +556,8 @@
       try { console.error('tracking build failed', err); } catch (_) {}
     }
     const payLine = res.paidWith === 'package'
-      ? `${m ? m.name : ''} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
-      : `${m ? m.name : ''} · ${fmtMoney(state.slot.price)} (pay in person)`;
+      ? `${masterLabel} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
+      : `${masterLabel} · ${fmtMoney(state.slot.price)} (pay in person)`;
     shell('You’re booked! 🎉', 'We’ll confirm your appointment shortly.',
       `<div class="bk-summary bk-summary-done">
          <div><b>${svc.name}</b></div>
@@ -566,7 +573,11 @@
     const order = ['category', 'subcategory', 'service', 'master', 'time', 'details'];
     const map = {
       details: 'time',
-      time: () => (lengthsFor(state.serviceId, state.masterId) ? 'length' : 'master'),
+      time: () => {
+        const svc = getService(state.serviceId);
+        if (svc && svc.dualMaster) return 'service';
+        return lengthsFor(state.serviceId, state.masterId) ? 'length' : 'master';
+      },
       length: 'master',
       master: 'service',
       service: () => {
@@ -596,7 +607,8 @@
     if (act === 'svc') {
       state.serviceId = t.dataset.id; state.masterId = null; state.slot = null; state.length = null;
       track('select_item', { items: [gaItem()] });
-      return renderMaster();
+      const _svc = getService(state.serviceId);
+      return _svc && _svc.dualMaster ? loadTime() : renderMaster();
     }
     if (act === 'master') { state.masterId = t.dataset.id || null; return maybeLengthThenTime(); }
     if (act === 'length') { state.length = t.dataset.id; return loadTime(); }
@@ -625,6 +637,7 @@
         state.categoryId = svc.cat.id;
         state.subcategoryId = svc.sub.id;
         state.serviceId = serviceId;
+        if (svc.dualMaster) { track('select_item', { items: [gaItem()] }); return loadTime(); }
         if (masterId && svc.masters.some((m) => m.masterId === masterId)) state.masterId = masterId;
         if (lengthParam) {
           const ls = lengthsFor(serviceId, state.masterId);

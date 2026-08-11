@@ -235,4 +235,34 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure"/>
   </url>
+  <url>
+    <loc>https://viewspa.miami/gallery</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/gallery"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/gallery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/gallery"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/gallery"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/ru/gallery</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/gallery"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/gallery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/gallery"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/gallery"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/gallery</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/gallery"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/gallery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/gallery"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/gallery"/>
+  </url>
 </urlset>
