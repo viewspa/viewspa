@@ -32,7 +32,35 @@
   }
 
   /* Header shadow */
-  function initHeaderShadow(){window.addEventListener('scroll',()=>{const h=document.getElementById('site-header'); if(h) h.classList.toggle('scrolled',window.scrollY>40);},{passive:true});}
+  /* Тень у шапки: тоже через наблюдателя, а не слушатель скролла. */
+  function initHeaderShadow(){
+    const h=document.getElementById('site-header');
+    if(!h) return;
+    if(!('IntersectionObserver' in window)) return;
+    const top=document.createElement('div');
+    top.setAttribute('aria-hidden','true');
+    top.style.cssText='position:absolute;top:0;left:0;width:1px;height:40px;pointer-events:none;visibility:hidden';
+    document.body.appendChild(top);
+    new IntersectionObserver(([e])=>h.classList.toggle('scrolled',!e.isIntersecting),{threshold:0}).observe(top);
+  }
+
+  /* Плавающие кнопки звонка и WhatsApp появляются только после первого экрана:
+     на самом верху они ложились поверх текста героя (аудит D-01). */
+  function initFloatingCtas(){
+    const els=[document.querySelector('.sticky-call'),document.querySelector('.sticky-whatsapp')].filter(Boolean);
+    if(!els.length) return;
+    els.forEach(el=>el.classList.add('cta-float'));
+    const show=(on)=>els.forEach(el=>el.classList.toggle('cta-float-in',on));
+
+    // Наблюдатель вместо слушателя скролла: слушатель дёргает пересчёт
+    // на каждый кадр прокрутки и просаживает мобильные устройства.
+    if(!('IntersectionObserver' in window)){ show(true); return; }
+    const sentinel=document.createElement('div');
+    sentinel.setAttribute('aria-hidden','true');
+    sentinel.style.cssText='position:absolute;top:0;left:0;width:1px;height:70vh;pointer-events:none;visibility:hidden';
+    document.body.appendChild(sentinel);
+    new IntersectionObserver(([e])=>show(!e.isIntersecting),{threshold:0}).observe(sentinel);
+  }
 
   /* Hamburger menu */
   function initHamburger(){
@@ -379,7 +407,7 @@
       let intervalId = null;
 
       [kicker, headline].forEach((el) => {
-        el.style.transition = 'opacity .35s ease, transform .35s ease';
+        el.style.transition = 'opacity .35s var(--ease), transform .35s var(--ease)';
         el.style.willChange = 'opacity, transform';
       });
 
@@ -414,32 +442,44 @@
     });
   }
 
-  /* Fade-in on scroll */
+  /* Fade-in on scroll.
+     Контент по умолчанию видим: скрывает его CSS-класс .js-reveal, который
+     навешивается только если JS жив и пользователь не просил убрать анимации.
+     Раньше opacity:0 ставился инлайном - при сбое JS блоки исчезали совсем. */
   function initScrollReveal() {
     if (!window.IntersectionObserver) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const targets = document.querySelectorAll(
       '.team-card, .offer-card, .svc-split-card, .pain-gain, .sec-title, .nw-item, .swiper-slide, .pain-bar, .master-bar, .bk-spec-card, .trust-item, .faq-item, .sterile-item, .master-card, .how-card, .svc-item, .pg-panel, .mini-cta-bar, .award-card'
     );
-    targets.forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(24px)';
-      el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
-    });
+    targets.forEach(el => el.classList.add('js-reveal'));
+
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.style.opacity = '1';
-          e.target.style.transform = 'translateY(0)';
-          io.unobserve(e.target);
-        }
+        if (!e.isIntersecting) return;
+        // соседи в одном ряду выезжают каскадом, а не одним щелчком
+        const row = Array.prototype.indexOf.call(e.target.parentNode.children, e.target);
+        e.target.style.transitionDelay = Math.min(row, 4) * 70 + 'ms';
+        e.target.classList.add('js-reveal-in');
+        io.unobserve(e.target);
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     targets.forEach(el => io.observe(el));
+
+    // страховка: всё, что осталось скрытым через 4 секунды, показываем принудительно
+    window.setTimeout(() => {
+      document.querySelectorAll('.js-reveal:not(.js-reveal-in)').forEach(el => {
+        const b = el.getBoundingClientRect();
+        if (b.top < window.innerHeight) el.classList.add('js-reveal-in');
+      });
+    }, 4000);
   }
 
   /* Initialize on DOM ready */
   document.addEventListener('DOMContentLoaded', ()=>{
     initHeaderShadow();
+    initFloatingCtas();
     initHamburger();
     initSwipers();
     initBookingModal();

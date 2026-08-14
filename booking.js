@@ -1,5 +1,5 @@
 /**
- * View Spa — booking flow (front-end).
+ * View Spa - booking flow (front-end).
  * Шаги: Category → Subcategory → Service → Master/Any → Date&Time → Details → Done.
  * Общается с Cloudflare Worker (см. CONFIG.apiBase).
  */
@@ -8,12 +8,17 @@
 
   const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
   const CONFIG = {
-    // Локально — wrangler dev; на проде — URL воркера (заполнить после деплоя).
+    // Локально - wrangler dev; на проде - URL воркера (заполнить после деплоя).
     apiBase: isLocal ? 'http://localhost:8787' : 'https://viewspa-booking.ivanseydametov.workers.dev',
-    // На localhost — тестовый site key Turnstile (всегда проходит, для разработки),
-    // на проде — реальный публичный site key.
+    // На localhost - тестовый site key Turnstile (всегда проходит, для разработки),
+    // на проде - реальный публичный site key.
     turnstileSiteKey: isLocal ? '1x00000000000000000000AA' : '0x4AAAAAADdzLSWcgv1JlXj3',
-    daysToShow: 21,
+    // насколько далеко вперёд можно листать календарь (Square отдаёт
+    // максимум 32 дня за запрос, поэтому тянем помесячно и кешируем)
+    monthsAhead: 3,
+    soonestCount: 6,
+    locale: 'en-US',
+    dowLabels: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
   };
 
   const state = {
@@ -25,10 +30,11 @@
     subcategoryId: null,
     serviceId: null,
     masterId: null, // null = «любой/сравнить»
-    length: null,   // выбранная длина (short/medium/long) для услуг с длинами
+    length: null, // выбранная длина (short/medium/long) для услуг с длинами
     slot: null,
-    slotsByDay: null,
     selectedDay: null,
+    monthCursor: null,   // {y, m} - какой месяц показан в календаре
+    monthCache: {},      // '2026-08' -> { '2026-08-14': [slot, ...] }
   };
 
   const root = document.getElementById('booking-app');
@@ -57,7 +63,7 @@
     if (svc.dualMaster) return fmtMoney(svc.price);
     const ps = svc.masters.map((m) => m.price);
     const lo = Math.min(...ps), hi = Math.max(...ps);
-    return lo === hi ? fmtMoney(lo) : `${fmtMoney(lo)}–${fmtMoney(hi)}`;
+    return lo === hi ? fmtMoney(lo) : `${fmtMoney(lo)} - ${fmtMoney(hi)}`;
   }
 
   // ── GA4 трекинг (конверсии по услугам) ──────────────────────────────
@@ -101,8 +107,8 @@
     } catch (_) { return null; }
   }
 
-  // Логируем РЕАЛЬНУЮ потерю денежной конверсии — громко в консоль и best-effort в воркер.
-  // sendBeacon переживает уход со страницы и не блокирует UI. Тихие потери — ровно то,
+  // Логируем РЕАЛЬНУЮ потерю денежной конверсии - громко в консоль и best-effort в воркер.
+  // sendBeacon переживает уход со страницы и не блокирует UI. Тихие потери - ровно то,
   // из-за чего выручка приходила в GA4 без источника; пусть каждая падает в лог.
   function logConvIssue(reason, d, err) {
     try { console.error('CONVERSION_ISSUE:', reason, d || {}, err || ''); } catch (_) {}
@@ -122,11 +128,11 @@
     } catch (_) {}
   }
 
-  // Конверсии по факту успешной брони — строго один раз на booking_id (дедупликация).
+  // Конверсии по факту успешной брони - строго один раз на booking_id (дедупликация).
   // Шлём три события с клиента, где живёт настоящая кука _ga (правильная атрибуция к google/cpc):
-  //   1) booking_completed — GA4 key event (отчёты по услугам)
-  //   2) purchase          — GA4 ecommerce (серверный Measurement Protocol отключён)
-  //   3) conversion        — Google Ads, привязка к gclid из куки _gcl_aw
+  // 1) booking_completed - GA4 key event (отчёты по услугам)
+  // 2) purchase - GA4 ecommerce (серверный Measurement Protocol отключён)
+  // 3) conversion - Google Ads, привязка к gclid из куки _gcl_aw
   // Обёрнуто целиком: сбой трекинга не должен ломать экран «You're booked!».
   function trackBookingCompleted(d, item) {
     try {
@@ -138,7 +144,7 @@
         sessionStorage.setItem('vs_bk_done', JSON.stringify(done.slice(-30)));
       } catch (_) {}
 
-      // Оплата подтверждена — грузим gtag немедленно, не ждём 3-сек таймер, иначе
+      // Оплата подтверждена - грузим gtag немедленно, не ждём 3-сек таймер, иначе
       // денежная конверсия может не успеть уйти до ухода со страницы.
       try { if (typeof window.vsEnsureAnalytics === 'function') window.vsEnsureAnalytics(); } catch (_) {}
 
@@ -150,11 +156,11 @@
       } else {
         logConvIssue('gtag_unavailable_booking_completed', d);
       }
-      // На случай, если позже появится GTM-контейнер — продублируем в dataLayer как custom event.
+      // На случай, если позже появится GTM-контейнер - продублируем в dataLayer как custom event.
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push(Object.assign({ event: 'booking_completed' }, d));
 
-      // 2) GA4 purchase — на клиенте. transaction_id = booking_id (дедуп с любым серверным событием).
+      // 2) GA4 purchase - на клиенте. transaction_id = booking_id (дедуп с любым серверным событием).
       try {
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'purchase', {
@@ -168,11 +174,11 @@
         }
       } catch (err) { logConvIssue('purchase_threw', d, err); }
 
-      // 3) Google Ads конверсия — привязка к gclid из куки _gcl_aw.
+      // 3) Google Ads конверсия - привязка к gclid из куки _gcl_aw.
       try {
         const sendTo = window.VS_ADS_CONVERSION;
         if (!sendTo) {
-          // Тег ещё не заведён маркетологом — ожидаемое состояние, не потеря конверсии.
+          // Тег ещё не заведён маркетологом - ожидаемое состояние, не потеря конверсии.
           try { console.info('ads conversion skipped: VS_ADS_CONVERSION not set yet →', d.booking_id); } catch (_) {}
         } else if (typeof window.gtag === 'function') {
           window.gtag('event', 'conversion', {
@@ -190,7 +196,7 @@
     }
   }
 
-  // Состояние Turnstile для текущей формы (виджет одноразовый — токен живёт до одной отправки).
+  // Состояние Turnstile для текущей формы (виджет одноразовый - токен живёт до одной отправки).
   const ts = { widgetId: null, token: null, failed: false };
 
   // Не блокирующее предупреждение в #bk-form-err: капча сбоит, но форму не запираем.
@@ -213,7 +219,7 @@
     return form?.querySelector('[name="cf-turnstile-response"]')?.value || '';
   }
 
-  // Сброс виджета после неудачной отправки — иначе одноразовый токен «протух».
+  // Сброс виджета после неудачной отправки - иначе одноразовый токен «протух».
   function resetTurnstile() {
     ts.token = null;
     try { if (window.turnstile && ts.widgetId != null) window.turnstile.reset(ts.widgetId); }
@@ -221,7 +227,7 @@
   }
 
   // Рендер Turnstile с ожиданием загрузки скрипта (виджет на динамической форме).
-  // appearance:'interaction-only' — чекбокс не показываем, пока он реально не нужен.
+  // appearance:'interaction-only' - чекбокс не показываем, пока он реально не нужен.
   function renderTurnstile() {
     if (!CONFIG.turnstileSiteKey) return;
     const el = root.querySelector('.cf-turnstile');
@@ -230,7 +236,7 @@
     let tries = 0;
     const fail = (msg) => {
       ts.failed = true;
-      formNotice(msg || 'Security check is slow to load. You can still tap Confirm — if it doesn’t go through, call or WhatsApp us and we’ll book you in.');
+      formNotice(msg || 'Security check is slow to load. You can still tap Confirm - if it doesn’t go through, call or WhatsApp us and we’ll book you in.');
     };
     const tryRender = () => {
       if (window.turnstile && window.turnstile.render) {
@@ -248,7 +254,7 @@
       } else if (tries++ < 60) {
         setTimeout(tryRender, 100);
       } else {
-        // Скрипт Cloudflare так и не загрузился (блокировщик/сеть) — не запираем форму.
+        // Скрипт Cloudflare так и не загрузился (блокировщик/сеть) - не запираем форму.
         fail('Security check couldn’t load (it may be blocked by your browser). Tap Confirm to try anyway, or call/WhatsApp us to book.');
       }
     };
@@ -301,7 +307,7 @@
   function renderSubcategory() {
     state.step = 'subcategory';
     const cat = state.categories.find((c) => c.id === state.categoryId);
-    // если всего одна подкатегория — пропускаем
+    // если всего одна подкатегория - пропускаем
     if (cat.subcategories.length === 1) { state.subcategoryId = cat.subcategories[0].id; return renderService(); }
     const cards = cat.subcategories.map((s) =>
       `<button class="bk-tile" data-act="sub" data-id="${s.id}">
@@ -333,7 +339,7 @@
     const entry = svc && svc.masters.find((m) => m.masterId === masterId);
     return entry && Array.isArray(entry.lengths) && entry.lengths.length ? entry.lengths : null;
   }
-  // После выбора мастера: если есть длины и она ещё не выбрана — показать шаг длины.
+  // После выбора мастера: если есть длины и она ещё не выбрана - показать шаг длины.
   function maybeLengthThenTime() {
     const lengths = lengthsFor(state.serviceId, state.masterId);
     if (lengths && !state.length) return renderLength();
@@ -360,7 +366,7 @@
     state.length = null;
     const svc = getService(state.serviceId);
     const masters = svc.masters.map((m) => ({ ...state.masters[m.masterId], price: m.price }));
-    // один мастер — пропускаем выбор
+    // один мастер - пропускаем выбор
     if (masters.length === 1) { state.masterId = masters[0].id; return maybeLengthThenTime(); }
     const cards = masters.map((m) =>
       `<button class="bk-master" data-act="master" data-id="${m.id}">
@@ -382,48 +388,205 @@
     shell('Choose your specialist', `For ${svc.name}.`, `<div class="bk-list">${any}${cards}</div>`, { back: true });
   }
 
+  // ── доступность по месяцам ─────────────────────────────────────────
+  // Square разрешает искать не больше чем на 32 дня за запрос, поэтому
+  // тянем помесячно и кешируем: клиент может листать на CONFIG.monthsAhead
+  // месяцев вперёд, а не только по ближайшим свободным слотам.
+  const monthKey = (y, m) => `${y}-${String(m + 1).padStart(2, '0')}`;
+
+  function monthTitle(y, m) {
+    return new Intl.DateTimeFormat(CONFIG.locale, { month: 'long', year: 'numeric', timeZone: tz() })
+      .format(new Date(Date.UTC(y, m, 15)));
+  }
+
+  // границы окна: от сегодня до последнего дня месяца +monthsAhead
+  function monthLimits() {
+    const now = new Date();
+    const first = { y: now.getFullYear(), m: now.getMonth() };
+    const lastDate = new Date(now.getFullYear(), now.getMonth() + CONFIG.monthsAhead, 1);
+    return { first, last: { y: lastDate.getFullYear(), m: lastDate.getMonth() } };
+  }
+  const monthIndex = (y, m) => y * 12 + m;
+
+  async function loadMonth(y, m) {
+    const key = monthKey(y, m);
+    if (state.monthCache[key]) return state.monthCache[key];
+
+    const now = new Date();
+    const startOfMonth = new Date(y, m, 1, 0, 0, 0);
+    const from = startOfMonth > now ? startOfMonth : now;
+    const to = new Date(y, m + 1, 1, 0, 0, 0); // первое число следующего месяца
+
+    const { slots } = await api('/api/availability', {
+      serviceId: state.serviceId, masterId: state.masterId || undefined,
+      length: state.length || undefined,
+      from: from.toISOString(), to: to.toISOString(),
+    });
+    const byDay = {};
+    for (const s of slots) { (byDay[dayKey(s.startAt)] ||= []).push(s); }
+    for (const d of Object.keys(byDay)) byDay[d].sort((a, b) => a.startAt.localeCompare(b.startAt));
+    state.monthCache[key] = byDay;
+    return byDay;
+  }
+
+  function timeHeader() {
+    const svc = getService(state.serviceId);
+    return `${svc.name}${state.masterId ? ' · ' + state.masters[state.masterId].name : ''}`;
+  }
+
   async function loadTime() {
     state.step = 'time';
-    const svc = getService(state.serviceId);
-    shell('Pick a date & time', `${svc.name}${state.masterId ? ' · ' + state.masters[state.masterId].name : ''}`,
-      `<div class="bk-loading">Loading availability…</div>`, { back: true });
+    const now = new Date();
+    state.monthCache = state.monthCache || {};
+    if (!state.monthCursor) state.monthCursor = { y: now.getFullYear(), m: now.getMonth() };
+    shell('Pick a date & time', timeHeader(), `<div class="bk-loading">Loading availability…</div>`, { back: true });
     try {
-      const from = new Date();
-      const to = new Date(Date.now() + CONFIG.daysToShow * 86400000);
-      const { slots } = await api('/api/availability', {
-        serviceId: state.serviceId, masterId: state.masterId || undefined,
-        length: state.length || undefined,
-        from: from.toISOString(), to: to.toISOString(),
-      });
-      const byDay = {};
-      for (const s of slots) { (byDay[dayKey(s.startAt)] ||= []).push(s); }
-      state.slotsByDay = byDay;
-      state.selectedDay = Object.keys(byDay).sort()[0] || null;
+      await loadMonth(state.monthCursor.y, state.monthCursor.m);
+      // подтягиваем следующий месяц, если в текущем уже ничего нет
+      const cur = state.monthCache[monthKey(state.monthCursor.y, state.monthCursor.m)];
+      if (!Object.keys(cur).length) {
+        const lim = monthLimits();
+        const nxt = new Date(state.monthCursor.y, state.monthCursor.m + 1, 1);
+        if (monthIndex(nxt.getFullYear(), nxt.getMonth()) <= monthIndex(lim.last.y, lim.last.m)) {
+          state.monthCursor = { y: nxt.getFullYear(), m: nxt.getMonth() };
+          await loadMonth(state.monthCursor.y, state.monthCursor.m);
+        }
+      }
+      pickDefaultDay();
       renderTime();
     } catch (e) {
-      shell('Pick a date & time', '', `<div class="bk-error">Could not load availability: ${e.message}</div>`, { back: true });
+      shell('Pick a date & time', timeHeader(), `<div class="bk-error">Could not load availability: ${e.message}</div>`, { back: true });
     }
   }
 
+  function currentMonthDays() {
+    return state.monthCache[monthKey(state.monthCursor.y, state.monthCursor.m)] || {};
+  }
+
+  function pickDefaultDay() {
+    const byDay = currentMonthDays();
+    const days = Object.keys(byDay).sort();
+    if (!state.selectedDay || !byDay[state.selectedDay]) state.selectedDay = days[0] || null;
+  }
+
+  // ближайшие свободные слоты - быстрый путь для тех, кому «когда угодно, но скорее»
+  function soonestHtml() {
+    const keys = Object.keys(state.monthCache).sort();
+    const out = [];
+    for (const k of keys) {
+      for (const d of Object.keys(state.monthCache[k]).sort()) {
+        for (const s of state.monthCache[k][d]) {
+          out.push({ day: d, slot: s });
+          if (out.length >= CONFIG.soonestCount) break;
+        }
+        if (out.length >= CONFIG.soonestCount) break;
+      }
+      if (out.length >= CONFIG.soonestCount) break;
+    }
+    if (!out.length) return '';
+    const chips = out.map(({ day, slot }) => {
+      const i = state.monthCache[monthKey(+day.slice(0, 4), +day.slice(5, 7) - 1)][day].indexOf(slot);
+      const who = !state.masterId && slot.masterId ? `<em>${state.masters[slot.masterId]?.name || ''}</em>` : '';
+      return `<button class="bk-soon" data-act="slot" data-day="${day}" data-i="${i}">
+                <span class="bk-soon-day">${dayLabel(slot.startAt)}</span>
+                <span class="bk-soon-time">${timeLabel(slot.startAt)}</span>${who}
+              </button>`;
+    }).join('');
+    return `<div class="bk-soonest">
+              <p class="bk-block-title">Soonest available</p>
+              <div class="bk-soon-row">${chips}</div>
+            </div>`;
+  }
+
+  function calendarHtml() {
+    const { y, m } = state.monthCursor;
+    const lim = monthLimits();
+    const idx = monthIndex(y, m);
+    const canPrev = idx > monthIndex(lim.first.y, lim.first.m);
+    const canNext = idx < monthIndex(lim.last.y, lim.last.m);
+    const byDay = currentMonthDays();
+
+    // сетка с понедельника
+    const firstDow = (new Date(y, m, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const todayKey = new Intl.DateTimeFormat('en-CA', { timeZone: tz(), year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+
+    let cells = '';
+    for (let i = 0; i < firstDow; i++) cells += `<span class="bk-cal-cell bk-cal-empty" aria-hidden="true"></span>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const has = !!byDay[key];
+      const isSel = key === state.selectedDay;
+      const isToday = key === todayKey;
+      const cls = ['bk-cal-day', has ? 'has' : 'none', isSel ? 'on' : '', isToday ? 'today' : ''].filter(Boolean).join(' ');
+      cells += has
+        ? `<button class="${cls}" data-act="day" data-id="${key}" aria-label="${dayLabel(byDay[key][0].startAt)}, ${byDay[key].length} times available">${d}<span class="bk-cal-dot" aria-hidden="true"></span></button>`
+        : `<span class="${cls}" aria-disabled="true">${d}</span>`;
+    }
+
+    const dows = CONFIG.dowLabels.map((w) => `<span class="bk-cal-dow">${w}</span>`).join('');
+    const empty = Object.keys(byDay).length ? '' :
+      `<p class="bk-cal-empty-note">No free times this month. Try the next one.</p>`;
+
+    return `<div class="bk-plan">
+      <p class="bk-block-title">Plan ahead</p>
+      <div class="bk-cal-head">
+        <button class="bk-cal-nav" data-act="month" data-dir="-1" ${canPrev ? '' : 'disabled'} aria-label="Previous month">‹</button>
+        <span class="bk-cal-title">${monthTitle(y, m)}</span>
+        <button class="bk-cal-nav" data-act="month" data-dir="1" ${canNext ? '' : 'disabled'} aria-label="Next month">›</button>
+      </div>
+      <div class="bk-cal-grid" role="grid">${dows}${cells}</div>
+      ${empty}
+    </div>`;
+  }
+
+  function slotsHtml() {
+    const byDay = currentMonthDays();
+    const list = byDay[state.selectedDay] || [];
+    if (!list.length) return '';
+    const slots = list.map((s, i) => {
+      const tag = !state.masterId && s.masterId ? `<span class="bk-slot-who">${state.masters[s.masterId]?.name || ''}</span>` : '';
+      return `<button class="bk-slot" data-act="slot" data-i="${i}" data-day="${state.selectedDay}">${timeLabel(s.startAt)}${tag}</button>`;
+    }).join('');
+    return `<div class="bk-day-slots">
+              <p class="bk-block-title">${dayLabel(list[0].startAt)} · ${list.length} time${list.length > 1 ? 's' : ''}</p>
+              <div class="bk-slots">${slots}</div>
+            </div>`;
+  }
+
   function renderTime() {
-    const svc = getService(state.serviceId);
-    const days = Object.keys(state.slotsByDay).sort();
-    if (!days.length) {
-      shell('Pick a date & time', svc.name, `<div class="bk-error">No available times in the next ${CONFIG.daysToShow} days. Please call us at (754) 202-6666.</div>`, { back: true });
+    const anySlots = Object.values(state.monthCache).some((byDay) => Object.keys(byDay).length);
+    if (!anySlots && Object.keys(state.monthCache).length >= 2) {
+      shell('Pick a date & time', timeHeader(),
+        `${calendarHtml()}<div class="bk-error">Nothing free in this window. Please call us at (754) 202-6666 and we will find a time.</div>`,
+        { back: true });
       return;
     }
-    const dayTabs = days.map((d) => {
-      const iso = state.slotsByDay[d][0].startAt;
-      return `<button class="bk-day ${d === state.selectedDay ? 'on' : ''}" data-act="day" data-id="${d}">${dayLabel(iso)}</button>`;
-    }).join('');
-    const slots = (state.slotsByDay[state.selectedDay] || [])
-      .sort((a, b) => a.startAt.localeCompare(b.startAt))
-      .map((s, i) => {
-        const tag = !state.masterId && s.masterId ? `<span class="bk-slot-who">${state.masters[s.masterId]?.name || ''}</span>` : '';
-        return `<button class="bk-slot" data-act="slot" data-i="${i}" data-day="${state.selectedDay}">${timeLabel(s.startAt)}${tag}</button>`;
-      }).join('');
-    shell('Pick a date & time', `${svc.name}${state.masterId ? ' · ' + state.masters[state.masterId].name : ''}`,
-      `<div class="bk-days">${dayTabs}</div><div class="bk-slots">${slots}</div>`, { back: true });
+    shell('Pick a date & time', timeHeader(),
+      `${soonestHtml()}${calendarHtml()}${slotsHtml()}`, { back: true });
+  }
+
+  async function goMonth(dir) {
+    const lim = monthLimits();
+    const d = new Date(state.monthCursor.y, state.monthCursor.m + dir, 1);
+    const idx = monthIndex(d.getFullYear(), d.getMonth());
+    if (idx < monthIndex(lim.first.y, lim.first.m) || idx > monthIndex(lim.last.y, lim.last.m)) return;
+    state.monthCursor = { y: d.getFullYear(), m: d.getMonth() };
+    state.selectedDay = null;
+    const key = monthKey(state.monthCursor.y, state.monthCursor.m);
+    if (!state.monthCache[key]) {
+      const btns = root.querySelectorAll('.bk-cal-nav');
+      btns.forEach((b) => (b.disabled = true));
+      const grid = root.querySelector('.bk-cal-grid');
+      if (grid) grid.classList.add('is-loading');
+      try { await loadMonth(state.monthCursor.y, state.monthCursor.m); }
+      catch (e) {
+        shell('Pick a date & time', timeHeader(), `<div class="bk-error">Could not load availability: ${e.message}</div>`, { back: true });
+        return;
+      }
+    }
+    pickDefaultDay();
+    renderTime();
   }
 
   // Приводим телефон к E.164 (Square требует код страны), но даём вводить как удобно.
@@ -462,7 +625,7 @@
        <form id="bk-form" class="bk-form">
          <label>Full name<input name="name" required autocomplete="name"></label>
          <label>Phone
-           <input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(305) 555-1234" title="Your mobile number — we’ll text your confirmation">
+           <input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(305) 555-1234" title="Your mobile number - we’ll text your confirmation">
          </label>
          <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
@@ -473,7 +636,7 @@
        </form>`, { back: true });
     renderTurnstile();
     const _form = document.getElementById('bk-form');
-    // Телефон нормализуем при отправке (см. normalizePhone), а НЕ по ходу ввода — чтобы
+    // Телефон нормализуем при отправке (см. normalizePhone), а НЕ по ходу ввода - чтобы
     // клиент мог писать привычно: (305) 555-1234. Код страны (+1) подставляется сам.
     _form.addEventListener('submit', submitBooking);
   }
@@ -503,11 +666,11 @@
       });
       renderDone(res);
     } catch (e2) {
-      // Капча одноразовая — после ошибки берём свежий токен, иначе повтор «протухнет».
+      // Капча одноразовая - после ошибки берём свежий токен, иначе повтор «протухнет».
       resetTurnstile();
       const spam = /turnstile|spam check/i.test(e2.message || '');
       err.textContent = spam
-        ? 'Couldn’t verify you’re human. Please tap Confirm to try again — or call/WhatsApp us and we’ll book you in.'
+        ? 'Couldn’t verify you’re human. Please tap Confirm to try again - or call/WhatsApp us and we’ll book you in.'
         : e2.message;
       err.hidden = false;
       btn.disabled = false; btn.textContent = 'Confirm booking';
@@ -521,21 +684,21 @@
     const masterLabel = svc && svc.dualMaster
       ? svc.dualMaster.map((s) => (state.masters[s.masterId] || {}).name).filter(Boolean).join(' + ')
       : (m ? m.name : '');
-    // Конверсия «бронь создана» — отдельно по категории услуги (nails/massage),
+    // Конверсия «бронь создана» - отдельно по категории услуги (nails/massage),
     // строго после успешного ответа воркера. Параметры собираем защищённо: отсутствие
     // любого необязательного поля не должно помешать отправке события.
     try {
       const _cat = svc && svc.cat;
       const _catId = _cat && _cat.id;
       const _catName = (_cat && _cat.name) || '';
-      // Категория из id ('nail'/'massage'); фолбэк — по имени.
+      // Категория из id ('nail'/'massage'); фолбэк - по имени.
       const _serviceCategory = _catId === 'massage' || /massage/i.test(_catName) ? 'massage' : 'nails';
       const _slot = state.slot || {};
       const _ls = lengthsFor(state.serviceId, _slot.masterId);
       const _lenName = _ls && state.length ? ((_ls.find((L) => L.id === state.length) || {}).name) : null;
       const _fullName = ((svc && svc.name) || state.serviceId || '') + (_lenName ? ' · ' + _lenName : '');
       const _value = Number(_slot.price) || 0;
-      // Товар для GA4 purchase — тот же, что в booking_completed.
+      // Товар для GA4 purchase - тот же, что в booking_completed.
       const _item = {
         item_id: (svc && svc.id) || state.serviceId || undefined,
         item_name: _fullName,
@@ -613,16 +776,22 @@
     if (act === 'master') { state.masterId = t.dataset.id || null; return maybeLengthThenTime(); }
     if (act === 'length') { state.length = t.dataset.id; return loadTime(); }
     if (act === 'day') { state.selectedDay = t.dataset.id; return renderTime(); }
+    if (act === 'month') { return goMonth(+t.dataset.dir); }
     if (act === 'slot') {
-      const s = state.slotsByDay[t.dataset.day][+t.dataset.i];
-      state.slot = s; return renderDetails();
+      const day = t.dataset.day;
+      const byDay = state.monthCache[monthKey(+day.slice(0, 4), +day.slice(5, 7) - 1)] || {};
+      const s = (byDay[day] || [])[+t.dataset.i];
+      if (!s) return;
+      state.slot = s;
+      state.selectedDay = day;
+      return renderDetails();
     }
   });
 
   // ── диплинк по параметрам ссылки ───────────────────────────────────
-  // booking.html?service=ID&master=ID  → сразу к услуге (и мастеру)
-  // booking.html?subcategory=ID        → сразу к списку услуг подраздела
-  // booking.html?category=ID           → сразу к подразделам раздела
+  // booking.html?service=ID&master=ID → сразу к услуге (и мастеру)
+  // booking.html?subcategory=ID → сразу к списку услуг подраздела
+  // booking.html?category=ID → сразу к подразделам раздела
   function applyDeepLink() {
     const p = new URLSearchParams(location.search);
     const serviceId = p.get('service');

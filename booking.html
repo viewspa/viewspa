@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Book Online | View Spa Aventura</title>
-<link rel="icon" type="image/jpeg" href="img/logo.jpg">
+<link rel="icon" type="image/png" href="img/logo.png">
 <meta name="description" content="Book your Russian manicure, smart pedicure or therapeutic massage at View Spa Aventura. Instant online booking.">
 <meta name="robots" content="noindex,follow">
 <script src="analytics.js" defer></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Lato:wght@300;400;700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <link rel="stylesheet" href="booking.css">
 <!-- Turnstile (подключается; виджет рисуется только если задан site key в booking.js) -->
@@ -22,16 +22,15 @@
 <header id="site-header">
   <div class="container hdr">
     <a href="index.html" class="logo">
-      <img src="img/logo.jpg" alt="View Spa Aventura logo" width="120" height="46" data-hide-on-error="true">
+      <img src="img/logo.png" alt="View Spa Aventura logo" width="120" height="46" data-hide-on-error="true">
     </a>
     <nav id="navMenu" role="navigation" aria-label="Main navigation">
-      <a href="index.html" class="nav-link">Home</a>
       <a href="massage.html" class="nav-link">Massage</a>
       <a href="manicure.html" class="nav-link">Nail Services</a>
-      <a href="booking.html" class="nav-link active" aria-current="page">Book Online</a>
       <a href="packages.html" class="nav-link">Gift Cards</a>
       <a href="gallery.html" class="nav-link">Gallery</a>
     </nav>
+    <span class="lang-switch"><span class="lang-cur">EN</span><span class="lang-sep">|</span><a href="ru/index.html" hreflang="ru" lang="ru" aria-label="Перейти на русскую версию сайта">RU</a><span class="lang-sep">|</span><a href="es/index.html" hreflang="es" lang="es" aria-label="Cambiar a la versión en español">ES</a></span>
     <div class="hdr-cta">
       <a href="tel:+17542026666" class="btn btn-gold btn-compact">(754) 202-6666</a>
     </div>
@@ -55,15 +54,15 @@
 
     <div class="bk-specialists">
       <div class="bk-spec-card">
-        <img src="img/Kseniia.jpg" alt="Ksenia — Head Nail Artist" class="bk-spec-photo" loading="lazy" width="64" height="64">
+        <img src="img/Kseniia.webp" alt="Ksenia - Head Nail Artist" class="bk-spec-photo" loading="lazy" width="64" height="64">
         <div class="bk-spec-body">
           <strong class="bk-spec-name">Ksenia</strong>
           <span class="bk-spec-role">Russian Manicure · Pedicure</span>
-          <span class="bk-spec-avail">★ Nailympia Champion · 2–3 weeks ahead</span>
+          <span class="bk-spec-avail">★ Nailympia Champion · 2-3 weeks ahead</span>
         </div>
       </div>
       <div class="bk-spec-card">
-        <img src="img/Ivan.jpg" alt="Ivan — Licensed Massage Therapist" class="bk-spec-photo" loading="lazy" width="64" height="64">
+        <img src="img/Ivan.webp" alt="Ivan - Licensed Massage Therapist" class="bk-spec-photo" loading="lazy" width="64" height="64">
         <div class="bk-spec-body">
           <strong class="bk-spec-name">Ivan</strong>
           <span class="bk-spec-role">Licensed Massage Therapist · AMTA Member</span>
@@ -71,7 +70,7 @@
         </div>
       </div>
       <div class="bk-spec-card">
-        <img src="img/Anastasia.jpg" alt="Anastasia — Nail Specialist" class="bk-spec-photo" loading="lazy" width="64" height="64">
+        <img src="img/Anastasia.webp" alt="Anastasia - Nail Specialist" class="bk-spec-photo" loading="lazy" width="64" height="64">
         <div class="bk-spec-body">
           <strong class="bk-spec-name">Anastasia</strong>
           <span class="bk-spec-role">Russian Manicure · Pedicure</span>
@@ -89,7 +88,7 @@
         <a href="tel:+17542026666" class="btn btn-dark">Call (754) 202-6666</a>
         <a href="https://wa.me/17542026666?text=Hi%2C%20I%27d%20like%20to%20book%20an%20appointment%20at%20View%20Spa" target="_blank" rel="noopener" class="btn btn-outline-d"><svg viewBox="0 0 24 24" fill="#25D366" width="16" height="16" style="flex-shrink:0;vertical-align:middle" aria-hidden="true"><path fill-rule="evenodd" d="M11.997 2C6.477 2 2 6.477 2 11.997c0 1.77.462 3.43 1.264 4.875L2 22l5.283-1.384A9.954 9.954 0 0011.997 22c5.52 0 9.997-4.477 9.997-9.997S17.517 2 11.997 2zM17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg> WhatsApp us</a>
       </div>
-      <p class="bk-fallback-note">Mon–Sat: 9:00 AM – 8:00 PM · Instant response</p>
+      <p class="bk-fallback-note">Mon-Sat: 9:00 AM - 8:00 PM · Instant response</p>
     </div>
   </div>
 </main>
@@ -105,7 +104,7 @@
     }
   }, 5000);
 
-  // GA4: generate_lead — клиент связался напрямую через fallback (виджет не загрузился)
+  // GA4: generate_lead - клиент связался напрямую через fallback (виджет не загрузился)
   (function() {
     var fb = document.getElementById('bookingFallback');
     if (!fb) return;
