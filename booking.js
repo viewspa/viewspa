@@ -630,6 +630,10 @@
          <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
          <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
+         <label class="bk-agree">
+           <input type="checkbox" name="agreePolicy" required>
+           <span>I can cancel or reschedule free up to 24 hours before. Later than that is 50%, a no-show is the full price — <a href="cancellation-policy.html" target="_blank" rel="noopener">cancellation policy</a>.</span>
+         </label>
          ${turnstile}
          <button type="submit" class="btn btn-gold bk-submit">Confirm booking</button>
          <div class="bk-error" id="bk-form-err" hidden></div>

@@ -240,6 +240,58 @@
   .bk-cal-grid { max-width: none; }
   .bk-cal-day, .bk-cal-empty { height: 44px; }
 }
+/* согласие с правилами отмены — обязательная галочка перед подтверждением */
+.bk-agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 48px;              /* удобная зона нажатия на телефоне */
+  padding: 12px 14px;
+  margin: 4px 0 2px;
+  background: var(--beige);
+  border-left: 2px solid var(--brass, var(--gold));
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mid);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+.bk-agree input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--accent, var(--dark));
+  cursor: pointer;
+}
+.bk-agree a { color: var(--dark); text-decoration: underline; text-underline-offset: 2px; }
+/* когда браузер блокирует отправку — подсвечиваем, что именно не отмечено */
+.bk-agree input:invalid:focus { outline: 2px solid var(--accent, var(--dark)); outline-offset: 2px; }
+
+/* ── Правила отмены на странице записи ─────────────────────────────── */
+/* «Free cancellation 24h» в шапке — теперь ссылка на полную политику */
+.bk-policy-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+}
+.bk-policy-link:hover { color: var(--accent, var(--dark)); }
+
+/* строка под формой: правило целиком, до подтверждения записи */
+.bk-policy-note {
+  max-width: 620px;
+  margin: 22px auto 0;
+  padding: 14px 18px;
+  background: var(--beige);
+  border-left: 2px solid var(--brass, var(--gold));
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--mid);
+}
+.bk-policy-note a { color: var(--dark); text-decoration: underline; text-underline-offset: 2px; }
+
 /* стрелки месяцев стоят парой справа от названия */
 .bk-cal-title { order: 1; }
 .bk-cal-nav[data-dir="-1"] { order: 2; }

@@ -265,4 +265,34 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/gallery"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/gallery"/>
   </url>
+  <url>
+    <loc>https://viewspa.miami/cancellation-policy</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/cancellation-policy"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/ru/cancellation-policy</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/cancellation-policy"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/cancellation-policy</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/cancellation-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/cancellation-policy"/>
+  </url>
 </urlset>
