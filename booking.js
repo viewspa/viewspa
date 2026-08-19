@@ -617,6 +617,7 @@
         <div><b>${svc.name}${_lenName ? ' · ' + _lenName + ' length' : ''}</b></div>
         <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)} · ${fmtDur(svc.durationMin)}</div>
         <div>${masterLabel} · ${fmtMoney(state.slot.price)}</div>
+        <div id="bk-total-line"></div>
       </div>`;
     const turnstile = CONFIG.turnstileSiteKey
       ? `<div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>` : '';
@@ -630,6 +631,7 @@
          <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
          <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
          <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
+         <div id="bk-addon"></div>
          <label class="bk-agree">
            <input type="checkbox" name="agreePolicy" required>
            <span>I can cancel or reschedule free up to 24 hours before. Later than that is 50%, a no-show is the full price — <a href="cancellation-policy.html" target="_blank" rel="noopener">cancellation policy</a>.</span>
@@ -639,6 +641,8 @@
          <div class="bk-error" id="bk-form-err" hidden></div>
        </form>`, { back: true });
     renderTurnstile();
+    renderAddonBlock();     // если опции уже загружены (например, вернулись назад)
+    updateAddonSummary();
     const _form = document.getElementById('bk-form');
     // Телефон нормализуем при отправке (см. normalizePhone), а НЕ по ходу ввода - чтобы
     // клиент мог писать привычно: (305) 555-1234. Код страны (+1) подставляется сам.
@@ -663,6 +667,7 @@
         serviceVariationVersion: state.slot.serviceVariationVersion,
         customer: { name: fd.get('name'), email: fd.get('email'), phone, note: fd.get('note') },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
+        addon: state.addon ? { serviceId: state.addon.serviceId, startAt: state.addon.startAt } : undefined,
         gclid: storedClickId('gclid') || undefined,
         gbraid: storedClickId('gbraid') || undefined,
         wbraid: storedClickId('wbraid') || undefined,
@@ -725,11 +730,24 @@
     const payLine = res.paidWith === 'package'
       ? `${masterLabel} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
       : `${masterLabel} · ${fmtMoney(state.slot.price)} (pay in person)`;
+    // доп-услуга: подтверждена, либо честно сообщаем, что не прошла
+    const addonHtml = res.addon
+      ? `<div class="bk-done-addon">
+           <div><b>+ ${res.addon.name}</b></div>
+           <div>${dayLabel(res.addon.startAt)}, ${timeLabel(res.addon.startAt)} · ${res.addon.masterName} · ${fmtMoney(res.addon.priceWithDiscount)} <s>${fmtMoney(res.addon.price)}</s></div>
+         </div>`
+      : (res.addonFailed
+          ? `<div class="bk-done-addon bk-done-addon-warn">
+               We couldn’t hold the massage slot — we’ll call you to sort it out.
+             </div>`
+          : '');
+
     shell('You’re booked! 🎉', 'We’ll confirm your appointment shortly.',
       `<div class="bk-summary bk-summary-done">
          <div><b>${svc.name}</b></div>
          <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)}</div>
          <div>${payLine}</div>
+         ${addonHtml}
        </div>
        <a href="index.html" class="btn btn-dark" style="margin-top:18px;display:inline-block">Back to site</a>`,
       { eyebrow: 'Confirmed' });
@@ -788,9 +806,75 @@
       if (!s) return;
       state.slot = s;
       state.selectedDay = day;
-      return renderDetails();
+      state.addon = null;
+      state.addonOptions = null;
+      renderDetails();
+      loadAddonOptions();   // подгружаем в фоне — форма не ждёт
+      return;
+    }
+    if (act === 'addon') {
+      const i = +t.dataset.i;
+      const opt = (state.addonOptions || [])[i];
+      if (!opt) return;
+      // повторный клик снимает выбор
+      state.addon = (state.addon && state.addon.startAt === opt.startAt && state.addon.serviceId === opt.serviceId) ? null : opt;
+      renderAddonBlock();
+      updateAddonSummary();
+      return;
     }
   });
+
+  // ── Массаж в тот же день ───────────────────────────────────────────
+  // Показываем только те сеансы, которые примыкают к выбранному слоту
+  // (сразу после или прямо перед), чтобы не обещать невозможное.
+  async function loadAddonOptions() {
+    const svc = getService(state.serviceId);
+    if (!svc || svc.cat.id !== 'nail' || svc.dualMaster) return;   // только к ногтям
+    try {
+      const r = await api('/api/addon-slots', {
+        startAt: state.slot.startAt,
+        durationMin: state.slot.durationMin || svc.durationMin,
+      });
+      state.addonOptions = r.options || [];
+      state.addonDiscount = r.discountUsd || 20;
+      renderAddonBlock();
+    } catch (_) { /* нет доп-услуг — просто не показываем блок */ }
+  }
+
+  function renderAddonBlock() {
+    const box = document.getElementById('bk-addon');
+    if (!box) return;
+    const opts = state.addonOptions || [];
+    if (!opts.length) { box.innerHTML = ''; return; }
+
+    const rows = opts.map((o, i) => {
+      const on = state.addon && state.addon.startAt === o.startAt && state.addon.serviceId === o.serviceId;
+      const when = o.when === 'after' ? 'right after your nails' : 'right before your nails';
+      return `<button type="button" class="bk-addon-opt${on ? ' on' : ''}" data-act="addon" data-i="${i}" aria-pressed="${on}">
+          <span class="bk-addon-main">
+            <span class="bk-addon-name">${o.durationMin} min massage · ${o.masterName}</span>
+            <span class="bk-addon-when">${when} · ${timeLabel(o.startAt)}</span>
+          </span>
+          <span class="bk-addon-price"><s>${fmtMoney(o.price)}</s> ${fmtMoney(o.priceWithDiscount)}</span>
+        </button>`;
+    }).join('');
+
+    box.innerHTML = `
+      <div class="bk-addon-box">
+        <p class="bk-addon-title">Add a massage the same day — save $${state.addonDiscount || 20}</p>
+        <p class="bk-addon-sub">One visit instead of two. Ivan is free around your appointment.</p>
+        ${rows}
+      </div>`;
+  }
+
+  // подстрока с итогом в сводке заказа
+  function updateAddonSummary() {
+    const el = document.getElementById('bk-total-line');
+    if (!el) return;
+    if (!state.addon) { el.innerHTML = ''; return; }
+    const total = (Number(state.slot.price) || 0) + (Number(state.addon.priceWithDiscount) || 0);
+    el.innerHTML = `<div class="bk-total">+ ${state.addon.durationMin} min massage · <b>${fmtMoney(total)} total</b></div>`;
+  }
 
   // ── диплинк по параметрам ссылки ───────────────────────────────────
   // booking.html?service=ID&master=ID → сразу к услуге (и мастеру)
