@@ -346,3 +346,74 @@
 .bk-cal-nav[data-dir="-1"] { order: 2; }
 .bk-cal-nav[data-dir="1"] { order: 3; }
 .bk-cal-head { gap: 8px; }
+
+/* ── Интейк на массаж: с чем клиент идёт ──────────────────────────
+   Не «слот в календаре», а приём: зоны в один тап + свободный текст. */
+.bk-intake {
+  display: block;
+  margin: 4px 0 2px;
+  padding: 16px;
+  background: var(--beige);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.bk-intake-title {
+  display: block;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--dark);
+}
+
+.bk-intake-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mid);
+}
+
+.bk-intake-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 4px;
+}
+
+.bk-chip {
+  min-height: 44px;
+  padding: 10px 14px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--dark);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+
+.bk-chip:hover { border-color: var(--gold); }
+
+.bk-chip[aria-pressed="true"] {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--dark);
+  font-weight: 600;
+}
+
+/* Наследуем колоночный flex от .bk-form label, иначе textarea схлопывается
+   до ширины по умолчанию (cols) и на мобильном занимает половину блока. */
+.bk-intake label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--mid);
+}
+
+.bk-intake textarea { width: 100%; }

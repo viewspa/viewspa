@@ -89,7 +89,7 @@
       "offers": [
         {
           "@type": "Offer",
-          "name": "Express Targeted Reset - 45 min",
+          "name": "Targeted Relief - 45 min",
           "price": "65",
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock"
@@ -177,7 +177,7 @@
           "name": "How much does a session cost?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Session lengths are 45, 60 and 90 minutes. The value is in focused therapeutic work that targets pain and improves mobility, not just time on the table. Prices are listed in the service section above, and each session is built around the result you want."
+            "text": "Sessions run 45, 60 and 90 minutes, but what you are choosing is a protocol, not a block of time. Each one lists exactly what it includes, and every longer session contains everything the shorter one does. Prices are listed in the service section above."
           }
         },
         {
@@ -256,18 +256,20 @@
   <div class="page-hero-inner container">
     <span class="eyebrow">Massage therapy near me · Aventura, FL</span>
     <h1>Therapeutic massage in Aventura - for when the usual fixes stopped working.</h1>
-    <div class="hero-price-callout">
-      <div class="hero-price-grid">
-        <span class="hero-price-item"><strong>$65</strong><span>45 min</span></span>
-        <span class="hero-price-item"><strong>$85</strong><span>60 min</span></span>
-        <span class="hero-price-item"><strong>$110</strong><span>90 min</span></span>
+    <div class="hero-price-callout hero-pick">
+      <span class="hero-pick-label">Where does it hurt?</span>
+      <div class="hero-pick-row">
+        <a href="massage-lower-back-pain.html" class="hero-pick-item" data-track="concern" data-concern="lower-back">Lower back</a>
+        <a href="massage-neck-shoulder.html" class="hero-pick-item" data-track="concern" data-concern="neck-shoulder">Neck &amp; shoulders</a>
+        <a href="massage-sports-recovery.html" class="hero-pick-item" data-track="concern" data-concern="sports">After training</a>
+        <a href="massage-full-body-maintenance.html" class="hero-pick-item" data-track="concern" data-concern="maintenance">Nothing hurts yet</a>
       </div>
-      <span class="hero-price-sub">Licensed FL therapist · LMT MA107225 · 5.0 ★ Google</span>
+      <span class="hero-price-sub">From $65 · 45, 60 or 90 min · Licensed FL therapist LMT MA107225 · 5.0 ★ Google</span>
     </div>
     <p class="hero-hide-mob">If you've tried massage before and felt fine for a day, then back to square one - that's not how it has to work. Ivan doesn't run a routine. He finds what's actually holding the tension and works there.</p>
     <div class="page-hero-actions">
       <a href="booking.html?category=massage" class="btn btn-gold" data-track="booking" aria-label="Book in 60 Seconds" onclick="if(window.gtag){gtag('event','booking_click',{event_category:'conversion',event_label:'hero'});}">Book in 60 Seconds</a>
-      <a href="#services" class="btn btn-outline-w" aria-label="See 60 & 90 min options">See 60 & 90 min options</a>
+      <a href="#services" class="btn btn-outline-w" aria-label="See how a session is built">How a session works</a>
     </div>
     <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20massage%20at%20View%20Spa." target="_blank" rel="noopener" class="btn-wa-text hero-hide-mob" data-track="whatsapp" data-wa-location="hero" onclick="if (window.gtag) { gtag('event','whatsapp_click',{event_category:'engagement', event_label:'hero'}); }">💬 Have a question first? Text us on WhatsApp</a>
     <ul class="page-hero-trust hero-hide-mob">
@@ -379,9 +381,9 @@
 <section class="sec section-beige" id="services">
   <div class="container">
     <span class="eyebrow">Massage Services & Pricing Near Me</span>
-    <h2 class="sec-title">Choose your <em>session</em></h2>
+    <h2 class="sec-title">Choose your <em>protocol</em></h2>
     <div class="gold-rule"></div>
-    <p class="section-copy">Three sessions for three situations: 45 minutes to pinpoint 1-2 problem areas, 60 for a full reset, 90 for deeper and more detailed work across the whole body.</p>
+    <p class="section-copy">Three protocols, not three timers. Each one is a defined sequence of hands-on work - you can read exactly what happens in the room before you book. Every longer session contains everything the shorter one does.</p>
     <div class="services-grid">
 
       <div class="svc-card">
@@ -390,8 +392,18 @@
           <div class="svc-body">
             <span class="svc-badge">Most Popular</span>
             <span class="svc-best-for">Best for monthly maintenance</span>
-            <h3>Full Body Reset (60 min)</h3>
-            <p><strong>Best for monthly maintenance and overall tension relief.</strong> A structured full-body treatment that targets office tension, shoulder tightness, and overall muscular imbalance.</p>
+            <h3>Full Body Reset</h3>
+            <p><strong>The whole chain, not just the spot that hurts.</strong> Neck pain usually starts lower down. This session follows the pattern through the body instead of chasing the symptom.</p>
+            <span class="svc-protocol-label">What the session includes</span>
+            <ul class="svc-protocol">
+              <li class="svc-protocol-carry">Everything in Targeted Relief, applied full body</li>
+              <li>Deep tissue through back, neck, shoulders, hips and legs</li>
+              <li>Trigger point release along the full pattern</li>
+              <li>Myofascial release</li>
+              <li>Assisted stretching</li>
+              <li>A light, calming close to every session</li>
+              <li>A recommended interval and a date for your next visit</li>
+            </ul>
           </div>
           <div class="svc-footer">
             <div><span class="svc-price">$85</span><span class="svc-duration svc-duration-block">⏱ 60 min · Ivan</span></div>
@@ -406,8 +418,16 @@
           <img src="img/90.webp" alt="90 minute deep tissue massage Aventura FL" class="svc-img" loading="lazy">
           <div class="svc-body">
             <span class="svc-best-for">Best for deeper relief</span>
-            <h3>Total Body Restoration (90 min)</h3>
-            <p><strong>For chronic tightness and deeper, more detailed work.</strong> Extended time allows for more precise attention across multiple areas without rushing the body.</p>
+            <h3>Total Body Restoration</h3>
+            <p><strong>Chronic tightness does not release on schedule.</strong> Ninety minutes is what it takes to work three or more areas properly, without cutting any of them short.</p>
+            <span class="svc-protocol-label">What the session includes</span>
+            <ul class="svc-protocol">
+              <li class="svc-protocol-carry">Everything in Full Body Reset</li>
+              <li>Three or more problem areas, none of them rushed</li>
+              <li>Extended myofascial work - the slow layers an hour cannot reach</li>
+              <li>Full assisted stretching sequence</li>
+              <li>A breakdown of why it keeps happening and what to do between sessions</li>
+            </ul>
           </div>
           <div class="svc-footer">
             <div><span class="svc-price">$110</span><span class="svc-duration svc-duration-block">⏱ 90 min · Ivan</span></div>
@@ -421,9 +441,19 @@
         <a href="booking.html?service=express-targeted-reset&master=ivan" data-track="booking">
           <img src="img/45.webp" alt="45 minute introductory therapy massage Aventura FL" class="svc-img" loading="lazy">
           <div class="svc-body">
-            <span class="svc-best-for">Best for new clients and preventive check-ins</span>
-            <h3>Express Targeted Reset (45 min)</h3>
-            <p><strong>Fast, focused work for 1-2 problem areas.</strong> Great for new clients who want to feel Ivan’s work and for regular maintenance before tension returns.</p>
+            <span class="svc-best-for">Best for one problem area</span>
+            <h3>Targeted Relief</h3>
+            <p><strong>One area, worked properly.</strong> Not a shortened massage - a complete protocol on a smaller field. Also the right first session if you want to feel Ivan’s work before committing to more.</p>
+            <span class="svc-protocol-label">What the session includes</span>
+            <ul class="svc-protocol">
+              <li>An assessment before every session; range of motion checked before and after when movement is the complaint</li>
+              <li>Deep tissue work on the target region</li>
+              <li>Trigger point release</li>
+              <li>Myofascial release</li>
+              <li>Assisted stretching for the area</li>
+              <li>Percussion therapy where it is needed</li>
+              <li>Two or three movements to hold the result at home</li>
+            </ul>
           </div>
           <div class="svc-footer">
             <div>
@@ -444,7 +474,7 @@
 <section class="sec section-beige" id="packages">
   <div class="container">
     <span class="eyebrow">Plans for lasting relief</span>
-    <h2 class="sec-title">One session is a start.<br><em>Two or more is a plan.</em></h2>
+    <h2 class="sec-title">One session is a start.<br>Two or more is a plan.</h2>
     <div class="gold-rule center"></div>
     <p class="section-copy-wide">One session starts the change. Two or three lock it in. That's not a sales pitch - that's how muscles actually work.</p>
     <div class="packages-grid">
@@ -489,7 +519,7 @@
 <section class="sec section-white">
   <div class="container text-center">
     <span class="eyebrow">Your first visit</span>
-    <h2 class="sec-title">What to <em>expect</em></h2>
+    <h2 class="sec-title">What to expect</h2>
     <div class="gold-rule center"></div>
     <div class="expect-grid">
       <div class="expect-item">
@@ -524,7 +554,7 @@
   </video>
   <div class="video-overlay" aria-hidden="true">
     <span class="eyebrow video-kicker" id="massage-video-kicker">Real session. Real work.</span>
-    <h2 class="sec-title video-title" id="massage-video-headline">Focused treatment.<br><em>Noticeable relief.</em></h2>
+    <h2 class="sec-title video-title" id="massage-video-headline">Focused treatment.<br>Noticeable relief.</h2>
   </div>
 </section>
 
@@ -534,7 +564,7 @@
     <div class="text-center review-head">
       <svg viewBox="0 0 48 48" width="66" height="20" class="google-logo" aria-label="Google"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
       <span class="eyebrow">Google Reviews</span>
-      <h2 class="sec-title sec-title-sm">Real Clients.<br><em>Real Relief.</em></h2>
+      <h2 class="sec-title sec-title-sm">Real Clients.<br>Real Relief.</h2>
       <p class="review-intro">The average client tries 2-3 therapists before they find Ivan. Most don't go anywhere else after.</p>
     </div>
     <div class="swiper massageSwiper">
@@ -564,7 +594,7 @@
 <section class="sec section-beige" id="techniques" aria-label="Massage techniques">
   <div class="container container-narrow">
     <span class="eyebrow">Techniques</span>
-    <h2 class="sec-title">Massage techniques at <em>View Spa</em></h2>
+    <h2 class="sec-title">Massage techniques at View Spa</h2>
     <div class="gold-rule"></div>
     <p class="section-copy">View Spa provides deep tissue massage in Aventura, Florida. Deep tissue massage uses slow strokes and firm pressure to reach deeper layers of muscle and connective tissue. It addresses chronic tension in the back, neck and shoulders.</p>
     <p class="section-copy">View Spa provides trigger point therapy in Aventura, Florida. Trigger point therapy targets contracted knots in muscle that cause local and referred pain. Releasing a trigger point reduces pain and restores normal muscle function.</p>
@@ -589,7 +619,7 @@
 <section class="sec section-white">
   <div class="container container-narrow">
     <span class="eyebrow">Massage FAQ</span>
-    <h2 class="sec-title">Everything you want to <em>know</em></h2>
+    <h2 class="sec-title">Everything you want to know</h2>
     <div class="gold-rule"></div>
     <ul class="faq-list">
       <li class="faq-item">
@@ -602,7 +632,7 @@
       </li>
       <li class="faq-item">
         <button class="faq-q"><span>How much does a session cost?</span><span class="faq-icon"></span></button>
-        <div class="faq-body"><div class="faq-body-inner">Session lengths are 45, 60 and 90 minutes. The value is in focused therapeutic work that targets pain and improves mobility, not just time on the table. Prices are listed in the service section above, and each session is built around the result you want.</div></div>
+        <div class="faq-body"><div class="faq-body-inner">Sessions run 45, 60 and 90 minutes, but what you are choosing is a protocol, not a block of time. Each one lists exactly what it includes, and every longer session contains everything the shorter one does. Prices are listed in the service section above.</div></div>
       </li>
       <li class="faq-item">
         <button class="faq-q"><span>Is this a professional therapeutic massage?</span><span class="faq-icon"></span></button>
@@ -656,7 +686,7 @@
   <div class="container contact-grid">
     <div>
       <span class="eyebrow">Find Us</span>
-      <h2 class="sec-title sec-title-contact">Aventura, <em>FL</em></h2>
+      <h2 class="sec-title sec-title-contact">Aventura, FL</h2>
       <div class="gold-rule"></div>
       <p class="contact-copy">20200 W Dixie Hwy, STE 1105B<br>Aventura, FL 33180</p>
       <p class="phone-line"><a href="tel:+17542026666" class="phone-link">+1 (754) 202-6666</a></p>
@@ -689,7 +719,7 @@
         <div class="footer-links">
           <a href="#services">Full Body Reset (60 min)</a>
           <a href="#services">Total Body Restoration (90 min)</a>
-          <a href="#services">Express Targeted Reset (45 min)</a>
+          <a href="#services">Targeted Relief (45 min)</a>
           <a href="manicure.html">Nail Services</a>
           <a href="index.html">Home</a>
         </div>

@@ -351,6 +351,18 @@
       const linkTrigger = event.target.closest('[data-track="booking"]');
       if(linkTrigger){
         trackBooking();
+        return;
+      }
+
+      // Клик по карточке проблемы: показывает, с чем реально приходят,
+      // и какие страницы стоит писать следующими.
+      const concernTrigger = event.target.closest('[data-track="concern"]');
+      if(concernTrigger && typeof window.gtag === 'function'){
+        window.gtag('event', 'concern_click', {
+          event_category: 'engagement',
+          event_label: concernTrigger.dataset.concern || 'unknown',
+          page: window.location.pathname
+        });
       }
     });
   }

@@ -2810,3 +2810,200 @@ body.no-scroll .sticky-whatsapp { opacity: 0; pointer-events: none; }
   .sameday-photo { min-height: 0; height: clamp(200px, 34vh, 300px); order: -1; }
   .sameday-text { padding: 28px 20px 32px; }
 }
+
+/* ── Состав протокола в карточке услуги ───────────────────────── */
+.svc-protocol-label {
+  display: block;
+  width: 100%;
+  margin: 16px 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--gold-accessible);
+}
+
+.svc-protocol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.svc-protocol li {
+  position: relative;
+  padding: 3px 0 3px 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mid);
+}
+
+.svc-protocol li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 9px;
+  width: 8px;
+  height: 4px;
+  border-left: 1.5px solid var(--gold-accessible);
+  border-bottom: 1.5px solid var(--gold-accessible);
+  transform: rotate(-45deg);
+}
+
+/* Строка «всё из предыдущего протокола» — якорь лестницы ценности */
+.svc-protocol li.svc-protocol-carry {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+@media (max-width: 640px) {
+  .svc-protocol li { font-size: 13.5px; padding-top: 4px; padding-bottom: 4px; }
+}
+
+/* ── «С чем приходят»: вход по проблеме, а не по длительности ───
+   Проблемные страницы существовали, но ссылались только со страницы
+   массажа. Этот блок — их точка входа с главной и с маникюра. */
+.concerns-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-1);
+  margin-top: var(--sp-3);
+}
+
+@media (min-width: 620px) {
+  .concerns-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+
+@media (min-width: 1000px) {
+  .concerns-grid { grid-template-columns: repeat(4, 1fr); gap: var(--sp-2); }
+}
+
+.concern-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: 22px 20px 18px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .25s var(--ease-out), transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+
+.concern-card:hover,
+.concern-card:focus-visible {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-1);
+}
+
+.concern-card h3 {
+  font-size: 18px;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.concern-card p {
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  color: var(--mid);
+  margin: 0;
+  flex: 1;
+}
+
+.concern-go {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gold-accessible);
+}
+
+.concerns-note {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-base);
+  color: var(--mid);
+  text-align: center;
+}
+
+.concerns-note a {
+  color: var(--gold-accessible);
+  font-weight: 600;
+}
+
+/* ── Промо «ногти + массаж»: фото-диптих ──────────────────────────
+   Фото широкое (16:9) и состоит из двух половин - маникюр и массаж.
+   В прежней колонке 416×594 object-fit:cover срезал 61% ширины и
+   оставлял только шов между половинами. Поэтому раскладка становится
+   в одну колонку: фото полосой сверху, текст под ним. */
+.sameday { grid-template-columns: 1fr; }
+
+/* Фото показываем целиком: aspect-ratio держит пропорцию оригинала,
+   max-width не даёт полосе разрастись на широких экранах. */
+.sameday-photo {
+  min-height: 0;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  aspect-ratio: 1376 / 600;
+}
+
+.sameday-photo img { object-position: center; }
+
+@media (min-width: 821px) {
+  .sameday-text {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+}
+
+/* Прежняя мобильная фиксированная высота перебивала aspect-ratio
+   и возвращала обрезку по краям - снимаем её. */
+@media (max-width: 820px) {
+  .sameday-photo { height: auto; }
+}
+
+/* ── Первый вопрос в hero: «где болит», а не «сколько минут» ──────
+   Человек с болью не знает, нужен ему час или полтора - он знает зону.
+   Цена и длительности остаются строкой ниже, но уже как справка. */
+.hero-pick { width: 100%; max-width: 580px; gap: 10px; }
+
+.hero-pick-label {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gold-on-dark);
+}
+
+.hero-pick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-pick-item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 15px;
+  border: 1px solid rgba(226, 196, 120, .45);
+  border-radius: 2px;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #fff;
+  transition: background .2s var(--ease-out), border-color .2s var(--ease-out);
+}
+
+.hero-pick-item:hover,
+.hero-pick-item:focus-visible {
+  background: rgba(226, 196, 120, .18);
+  border-color: var(--gold-on-dark);
+}
+
+@media (max-width: 600px) {
+  .hero-pick { max-width: none; }
+  .hero-pick-item { font-size: 13.5px; padding: 10px 12px; }
+}

@@ -21,6 +21,16 @@
     dowLabels: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
   };
 
+  // Зоны для интейка на массаж. Порядок - от самых частых обращений к профилактике.
+  const MASSAGE_CONCERNS = [
+    'Lower back',
+    'Neck & shoulders',
+    'Upper back',
+    'Hips & legs',
+    'After training',
+    'Nothing specific - maintenance',
+  ];
+
   const state = {
     business: null,
     masters: null,
@@ -621,6 +631,22 @@
       </div>`;
     const turnstile = CONFIG.turnstileSiteKey
       ? `<div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>` : '';
+    // Массаж - это не «слот в календаре», а приём. Спрашиваем, с чем человек идёт:
+    // Иван успевает подготовиться, а клиент видит, что сеанс строят под него.
+    // Чипсы, а не только текст: заполняют в один тап, поэтому реально заполняют.
+    const isMassage = !!(svc.cat && svc.cat.id === 'massage');
+    const intake = isMassage
+      ? `<div class="bk-intake">
+           <span class="bk-intake-title">What should Ivan work on?</span>
+           <span class="bk-intake-hint">Tap everything that applies - it lets him plan the session before you arrive.</span>
+           <div class="bk-intake-chips">
+             ${MASSAGE_CONCERNS.map((c) => `<button type="button" class="bk-chip" data-concern="${c}" aria-pressed="false">${c}</button>`).join('')}
+           </div>
+           <label>Anything else he should know? (optional)
+             <textarea name="note" rows="3" placeholder="When it started, which movement sets it off, and anything he should avoid - injuries, recent surgery, pregnancy."></textarea>
+           </label>
+         </div>`
+      : `<label>Note (optional)<textarea name="note" rows="2"></textarea></label>`;
     shell('Your details', 'Pay in person at your appointment.',
       `${summary}
        <form id="bk-form" class="bk-form">
@@ -629,7 +655,7 @@
            <input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(305) 555-1234" title="Your mobile number - we’ll text your confirmation">
          </label>
          <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
-         <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
+         ${intake}
          <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
          <div id="bk-addon"></div>
          <label class="bk-agree">
@@ -644,6 +670,12 @@
     renderAddonBlock();     // если опции уже загружены (например, вернулись назад)
     updateAddonSummary();
     const _form = document.getElementById('bk-form');
+    // Переключение чипсов зон. Делегируем на форму: чипсы рисуются вместе с ней.
+    _form.addEventListener('click', (ev) => {
+      const chip = ev.target.closest('.bk-chip');
+      if (!chip || !_form.contains(chip)) return;
+      chip.setAttribute('aria-pressed', chip.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    });
     // Телефон нормализуем при отправке (см. normalizePhone), а НЕ по ходу ввода - чтобы
     // клиент мог писать привычно: (305) 555-1234. Код страны (+1) подставляется сам.
     _form.addEventListener('submit', submitBooking);
@@ -659,13 +691,19 @@
     try {
       const fd = new FormData(form);
       const phone = normalizePhone(fd.get('phone'));
+      // Выбранные зоны + свободный текст склеиваем в одну заметку: она уходит
+      // в Square (customer_note) и в уведомления владельцу.
+      const areas = Array.from(form.querySelectorAll('.bk-chip[aria-pressed="true"]'))
+        .map((b) => b.dataset.concern).filter(Boolean);
+      const note = [areas.length ? 'Areas: ' + areas.join(', ') : '', (fd.get('note') || '').trim()]
+        .filter(Boolean).join(' · ');
       const res = await api('/api/book', {
         serviceId: state.serviceId,
         masterId: state.slot.masterId,
         length: state.length || undefined,
         startAt: state.slot.startAt,
         serviceVariationVersion: state.slot.serviceVariationVersion,
-        customer: { name: fd.get('name'), email: fd.get('email'), phone, note: fd.get('note') },
+        customer: { name: fd.get('name'), email: fd.get('email'), phone, note },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
         addon: state.addon ? { serviceId: state.addon.serviceId, startAt: state.addon.startAt } : undefined,
         gclid: storedClickId('gclid') || undefined,

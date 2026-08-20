@@ -38,6 +38,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-lower-back-pain"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-lower-back-pain"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-lower-back-pain"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-lower-back-pain"/>
   </url>
   <url>
@@ -47,6 +48,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-neck-shoulder"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-neck-shoulder"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-neck-shoulder"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-neck-shoulder"/>
   </url>
   <url>
@@ -56,6 +58,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-sports-recovery"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-sports-recovery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-sports-recovery"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-sports-recovery"/>
   </url>
   <url>
@@ -65,6 +68,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-lymphatic-drainage"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-lymphatic-drainage"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-lymphatic-drainage"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-lymphatic-drainage"/>
   </url>
   <url>
@@ -104,6 +108,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-gel-lifting"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-gel-lifting"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-gel-lifting"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-gel-lifting"/>
   </url>
   <url>
@@ -113,6 +118,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-thin-brittle-nails"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-thin-brittle-nails"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-thin-brittle-nails"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-thin-brittle-nails"/>
   </url>
   <url>
@@ -122,6 +128,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-nail-recovery"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-nail-recovery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-nail-recovery"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-nail-recovery"/>
   </url>
   <url>
@@ -131,6 +138,7 @@
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-safe-sterile"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-safe-sterile"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-safe-sterile"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-safe-sterile"/>
   </url>
   <url>
@@ -140,6 +148,17 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-gel-lifting"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-gel-lifting"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-gel-lifting"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-gel-lifting"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/manicure-gel-lifting</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-gel-lifting"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-gel-lifting"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-gel-lifting"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-gel-lifting"/>
   </url>
   <url>
@@ -149,6 +168,17 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-thin-brittle-nails"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-thin-brittle-nails"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-thin-brittle-nails"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-thin-brittle-nails"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/manicure-thin-brittle-nails</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-thin-brittle-nails"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-thin-brittle-nails"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-thin-brittle-nails"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-thin-brittle-nails"/>
   </url>
   <url>
@@ -158,6 +188,17 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-nail-recovery"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-nail-recovery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-nail-recovery"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-nail-recovery"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/manicure-nail-recovery</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-nail-recovery"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-nail-recovery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-nail-recovery"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-nail-recovery"/>
   </url>
   <url>
@@ -167,6 +208,17 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-safe-sterile"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-safe-sterile"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-safe-sterile"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-safe-sterile"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/manicure-safe-sterile</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/manicure-safe-sterile"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/manicure-safe-sterile"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/manicure-safe-sterile"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/manicure-safe-sterile"/>
   </url>
   <url>
@@ -176,7 +228,48 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-lower-back-pain"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-lower-back-pain"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-lower-back-pain"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-lower-back-pain"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/massage-lower-back-pain</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-lower-back-pain"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-lower-back-pain"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-lower-back-pain"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-lower-back-pain"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/massage-full-body-maintenance</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-full-body-maintenance"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/ru/massage-full-body-maintenance</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-full-body-maintenance"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/massage-full-body-maintenance</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-full-body-maintenance"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-full-body-maintenance"/>
   </url>
   <url>
     <loc>https://viewspa.miami/ru/massage-neck-shoulder</loc>
@@ -185,6 +278,17 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-neck-shoulder"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-neck-shoulder"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-neck-shoulder"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-neck-shoulder"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/massage-neck-shoulder</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-neck-shoulder"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-neck-shoulder"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-neck-shoulder"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-neck-shoulder"/>
   </url>
   <url>
@@ -194,6 +298,17 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-sports-recovery"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-sports-recovery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-sports-recovery"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-sports-recovery"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/massage-sports-recovery</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-sports-recovery"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-sports-recovery"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-sports-recovery"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-sports-recovery"/>
   </url>
   <url>
@@ -203,6 +318,17 @@
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-lymphatic-drainage"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-lymphatic-drainage"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-lymphatic-drainage"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-lymphatic-drainage"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/massage-lymphatic-drainage</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/massage-lymphatic-drainage"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/massage-lymphatic-drainage"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/massage-lymphatic-drainage"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/massage-lymphatic-drainage"/>
   </url>
   <url>
