@@ -3007,3 +3007,16 @@ body.no-scroll .sticky-whatsapp { opacity: 0; pointer-events: none; }
   .hero-pick { max-width: none; }
   .hero-pick-item { font-size: 13.5px; padding: 10px 12px; }
 }
+
+/* ── Главная: акцент цветом, а не наклоном ────────────────────────
+   В hero курсив стоял дважды - на второй строке заголовка и на всём
+   слогане - поверх золотого цвета. Два слоя выделения на одном экране
+   читаются как шум. Золото оставляем, наклон снимаем.
+   .hero-h1 и .hero-slogan используются только на index. */
+.hero-h1 em { font-style: normal; }
+.hero-slogan { font-style: normal; }
+.sec-title em.plain { font-style: normal; }
+
+/* Слоган в подвале - тоже без наклона: курсив перестал быть
+   средством выделения на сайте, остался только цвет. */
+.foot-tag, .footer-tagline { font-style: normal; }
