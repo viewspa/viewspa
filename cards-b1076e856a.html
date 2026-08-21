@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Карты и пакеты · View Spa</title>
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { background: var(--beige); }
+  .ad-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 16px 60px; }
+  .ad-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+  .ad-head h1 { font-size: 26px; margin: 0; }
+  .ad-head span { font-size: 14px; color: var(--mid); }
+
+  .ad-auth { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .ad-auth input { flex: 1 1 260px; min-width: 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-body); font-size: 16px; }
+  .ad-auth input:focus { outline: none; border-color: var(--gold); }
+
+  .ad-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .ad-stat { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .ad-stat b { display: block; font-family: var(--font-display); font-size: 26px; color: var(--dark); line-height: 1.1; }
+  .ad-stat span { font-size: 13px; color: var(--mid); }
+
+  .ad-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .ad-tools input { flex: 1 1 220px; min-width: 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-body); font-size: 15px; }
+
+  .ad-scroll { overflow-x: auto; background: var(--white); border: 1px solid var(--border); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { padding: 11px 12px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+  th { font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mid); font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .ad-gan { font-family: ui-monospace, Menlo, Consolas, monospace; cursor: pointer; border-bottom: 1px dashed var(--border); }
+  .ad-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
+  .ad-warn { background: rgba(201,168,76,.18); color: var(--gold-accessible); }
+  .ad-bad { background: #fdf3f3; color: #a33; }
+  .ad-ok { background: rgba(39,174,96,.12); color: #1e7a45; }
+  .ad-msg { padding: 16px; font-size: 15px; color: var(--mid); }
+  .ad-err { background: #fdf3f3; border: 1px solid #f0c9c9; color: #a33; padding: 12px 14px; border-radius: 8px; font-size: 15px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+<div class="ad-wrap">
+  <div class="ad-head">
+    <h1>Карты и пакеты</h1>
+    <span id="ad-updated"></span>
+  </div>
+
+  <div class="ad-auth">
+    <input id="ad-secret" type="password" placeholder="Админ-ключ" autocomplete="current-password">
+    <button class="btn btn-gold" id="ad-load">Показать</button>
+  </div>
+
+  <div id="ad-error" class="ad-err" hidden></div>
+  <div id="ad-stats" class="ad-stats" hidden></div>
+
+  <div class="ad-tools" hidden id="ad-tools">
+    <input id="ad-search" placeholder="Поиск: последние 4 цифры, email, название">
+    <button class="btn btn-dark" id="ad-csv">Скачать CSV</button>
+  </div>
+
+  <div class="ad-scroll">
+    <div id="ad-body"><p class="ad-msg">Введите ключ и нажмите «Показать».</p></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://viewspa-booking.ivanseydametov.workers.dev';
+  var rows = [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var money = function (c) { return '$' + (c / 100).toFixed(c % 100 ? 2 : 0); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m];
+    });
+  };
+  var date = function (iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    return isNaN(d) ? '—' : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+
+  // Ключ держим только до закрытия вкладки - в localStorage ему не место.
+  try {
+    var saved = sessionStorage.getItem('vs_admin_key');
+    if (saved) $('ad-secret').value = saved;
+  } catch (e) {}
+
+  function showError(msg) {
+    var box = $('ad-error');
+    box.textContent = msg;
+    box.hidden = !msg;
+  }
+
+  function statusTag(r) {
+    if (r.state !== 'ACTIVE') return '<span class="ad-tag ad-bad">' + esc(r.state) + '</span>';
+    if (r.balanceCents === 0) return '<span class="ad-tag ad-bad">потрачена</span>';
+    if (r.daysLeft != null && r.daysLeft < 0) return '<span class="ad-tag ad-bad">просрочена</span>';
+    if (r.daysLeft != null && r.daysLeft <= 30) return '<span class="ad-tag ad-warn">' + r.daysLeft + ' дн.</span>';
+    if (r.sessionsLeft != null && r.sessionsLeft <= 2) return '<span class="ad-tag ad-warn">кончается</span>';
+    return '<span class="ad-tag ad-ok">активна</span>';
+  }
+
+  function render(list) {
+    if (!list.length) {
+      $('ad-body').innerHTML = '<p class="ad-msg">Ничего не найдено.</p>';
+      return;
+    }
+    var html = '<table><thead><tr>' +
+      '<th>Карта</th><th>Что</th><th>Осталось</th><th>Баланс</th>' +
+      '<th>Действует до</th><th>Покупатель</th><th>Куплена</th><th>Статус</th>' +
+      '</tr></thead><tbody>';
+    list.forEach(function (r) {
+      html += '<tr>' +
+        '<td><span class="ad-gan" data-gan="' + esc(r.gan) + '" title="Нажмите, чтобы скопировать номер целиком">…' + esc(r.last4) + '</span></td>' +
+        '<td>' + esc(r.name) + (r.tracked ? '' : ' <span class="ad-tag ad-warn">нет записи</span>') + '</td>' +
+        '<td class="num">' + (r.sessionsLeft != null ? r.sessionsLeft + ' из ' + (r.sessionsTotal || '?') : '—') + '</td>' +
+        '<td class="num">' + money(r.balanceCents) + '</td>' +
+        '<td class="num">' + date(r.expiresAt) + '</td>' +
+        '<td>' + esc(r.buyerEmail || '—') + '</td>' +
+        '<td class="num">' + date(r.createdAt) + '</td>' +
+        '<td>' + statusTag(r) + '</td>' +
+        '</tr>';
+    });
+    $('ad-body').innerHTML = html + '</tbody></table>';
+  }
+
+  function applyFilter() {
+    var q = ($('ad-search').value || '').trim().toLowerCase();
+    if (!q) return render(rows);
+    render(rows.filter(function (r) {
+      return (r.gan || '').indexOf(q) >= 0
+        || (r.buyerEmail || '').toLowerCase().indexOf(q) >= 0
+        || (r.name || '').toLowerCase().indexOf(q) >= 0;
+    }));
+  }
+
+  async function load() {
+    var key = $('ad-secret').value.trim();
+    if (!key) return showError('Введите ключ.');
+    showError('');
+    $('ad-body').innerHTML = '<p class="ad-msg">Загружаю…</p>';
+    try {
+      var res = await fetch(API + '/api/admin/packages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': key },
+        body: '{}',
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || ('Ошибка ' + res.status));
+
+      try { sessionStorage.setItem('vs_admin_key', key); } catch (e) {}
+      rows = data.items || [];
+
+      $('ad-stats').hidden = false;
+      $('ad-stats').innerHTML =
+        '<div class="ad-stat"><b>' + data.activeCount + '</b><span>активных карт</span></div>' +
+        '<div class="ad-stat"><b>' + money(data.outstandingCents) + '</b><span>не отработано</span></div>' +
+        '<div class="ad-stat"><b>' + data.count + '</b><span>всего карт</span></div>';
+      $('ad-tools').hidden = false;
+      $('ad-updated').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU');
+      applyFilter();
+    } catch (e) {
+      showError(e.message);
+      $('ad-body').innerHTML = '<p class="ad-msg">Не загрузилось.</p>';
+    }
+  }
+
+  function csv() {
+    var head = ['Карта', 'Что', 'Осталось сеансов', 'Всего сеансов', 'Баланс USD', 'Действует до', 'Покупатель', 'Куплена', 'Статус'];
+    var lines = [head.join(';')];
+    rows.forEach(function (r) {
+      lines.push([
+        r.gan, r.name, r.sessionsLeft == null ? '' : r.sessionsLeft, r.sessionsTotal || '',
+        (r.balanceCents / 100).toFixed(2), r.expiresAt ? r.expiresAt.slice(0, 10) : '',
+        r.buyerEmail || '', r.createdAt ? r.createdAt.slice(0, 10) : '', r.state,
+      ].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';'));
+    });
+    // BOM - иначе Excel открывает кириллицу кракозябрами
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'viewspa-cards-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  $('ad-load').addEventListener('click', load);
+  $('ad-secret').addEventListener('keydown', function (e) { if (e.key === 'Enter') load(); });
+  $('ad-search').addEventListener('input', applyFilter);
+  $('ad-csv').addEventListener('click', csv);
+
+  // Клик по номеру копирует его целиком - чтобы вставить в списание.
+  $('ad-body').addEventListener('click', function (e) {
+    var el = e.target.closest('.ad-gan');
+    if (!el) return;
+    var gan = el.dataset.gan;
+    navigator.clipboard.writeText(gan).then(function () {
+      var was = el.textContent;
+      el.textContent = 'скопировано';
+      setTimeout(function () { el.textContent = was; }, 1200);
+    }).catch(function () { window.prompt('Номер карты:', gan); });
+  });
+
+  if ($('ad-secret').value) load();
+})();
+</script>
+</body>
+</html>
