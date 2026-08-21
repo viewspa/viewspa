@@ -287,11 +287,23 @@
     box.innerHTML = '<div class="bk-loading" style="padding:14px 0">Checking…</div>';
     try {
       const r = await api('/api/package-balance', { gan: code });
-      box.innerHTML = `<div class="bk-summary" style="margin-top:12px">
+      // Остаток - главное число: человек пришёл узнать, сколько у него есть.
+      // Дата словами читается лучше цифр, а строка про ритм превращает
+      // остаток в план и заодно ведёт к записи прямо сейчас.
+      const validUntil = r.expiresAt
+        ? new Date(r.expiresAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : null;
+      const isPackage = r.sessionsLeft != null;
+      box.innerHTML = `<div class="bk-summary bk-balance" style="margin-top:12px">
         ${r.name ? `<div><b>${r.name}</b></div>` : ''}
-        ${r.sessionsLeft != null ? `<div><b>${r.sessionsLeft}</b> of ${r.sessionsTotal} sessions left</div>` : ''}
-        <div>Balance: ${money(r.balanceCents)}${r.state !== 'ACTIVE' ? ' · ' + r.state : ''}</div>
-        ${r.expiresAt ? `<div>Valid until ${new Date(r.expiresAt).toLocaleDateString()}</div>` : ''}
+        ${isPackage
+          ? `<div class="bk-balance-count"><b>${r.sessionsLeft}</b> of ${r.sessionsTotal} sessions left</div>`
+          : `<div class="bk-balance-count"><b>${money(r.balanceCents)}</b> balance</div>`}
+        <div class="bk-balance-meta">${isPackage ? `Balance ${money(r.balanceCents)}` : 'Gift certificate'}${validUntil ? ` · valid until ${validUntil}` : ''}${r.state !== 'ACTIVE' ? ` · ${r.state}` : ''}</div>
+        ${isPackage && r.sessionsLeft > 0 ? '<div class="bk-balance-meta">Ivan recommends one session every 4 weeks.</div>' : ''}
+        ${r.sessionsLeft !== 0 && r.state === 'ACTIVE'
+          ? `<a href="booking.html${isPackage ? '?service=full-body-reset&master=ivan' : ''}" class="btn btn-gold" style="display:inline-block;margin-top:10px" data-track="booking">${isPackage ? 'Book your next session' : 'Book an appointment'} &rarr;</a>`
+          : ''}
       </div>`;
     } catch (e) {
       box.innerHTML = `<div class="bk-error" style="margin-top:12px">${e.message}</div>`;

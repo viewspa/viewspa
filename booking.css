@@ -417,3 +417,26 @@
 }
 
 .bk-intake textarea { width: 100%; }
+
+/* ── Результат проверки баланса пакета ────────────────────────────
+   Остаток - главное число на экране, остальное подписью. */
+.bk-balance { align-items: flex-start; }
+
+.bk-balance-count {
+  font-size: 15px;
+  color: var(--mid);
+}
+
+.bk-balance-count b {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.1;
+  color: var(--dark);
+  margin-right: 4px;
+}
+
+.bk-balance-meta {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mid);
+}
