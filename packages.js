@@ -16,6 +16,113 @@
 
   const money = (c) => '$' + (c / 100).toFixed(c % 100 ? 2 : 0);
 
+  // ── Аналитика покупок ─────────────────────────────────────────────
+  // Покупка пакета/сертификата - это оплаченный заказ, самый крупный чек на
+  // сайте. Логика та же, что в booking.js: дедуп, принудительная загрузка
+  // gtag, GA4 purchase и конверсия Ads. Тихие потери логируем.
+  function logConvIssue(reason, d, err) {
+    try { console.error('CONVERSION_ISSUE:', reason, d || {}, err || ''); } catch (_) {}
+    try {
+      const payload = JSON.stringify({
+        reason, gan: (d && d.transaction_id) || null, value: (d && d.value) || null,
+        message: (err && err.message) || undefined, url: location.href, t: Date.now(),
+      });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(CONFIG.apiBase + '/api/log-conversion', new Blob([payload], { type: 'application/json' }));
+      }
+    } catch (_) {}
+  }
+
+  function gaItem(kind, item, res) {
+    return {
+      item_id: kind === 'package' ? (item.id || 'package') : 'gift-certificate',
+      item_name: kind === 'package' ? (res.name || item.name) : 'Gift certificate',
+      item_category: kind === 'package' ? 'Massage package' : 'Gift certificate',
+      price: Number(((res.balanceCents || 0) / 100).toFixed(2)),
+      quantity: 1,
+    };
+  }
+
+  function trackBeginCheckout(kind, item) {
+    const cents = kind === 'package' ? item.priceCents : item.amountCents;
+    try {
+      if (typeof window.gtag !== 'function') return;
+      window.gtag('event', 'begin_checkout', {
+        currency: 'USD',
+        value: Number(((cents || 0) / 100).toFixed(2)),
+        items: [{
+          item_id: kind === 'package' ? (item.id || 'package') : 'gift-certificate',
+          item_name: kind === 'package' ? item.name : 'Gift certificate',
+          item_category: kind === 'package' ? 'Massage package' : 'Gift certificate',
+          price: Number(((cents || 0) / 100).toFixed(2)),
+          quantity: 1,
+        }],
+      });
+    } catch (_) {}
+  }
+
+  function trackPurchase(kind, item, res) {
+    const gan = res && res.gan;
+    const d = {
+      transaction_id: gan,
+      value: Number((((res && res.balanceCents) || 0) / 100).toFixed(2)),
+      currency: 'USD',
+      item_category: kind === 'package' ? 'Massage package' : 'Gift certificate',
+    };
+    try {
+      if (!gan) return logConvIssue('missing_gan', d);
+      // Дедуп: повторный рендер экрана «готово» не должен слать вторую покупку.
+      try {
+        const done = JSON.parse(sessionStorage.getItem('vs_pkg_done') || '[]');
+        if (done.includes(gan)) return;
+        done.push(gan);
+        sessionStorage.setItem('vs_pkg_done', JSON.stringify(done.slice(-30)));
+      } catch (_) {}
+
+      // Оплата прошла - gtag нужен сейчас, а не через таймер.
+      try { if (typeof window.vsEnsureAnalytics === 'function') window.vsEnsureAnalytics(); } catch (_) {}
+      try { console.log('package_purchased →', d); } catch (_) {}
+
+      const items = [gaItem(kind, item, res)];
+
+      // 1) Своё событие - чтобы отделить покупки пакетов от записей.
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'package_purchased', d);
+      } else {
+        logConvIssue('gtag_unavailable_package_purchased', d);
+      }
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: 'package_purchased' }, d));
+
+      // 2) GA4 purchase - transaction_id = номер карты, дедуп со Square-вебхуком.
+      try {
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'purchase', {
+            transaction_id: gan, value: d.value, currency: 'USD', items,
+          });
+        } else {
+          logConvIssue('gtag_unavailable_purchase', d);
+        }
+      } catch (err) { logConvIssue('purchase_threw', d, err); }
+
+      // 3) Конверсия Google Ads - тот же тег, что у записи.
+      try {
+        const sendTo = window.VS_ADS_CONVERSION;
+        if (!sendTo) {
+          try { console.info('ads conversion skipped: VS_ADS_CONVERSION not set →', gan); } catch (_) {}
+        } else if (typeof window.gtag === 'function') {
+          window.gtag('event', 'conversion', {
+            send_to: sendTo, value: d.value, currency: 'USD', transaction_id: gan,
+          });
+        } else {
+          logConvIssue('gtag_unavailable_ads_conversion', d);
+        }
+      } catch (err) { logConvIssue('ads_conversion_threw', d, err); }
+    } catch (err) {
+      logConvIssue('track_purchase_threw', d, err);
+    }
+  }
+
   async function api(path, body, method) {
     const res = await fetch(CONFIG.apiBase + path, {
       method: method || (body ? 'POST' : 'GET'),
@@ -92,6 +199,7 @@
 
   async function renderPurchase(kind, item) {
     // kind: 'package' | 'certificate'
+    trackBeginCheckout(kind, item);
     const title = kind === 'package' ? item.name : `Gift certificate · ${money(item.amountCents)}`;
     root.innerHTML = `
       <div class="bk-card">
@@ -142,6 +250,7 @@
       } else {
         res = await api('/api/buy-certificate', { amountCents: item.amountCents, paymentToken: token, buyer, turnstileToken: tsToken });
       }
+      trackPurchase(kind, item, res);
       renderDone(kind, res);
     } catch (e2) {
       showErr('pay-err', e2.message); btn.disabled = false; btn.textContent = label;
