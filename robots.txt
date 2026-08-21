@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /cards.html
 
 Sitemap: https://viewspa.miami/sitemap.xml
