@@ -23,9 +23,13 @@ gtag('js', new Date());
 gtag('config', 'G-P0GR3YZQQL', { send_page_view: true });
 if (VS_ADS_TAG_ID) gtag('config', VS_ADS_TAG_ID); // включает _gcl_aw (conversion linker в пределах домена — по умолчанию)
 
-// Вставка gtag.js. По умолчанию отложена на 3 сек после load (производительность),
-// но её можно форсировать немедленно через window.vsEnsureAnalytics() — экран успеха
-// вызывает её, чтобы денежная конверсия не ждала таймер и успела уйти до ухода со страницы.
+// Вставка gtag.js — сразу, без таймера.
+// Раньше загрузка откладывалась на 3 сек после load ради производительности, но пока
+// библиотека не загрузилась, GA4 не фиксирует начало сеанса и его источник: кто успевал
+// уйти или кликнуть дальше за эти секунды, попадал в отчёты как Unassigned. За 22.08
+// так потерялось 6 сеансов из 7 и половина дохода. Скрипт async и разметку не блокирует,
+// так что выигрыш в скорости был десятки миллисекунд, а цена — половина атрибуции.
+// vsEnsureAnalytics остаётся публичной и идемпотентной: экран успеха всё равно её зовёт.
 var _vsGtagRequested = false;
 function vsEnsureAnalytics() {
   if (_vsGtagRequested) return;
@@ -36,4 +40,4 @@ function vsEnsureAnalytics() {
   document.head.appendChild(s);
 }
 window.vsEnsureAnalytics = vsEnsureAnalytics;
-window.addEventListener('load', function () { setTimeout(vsEnsureAnalytics, 3000); });
+vsEnsureAnalytics();
