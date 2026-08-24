@@ -16,6 +16,9 @@
 
   const money = (c) => '$' + (c / 100).toFixed(c % 100 ? 2 : 0);
 
+  // Первое касание, записанное analytics.js на любой странице сайта.
+  const vsSrc = () => (typeof window.vsSource === 'function' ? window.vsSource() : null) || undefined;
+
   // ── Аналитика покупок ─────────────────────────────────────────────
   // Покупка пакета/сертификата - это оплаченный заказ, самый крупный чек на
   // сайте. Логика та же, что в booking.js: дедуп, принудительная загрузка
@@ -246,9 +249,9 @@
       const buyer = { name: form.name.value, email: form.email.value };
       let res;
       if (kind === 'package') {
-        res = await api('/api/buy-package', { packageId: item.id, paymentToken: token, buyer, turnstileToken: tsToken });
+        res = await api('/api/buy-package', { packageId: item.id, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc() });
       } else {
-        res = await api('/api/buy-certificate', { amountCents: item.amountCents, paymentToken: token, buyer, turnstileToken: tsToken });
+        res = await api('/api/buy-certificate', { amountCents: item.amountCents, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc() });
       }
       trackPurchase(kind, item, res);
       renderDone(kind, res);

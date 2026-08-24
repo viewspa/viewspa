@@ -41,3 +41,64 @@ function vsEnsureAnalytics() {
 }
 window.vsEnsureAnalytics = vsEnsureAnalytics;
 vsEnsureAnalytics();
+
+// ── Источник визита ────────────────────────────────────────────────────────
+// Запоминаем первое касание на ЛЮБОЙ странице (раньше метки клика ловились
+// только на booking.html — реклама, ведущая на /massage, теряла gclid).
+// Пишем один раз и не перезаписываем 90 дней: нужен именно первый источник,
+// а не тот заход, в котором человек дошёл до записи.
+(function () {
+  var KEY = 'vs_src';
+  var MAX_AGE = 90 * 86400000;
+
+  function read() {
+    try {
+      var o = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (!o || !o.t || Date.now() - o.t > MAX_AGE) return null;
+      return o;
+    } catch (_) { return null; }
+  }
+
+  function paid(o) {
+    return !!(o && (o.gclid || o.gbraid || o.wbraid || o.utm_source));
+  }
+
+  function capture() {
+    try {
+      var prev = read();
+      var p = new URLSearchParams(location.search);
+      // Обычно первое касание не перезаписываем. Исключение: раньше записан
+      // заход без меток, а сейчас человек пришёл по рекламе или по ссылке
+      // с utm. Такой визит важнее — иначе оплаченный клик потеряется, а
+      // владелец увидит «прямой заход» и решит, что реклама не работает.
+      var hasMarker = !!(p.get('gclid') || p.get('gbraid') || p.get('wbraid') || p.get('utm_source'));
+      if (prev && (paid(prev) || !hasMarker)) return;
+      var ref = '';
+      try {
+        // Внутренние переходы источником не считаются.
+        if (document.referrer && new URL(document.referrer).hostname !== location.hostname) {
+          ref = new URL(document.referrer).hostname;
+        }
+      } catch (_) {}
+
+      var src = {
+        t: Date.now(),
+        ref: ref || '',
+        land: (location.pathname || '/').slice(0, 120),
+        utm_source: p.get('utm_source') || '',
+        utm_medium: p.get('utm_medium') || '',
+        utm_campaign: p.get('utm_campaign') || '',
+        gclid: p.get('gclid') || '',
+        gbraid: p.get('gbraid') || '',
+        wbraid: p.get('wbraid') || '',
+      };
+      // Если перезаписали более ранний заход - сохраняем дату первого касания.
+      if (prev) src.t0 = prev.t0 || prev.t;
+      // Прямой заход без реферера и меток тоже пишем - это тоже ответ.
+      localStorage.setItem(KEY, JSON.stringify(src));
+    } catch (_) {}
+  }
+
+  capture();
+  window.vsSource = read;
+})();
