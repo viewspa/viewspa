@@ -66,9 +66,12 @@
 
   function trackPurchase(kind, item, res) {
     const gan = res && res.gan;
+    // Ценность конверсии - фактически списанная сумма, вместе с чаевыми:
+    // это реальные деньги, и по ним Ads считает окупаемость. Цена позиции
+    // ниже остаётся ценой самого пакета.
     const d = {
       transaction_id: gan,
-      value: Number((((res && res.balanceCents) || 0) / 100).toFixed(2)),
+      value: Number((((res && (res.totalCents || res.balanceCents)) || 0) / 100).toFixed(2)),
       currency: 'USD',
       item_category: kind === 'package' ? 'Massage package' : 'Gift certificate',
     };
@@ -200,10 +203,42 @@
       </div>`;
   }
 
+  // ── Чаевые при покупке пакета ─────────────────────────────────────
+  // Пакет оплачивается один раз, а потом человек просто приходит: момента
+  // оплаты на визите нет, а значит нет и привычного момента для чаевых.
+  // Поэтому предлагаем их здесь - и считаем ЗА СЕАНС, а не процентом от
+  // чека: «$15 за сеанс» читается как обычные чаевые, а «20% от $590» -
+  // как ещё одна крупная сумма поверх крупной.
+  const TIP_PER_SESSION = [10, 15, 20];
+
+  function tipBlock(item) {
+    // Суммы на чипах - за сеанс, без итога рядом: «$15 · $120» непонятно,
+    // какое из чисел за что. Итог показываем отдельной строкой ниже, уже
+    // умножением - и только после выбора, чтобы $160 не пугало заранее.
+    const chips = TIP_PER_SESSION.map((v) => `
+      <button type="button" class="bk-chip" data-tip="${v}" aria-pressed="false">$${v}</button>`).join('');
+    return `
+      <fieldset class="bk-tip">
+        <legend>Tip for Ivan <span class="bk-tip-opt">— optional</span></legend>
+        <p class="bk-tip-note">You're paying for all ${item.sessions} sessions today, so there's no bill at the end of each visit. If you'd like to leave something, add it here.</p>
+        <p class="bk-tip-per">Per session:</p>
+        <div class="bk-intake-chips">
+          ${chips}
+          <button type="button" class="bk-chip" data-tip="custom" aria-pressed="false">Other</button>
+          <button type="button" class="bk-chip" data-tip="0" aria-pressed="false">No thanks</button>
+        </div>
+        <label class="bk-tip-custom" hidden>Total tip (USD)
+          <input name="tipCustom" type="number" min="0" max="${Math.floor(item.priceCents / 200)}" step="5" inputmode="numeric">
+        </label>
+        <p class="bk-tip-math" aria-live="polite" hidden></p>
+      </fieldset>`;
+  }
+
   async function renderPurchase(kind, item) {
     // kind: 'package' | 'certificate'
     trackBeginCheckout(kind, item);
     const title = kind === 'package' ? item.name : `Gift certificate · ${money(item.amountCents)}`;
+    const baseCents = kind === 'package' ? item.priceCents : item.amountCents;
     root.innerHTML = `
       <div class="bk-card">
         <button class="bk-back" data-act="home">‹ Back</button>
@@ -213,14 +248,16 @@
         <form id="pay-form" class="bk-form">
           <label>Full name<input name="name" required autocomplete="name"></label>
           <label>Email<input name="email" type="email" required autocomplete="email"></label>
+          ${kind === 'package' ? tipBlock(item) : ''}
           <label>Card</label>
           <div id="card-container" style="padding:4px 0"></div>
           <div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>
-          <button type="submit" class="btn btn-gold bk-submit">Pay ${kind === 'package' ? money(item.priceCents) : money(item.amountCents)}</button>
+          <button type="submit" class="btn btn-gold bk-submit">Pay ${money(baseCents)}</button>
           <div class="bk-error" id="pay-err" hidden></div>
         </form>
       </div>`;
     renderTurnstile();
+    if (kind === 'package') bindTip(item, baseCents);
 
     // init Square card
     try {
@@ -233,6 +270,56 @@
     }
 
     document.getElementById('pay-form').addEventListener('submit', (e) => onPay(e, kind, item));
+  }
+
+  // Сколько чаевых выбрано сейчас, в центах. Единственный источник правды:
+  // и кнопка оплаты, и запрос на сервер читают отсюда.
+  function tipCents(item) {
+    const form = document.getElementById('pay-form');
+    if (!form) return 0;
+    const picked = form.querySelector('.bk-chip[aria-pressed="true"]');
+    if (!picked) return 0;
+    if (picked.dataset.tip === 'custom') {
+      const v = Math.max(0, Math.round(Number(form.tipCustom.value) || 0));
+      return Math.min(v, Math.floor(item.priceCents / 200)) * 100;
+    }
+    return Number(picked.dataset.tip) * item.sessions * 100;
+  }
+
+  function bindTip(item, baseCents) {
+    const form = document.getElementById('pay-form');
+    const btn = form.querySelector('.bk-submit');
+    const custom = form.querySelector('.bk-tip-custom');
+    const math = form.querySelector('.bk-tip-math');
+
+    // Строка с умножением - главное место, где становится ясно, что «$15»
+    // это за сеанс, а не за весь пакет. Кнопка оплаты показывает итог,
+    // эта строка - как он получился.
+    const sync = () => {
+      const tip = tipCents(item);
+      btn.textContent = 'Pay ' + money(baseCents + tip);
+      const picked = form.querySelector('.bk-chip[aria-pressed="true"]');
+      const per = picked && /^\d+$/.test(picked.dataset.tip) ? Number(picked.dataset.tip) : 0;
+      if (tip > 0 && per > 0) {
+        math.textContent = `$${per} × ${item.sessions} sessions = ${money(tip)}`;
+      } else if (tip > 0) {
+        math.textContent = `${money(tip)} total · ${money(Math.round(tip / item.sessions))} per session`;
+      }
+      math.hidden = tip <= 0;
+    };
+
+    form.querySelectorAll('.bk-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const on = chip.getAttribute('aria-pressed') === 'true';
+        form.querySelectorAll('.bk-chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+        chip.setAttribute('aria-pressed', on ? 'false' : 'true');
+        const isCustom = !on && chip.dataset.tip === 'custom';
+        custom.hidden = !isCustom;
+        if (isCustom) form.tipCustom.focus();
+        sync();
+      });
+    });
+    form.tipCustom.addEventListener('input', sync);
   }
 
   async function onPay(e, kind, item) {
@@ -249,7 +336,7 @@
       const buyer = { name: form.name.value, email: form.email.value };
       let res;
       if (kind === 'package') {
-        res = await api('/api/buy-package', { packageId: item.id, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc() });
+        res = await api('/api/buy-package', { packageId: item.id, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc(), tipCents: tipCents(item) });
       } else {
         res = await api('/api/buy-certificate', { amountCents: item.amountCents, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc() });
       }
@@ -264,6 +351,7 @@
     const code = (res.gan || '').replace(/(\d{4})(?=\d)/g, '$1 ');
     const detail = kind === 'package'
       ? `<div>${res.name}</div><div><b>${res.sessions} sessions</b> · valid until ${new Date(res.expiresAt).toLocaleDateString()}</div>`
+        + (res.tipCents > 0 ? `<div class="bk-tip-note">Includes a ${money(res.tipCents)} tip for Ivan · charged ${money(res.totalCents)} today</div>` : '')
       : `<div>Gift certificate</div><div><b>${money(res.balanceCents)}</b> balance</div>`;
     root.innerHTML = `
       <div class="bk-card">

@@ -440,3 +440,51 @@
   line-height: 1.5;
   color: var(--mid);
 }
+
+/* ── Чаевые при покупке пакета ───────────────────────────────────────
+   Блок стоит между контактами и картой: сумма в кнопке оплаты меняется
+   сразу, так что человек видит итог до того, как введёт карту. */
+.bk-tip {
+  margin: 4px 0 2px;
+  padding: 0;
+  border: none;
+}
+
+.bk-tip legend {
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.bk-tip-note {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted, #6b6b6b);
+}
+
+.bk-tip .bk-chip { font-weight: 500; }
+
+.bk-tip-opt {
+  font-weight: 400;
+  color: var(--muted, #6b6b6b);
+}
+
+.bk-tip-per {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.bk-tip-per + .bk-intake-chips { margin-top: 8px; }
+
+/* Строка с умножением: тут человек и понимает, что $15 - за сеанс. */
+.bk-tip-math {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--dark);
+}
+
+.bk-tip-custom { margin-top: 10px; max-width: 220px; }
