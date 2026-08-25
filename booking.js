@@ -709,6 +709,8 @@
         gclid: storedClickId('gclid') || undefined,
         gbraid: storedClickId('gbraid') || undefined,
         wbraid: storedClickId('wbraid') || undefined,
+        // Первое касание, записанное в analytics.js на любой странице.
+        source: (typeof window.vsSource === 'function' ? window.vsSource() : null) || undefined,
         turnstileToken: turnstileToken(form),
       });
       renderDone(res);
