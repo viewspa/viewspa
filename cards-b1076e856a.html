@@ -52,6 +52,53 @@
     padding: 5px 8px;
   }
   .ad-name-input:focus { outline: none; border-color: var(--gold); }
+
+  /* Списание и возврат сеанса */
+  .ad-act { white-space: nowrap; }
+  .ad-btn {
+    font-family: var(--font-body); font-size: 13px; line-height: 1;
+    padding: 7px 10px; margin-right: 6px;
+    background: var(--white); color: var(--dark);
+    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .ad-btn:last-child { margin-right: 0; }
+  .ad-btn:hover:not(:disabled) { border-color: var(--gold); }
+  .ad-btn:disabled { opacity: .4; cursor: default; }
+  .ad-btn-minus:hover:not(:disabled) { border-color: #c0392b; color: #a33; }
+  .ad-act-no { color: var(--mid); font-size: 13px; }
+
+  /* Продажа карты вживую */
+  .ad-issue { background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; }
+  .ad-issue > summary { padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; }
+  .ad-issue > summary::-webkit-details-marker { display: none; }
+  .ad-issue > summary::before { content: '+ '; color: var(--gold-accessible); font-weight: 700; }
+  .ad-issue[open] > summary::before { content: '− '; }
+  .ad-issue[open] > summary { border-bottom: 1px solid var(--border); }
+  .ad-issue-body { padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: end; }
+  .ad-field { display: flex; flex-direction: column; gap: 5px; }
+  .ad-field label { font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: var(--mid); font-weight: 700; }
+  .ad-opt { text-transform: none; letter-spacing: 0; font-weight: 400; font-style: italic; }
+  .ad-field input, .ad-field select {
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: var(--font-body); font-size: 15px; background: var(--white); color: var(--dark);
+  }
+  .ad-field input:focus, .ad-field select:focus { outline: none; border-color: var(--gold); }
+  .ad-issue-go { display: flex; align-items: end; }
+  .ad-issue-go .btn { width: 100%; }
+  .ad-issue-result {
+    grid-column: 1 / -1; padding: 16px; border-radius: 8px;
+    background: rgba(39,174,96,.08); border: 1px solid rgba(39,174,96,.3);
+  }
+  .ad-issue-result.bad { background: #fdf3f3; border-color: #f0c9c9; }
+  .ad-issue-code {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 24px;
+    letter-spacing: 2px; font-weight: 700; margin: 8px 0; cursor: pointer;
+    border-bottom: 1px dashed var(--border); display: inline-block;
+  }
+  .ad-issue-meta { font-size: 14px; color: var(--mid); }
+  .ad-sub { font-size: 12px; color: var(--mid); }
+  .ad-field input[readonly] { background: var(--beige); color: var(--mid); cursor: default; }
 </style>
 </head>
 <body>
@@ -68,6 +115,63 @@
 
   <div id="ad-error" class="ad-err" hidden></div>
   <div id="ad-stats" class="ad-stats" hidden></div>
+
+  <details class="ad-issue" id="ad-issue" hidden>
+    <summary>Продать карту вживую — за наличные или переводом</summary>
+    <div class="ad-issue-body">
+      <div class="ad-field">
+        <label for="iss-kind">Что продаём</label>
+        <select id="iss-kind">
+          <option value="package">Пакет массажа</option>
+          <option value="certificate">Подарочный сертификат</option>
+        </select>
+      </div>
+
+      <div class="ad-field" id="iss-pkg-wrap">
+        <label for="iss-pkg">Пакет</label>
+        <select id="iss-pkg"></select>
+      </div>
+
+      <div class="ad-field" id="iss-amt-wrap">
+        <label for="iss-amt">Сумма, $ <span class="ad-opt" id="iss-amt-hint"></span></label>
+        <input id="iss-amt" type="number" min="25" max="1000" step="5" value="100" inputmode="numeric">
+      </div>
+
+      <div class="ad-field">
+        <label for="iss-name">Имя клиента</label>
+        <input id="iss-name" type="text" maxlength="80" placeholder="Марина К.">
+      </div>
+
+      <div class="ad-field">
+        <label for="iss-phone">Телефон</label>
+        <input id="iss-phone" type="tel" maxlength="32" placeholder="+1 754 202 6666" autocomplete="off">
+      </div>
+
+      <div class="ad-field">
+        <label for="iss-email">Почта <span class="ad-opt">необязательно</span></label>
+        <input id="iss-email" type="email" maxlength="120" placeholder="код уйдёт письмом">
+      </div>
+
+      <div class="ad-field">
+        <label for="iss-tender">Как оплатил</label>
+        <select id="iss-tender">
+          <option value="CASH">Наличные</option>
+          <option value="EXTERNAL">Перевод</option>
+        </select>
+      </div>
+
+      <div class="ad-field" id="iss-note-wrap" hidden>
+        <label for="iss-note">Чем перевёл</label>
+        <input id="iss-note" type="text" maxlength="50" value="Zelle" placeholder="Zelle, Venmo…">
+      </div>
+
+      <div class="ad-issue-go">
+        <button class="btn btn-gold" id="iss-go">Выпустить карту</button>
+      </div>
+
+      <div id="iss-result" class="ad-issue-result" hidden></div>
+    </div>
+  </details>
 
   <div class="ad-tools" hidden id="ad-tools">
     <input id="ad-search" placeholder="Поиск: имя, последние 4 цифры, email">
@@ -119,6 +223,19 @@
     return '<span class="ad-tag ad-ok">активна</span>';
   }
 
+  // Списать и вернуть можно только там, где известна ставка за сеанс:
+  // иначе непонятно, сколько снимать. У сертификатов ставки нет.
+  function actionButtons(r) {
+    if (r.state !== 'ACTIVE') return '<span class="ad-act-no">—</span>';
+    if (r.sessionsLeft == null) return '<span class="ad-act-no">не пакет</span>';
+    var out = '';
+    out += '<button class="ad-btn ad-btn-minus" data-act="redeem" data-gan="' + esc(r.gan) +
+           '" title="Списать один сеанс"' + (r.sessionsLeft < 1 ? ' disabled' : '') + '>− сеанс</button>';
+    out += '<button class="ad-btn" data-act="return" data-gan="' + esc(r.gan) +
+           '" title="Вернуть сеанс — отмена ошибочного списания">+ сеанс</button>';
+    return out;
+  }
+
   function render(list) {
     if (!list.length) {
       $('ad-body').innerHTML = '<p class="ad-msg">Ничего не найдено.</p>';
@@ -126,7 +243,7 @@
     }
     var html = '<table><thead><tr>' +
       '<th>Карта</th><th>Имя</th><th>Что</th><th>Осталось</th><th>Баланс</th>' +
-      '<th>Действует до</th><th>Покупатель</th><th>Куплена</th><th>Статус</th>' +
+      '<th>Действует до</th><th>Покупатель</th><th>Куплена</th><th>Статус</th><th>Сеанс</th>' +
       '</tr></thead><tbody>';
     list.forEach(function (r) {
       // Имя: сначала проставленное вручную, потом имя плательщика.
@@ -143,9 +260,11 @@
         '<td class="num">' + (r.sessionsLeft != null ? r.sessionsLeft + ' из ' + (r.sessionsTotal || '?') : '—') + '</td>' +
         '<td class="num">' + money(r.balanceCents) + '</td>' +
         '<td class="num">' + date(r.expiresAt) + '</td>' +
-        '<td>' + esc(r.buyerEmail || '—') + '</td>' +
+        '<td>' + (r.buyerPhone ? esc(r.buyerPhone) + (r.buyerEmail ? '<br><span class="ad-sub">' + esc(r.buyerEmail) + '</span>' : '')
+                                : esc(r.buyerEmail || '—')) + '</td>' +
         '<td class="num">' + date(r.createdAt) + '</td>' +
         '<td>' + statusTag(r) + '</td>' +
+        '<td class="ad-act">' + actionButtons(r) + '</td>' +
         '</tr>';
     });
     $('ad-body').innerHTML = html + '</tbody></table>';
@@ -154,7 +273,11 @@
   function applyFilter() {
     var q = ($('ad-search').value || '').trim().toLowerCase();
     if (!q) return render(rows);
+    // Телефон ищем по одним цифрам: в базе он может быть с +1, скобками
+    // и пробелами, а искать его будут как придётся.
+    var digits = q.replace(/\D/g, '');
     render(rows.filter(function (r) {
+      if (digits && (r.buyerPhone || '').replace(/\D/g, '').indexOf(digits) >= 0) return true;
       return (r.gan || '').indexOf(q) >= 0
         || (r.buyerEmail || '').toLowerCase().indexOf(q) >= 0
         || (r.label || '').toLowerCase().indexOf(q) >= 0
@@ -186,6 +309,8 @@
         '<div class="ad-stat"><b>' + money(data.outstandingCents) + '</b><span>не отработано</span></div>' +
         '<div class="ad-stat"><b>' + data.count + '</b><span>всего карт</span></div>';
       $('ad-tools').hidden = false;
+      $('ad-issue').hidden = false;
+      if (!$('iss-pkg').options.length) loadPackages();
       $('ad-updated').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU');
       applyFilter();
     } catch (e) {
@@ -195,14 +320,14 @@
   }
 
   function csv() {
-    var head = ['Карта', 'Имя', 'Что', 'Осталось сеансов', 'Всего сеансов', 'Баланс USD', 'Действует до', 'Покупатель', 'Куплена', 'Статус'];
+    var head = ['Карта', 'Имя', 'Что', 'Осталось сеансов', 'Всего сеансов', 'Баланс USD', 'Действует до', 'Телефон', 'Почта', 'Куплена', 'Статус'];
     var lines = [head.join(';')];
     rows.forEach(function (r) {
       lines.push([
         r.gan, r.label || r.buyerName || '', r.name,
         r.sessionsLeft == null ? '' : r.sessionsLeft, r.sessionsTotal || '',
         (r.balanceCents / 100).toFixed(2), r.expiresAt ? r.expiresAt.slice(0, 10) : '',
-        r.buyerEmail || '', r.createdAt ? r.createdAt.slice(0, 10) : '', r.state,
+        r.buyerPhone || '', r.buyerEmail || '', r.createdAt ? r.createdAt.slice(0, 10) : '', r.state,
       ].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';'));
     });
     // BOM - иначе Excel открывает кириллицу кракозябрами
@@ -228,7 +353,11 @@
       var was = el.textContent;
       el.textContent = 'скопировано';
       setTimeout(function () { el.textContent = was; }, 1200);
-    }).catch(function () { window.prompt('Номер карты:', gan); });
+    }).catch(function () {
+      // Буфер обмена бывает недоступен (не https, запрет в браузере).
+      // prompt тоже поддерживается не везде - падать из-за копирования нельзя.
+      try { window.prompt('Номер карты:', gan); } catch (_) { showError('Скопируйте номер вручную: ' + gan); }
+    });
   });
 
   // ── Имя карты ────────────────────────────────────────────────────
@@ -293,6 +422,171 @@
       else if (ev.key === 'Escape') { settled = true; applyFilter(); }
     });
     input.addEventListener('blur', commit);
+  });
+
+  // ── Продажа карты вживую ─────────────────────────────────────────
+  // Интерфейс Square этого не даёт, а через API проходит: заказ ->
+  // платёж (наличные или перевод) -> карта -> активация. Для пакета
+  // дополнительно пишется запись, иначе это были бы просто деньги
+  // на карте: сеансы не считались бы и гасить пакетом было бы нельзя.
+  // Сумма показывается всегда. Для пакета она берётся из каталога и
+  // закрыта на правку: цена пакета жёстко связана со ставкой за сеанс,
+  // и продажа за другие деньги сломала бы счёт сеансов - на карту легло бы
+  // не 8 сеансов, а сколько получится делением.
+  function issueToggle() {
+    var isPkg = $('iss-kind').value === 'package';
+    $('iss-pkg-wrap').hidden = !isPkg;
+    $('iss-note-wrap').hidden = $('iss-tender').value !== 'EXTERNAL';
+
+    var amt = $('iss-amt');
+    if (isPkg) {
+      var opt = $('iss-pkg').options[$('iss-pkg').selectedIndex];
+      amt.value = opt && opt.dataset.price ? (Number(opt.dataset.price) / 100) : '';
+      amt.readOnly = true;
+      $('iss-amt-hint').textContent = 'цена пакета';
+    } else {
+      if (amt.readOnly) amt.value = 100;   // возвращаемся к сертификату - разумный старт
+      amt.readOnly = false;
+      $('iss-amt-hint').textContent = '';
+    }
+  }
+
+  async function loadPackages() {
+    try {
+      var res = await fetch(API + '/api/packages');
+      var d = await res.json();
+      $('iss-pkg').innerHTML = (d.packages || []).map(function (p) {
+        return '<option value="' + esc(p.id) + '" data-price="' + p.priceCents + '">' +
+          esc(p.name) + ' — ' + money(p.priceCents) + '</option>';
+      }).join('');
+      issueToggle();   // подставить цену первого пакета
+    } catch (e) {
+      $('iss-pkg').innerHTML = '<option value="">не загрузились</option>';
+    }
+  }
+
+  async function issueCard() {
+    var btn = $('iss-go');
+    var box = $('iss-result');
+    var kind = $('iss-kind').value;
+    var body = {
+      kind: kind,
+      buyerName: $('iss-name').value.replace(/\s+/g, ' ').trim(),
+      buyerPhone: $('iss-phone').value.trim(),
+      buyerEmail: $('iss-email').value.trim(),
+      tender: $('iss-tender').value,
+      tenderNote: $('iss-note').value.trim(),
+    };
+    if (kind === 'package') body.packageId = $('iss-pkg').value;
+    else body.amountCents = Math.round(Number($('iss-amt').value) * 100);
+
+    var what = kind === 'package'
+      ? $('iss-pkg').options[$('iss-pkg').selectedIndex].text
+      : 'сертификат на $' + $('iss-amt').value;
+    var how = body.tender === 'CASH' ? 'наличными' : ('переводом' + (body.tenderNote ? ' (' + body.tenderNote + ')' : ''));
+    if (!window.confirm('Выпустить карту?\n\n' + what + '\nОплачено ' + how +
+        (body.buyerName ? '\nКлиент: ' + body.buyerName : '') +
+        (body.buyerPhone ? '\nТелефон: ' + body.buyerPhone : '') +
+        '\n\nПродажа попадёт в отчёты Square.')) return;
+
+    btn.disabled = true;
+    var was = btn.textContent;
+    btn.textContent = 'Выпускаю…';
+    box.hidden = true;
+    box.className = 'ad-issue-result';
+
+    try {
+      var res = await fetch(API + '/api/admin/issue-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify(body),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+
+      var pretty = String(d.gan).replace(/(\d{4})(?=\d)/g, '$1 ');
+      box.innerHTML = '<div><b>' + esc(d.name) + '</b> · ' + money(d.balanceCents) + ' · ' + esc(d.tender) + '</div>' +
+        '<div class="ad-issue-code" data-gan="' + esc(d.gan) + '" title="Нажмите, чтобы скопировать">' + pretty + '</div>' +
+        '<div class="ad-issue-meta">' +
+          (d.sessions ? d.sessions + ' сеансов · до ' + date(d.expiresAt) + ' · ' : '') +
+          (d.emailSent ? 'код отправлен на почту' : 'продиктуйте код клиенту') +
+        '</div>';
+      box.hidden = false;
+      $('iss-name').value = '';
+      $('iss-phone').value = '';
+      $('iss-email').value = '';
+      await load();
+    } catch (err) {
+      box.className = 'ad-issue-result bad';
+      box.textContent = err.message;
+      box.hidden = false;
+    }
+    btn.disabled = false;
+    btn.textContent = was;
+  }
+
+  $('iss-kind').addEventListener('change', issueToggle);
+  $('iss-pkg').addEventListener('change', issueToggle);
+  $('iss-tender').addEventListener('change', issueToggle);
+  $('iss-go').addEventListener('click', issueCard);
+  $('iss-result').addEventListener('click', function (e) {
+    var el = e.target.closest('.ad-issue-code');
+    if (!el) return;
+    navigator.clipboard.writeText(el.dataset.gan).then(function () {
+      var w = el.textContent;
+      el.textContent = 'скопировано';
+      setTimeout(function () { el.textContent = w; }, 1200);
+    }).catch(function () {
+      try { window.prompt('Номер карты:', el.dataset.gan); } catch (_) {}
+    });
+  });
+  issueToggle();
+
+  // ── Списание и возврат сеанса ────────────────────────────────────
+  // Деньги клиента, поэтому: явное подтверждение с последствием в тексте,
+  // кнопки блокируются на время запроса, список перезагружается из Square -
+  // на экране всегда настоящий баланс, а не наш расчёт.
+  async function sessionOp(kind, gan, btn) {
+    var row = null;
+    for (var i = 0; i < rows.length; i++) if (rows[i].gan === gan) { row = rows[i]; break; }
+    if (!row) return;
+
+    var who = row.label || row.buyerName || row.buyerEmail || ('карта …' + row.last4);
+    var rate = row.sessionsTotal ? Math.round(row.balanceCents / Math.max(row.sessionsLeft, 1)) : null;
+    var text = kind === 'redeem'
+      ? 'Списать один сеанс?\n\n' + who + '\nСейчас: ' + row.sessionsLeft + ' из ' + (row.sessionsTotal || '?') +
+        '\nСтанет: ' + (row.sessionsLeft - 1) + ' из ' + (row.sessionsTotal || '?')
+      : 'Вернуть один сеанс?\n\n' + who + '\nСейчас: ' + row.sessionsLeft + ' из ' + (row.sessionsTotal || '?') +
+        '\nСтанет: ' + (row.sessionsLeft + 1) + ' из ' + (row.sessionsTotal || '?');
+    if (!window.confirm(text)) return;
+
+    var all = document.querySelectorAll('.ad-btn');
+    for (var k = 0; k < all.length; k++) all[k].disabled = true;
+    var was = btn.textContent;
+    btn.textContent = '…';
+    showError('');
+
+    try {
+      var res = await fetch(API + '/api/admin/' + (kind === 'redeem' ? 'redeem-session' : 'return-session'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ gan: gan, sessions: 1 }),
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(data.error || ('Не получилось (' + res.status + ')'));
+      btn.textContent = was;
+      await load();   // перечитываем из Square, а не досчитываем на месте
+    } catch (err) {
+      btn.textContent = was;
+      for (var m = 0; m < all.length; m++) all[m].disabled = false;
+      showError(err.message);
+    }
+  }
+
+  $('ad-body').addEventListener('click', function (e) {
+    var btn = e.target.closest('.ad-btn');
+    if (!btn || btn.disabled) return;
+    sessionOp(btn.dataset.act, btn.dataset.gan, btn);
   });
 
   if ($('ad-secret').value) load();
