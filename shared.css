@@ -2400,285 +2400,246 @@ footer .text-gold-lt,
   .hero-aside-inner { grid-template-areas: "quote" "meta" "actions"; grid-template-columns: 1fr; }
 }
 
-/* =========================================================
-   HERO v3.1 - кадрирование, затемнение, единая композиция
-   ========================================================= */
-
-/* (1) кадрирование главной: вывеска целиком помещается в кадр.
-   Десктоп - окно кадра опускается ниже, мобильный - вывеска по центру. */
-.hero-bg-img { object-position: 50% 45%; }
-@media(max-width: 860px) { .hero-bg-img { object-position: 50% 42%; } }
-
-/* (2) затемнение убавлено: интерьер должно быть видно */
-.hero-overlay {
-  background:
-    linear-gradient(100deg, rgba(12,10,6,.72) 0%, rgba(12,10,6,.54) 38%, rgba(12,10,6,.18) 70%, rgba(12,10,6,.30) 100%),
-    linear-gradient(to top, rgba(12,10,6,.34), transparent 42%);
+/* =============================================================
+   ПЕРВЫЙ ЭКРАН - единый блок (схлопнуты прежние HERO v3.1-v3.4)
+   Кадрирование, подложка и типографика героя главной и внутренних
+   страниц. Раньше лежало четырьмя слоями: .hero-overlay объявлялся
+   11 раз, .hero-inner::before - 9 и в конце гасился display:none.
+   Оставлены только победившие объявления, порядок сохранён.
+   ============================================================= */
+.hero-bg-img {
+  object-position: 50% 45%;
 }
 @media(max-width: 860px) {
-  .hero-overlay {
-    background:
-      linear-gradient(180deg, rgba(12,10,6,.62) 0%, rgba(12,10,6,.44) 45%, rgba(12,10,6,.58) 100%);
+  .hero-bg-img {
+    object-position: 50% 42%;
   }
-}
-
-/* (3) внутренние страницы получают ту же композицию, что главная:
-   текст прижат влево, тот же направленный скрим, та же ширина колонки */
-.page-hero { background-position: center 42%; }
-.page-hero::after {
-  background:
-    linear-gradient(100deg, rgba(12,10,6,.70) 0%, rgba(12,10,6,.52) 40%, rgba(12,10,6,.16) 72%, rgba(12,10,6,.30) 100%),
-    linear-gradient(to top, rgba(12,10,6,.32), transparent 42%);
 }
 .page-hero-inner {
-  max-width: 1320px; width: 100%; margin: 0 auto;
-  padding-left: 20px; padding-right: 20px;
+  max-width: 1320px;
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
-.page-hero-inner > * { max-width: 640px; }
-.page-hero-inner h1 { font-size: clamp(32px, 5.2vw, 60px); letter-spacing: -.018em; line-height: 1.06; max-width: 15ch; }
-.page-hero-inner .eyebrow { letter-spacing: 2.4px; }
-@media(min-width: 1100px) { .page-hero-inner > * { max-width: 720px; } }
+.page-hero-inner > * {
+  max-width: 640px;
+}
+.page-hero-inner h1 {
+  letter-spacing: -.018em;
+  line-height: 1.06;
+}
+.page-hero-inner .eyebrow {
+  letter-spacing: 2.4px;
+}
 @media(max-width: 600px) {
-  .page-hero { background-position: center 40%; }
-  .page-hero-inner h1 { font-size: clamp(28px, 8vw, 36px); }
-}
-
-/* видео в разделе "внутри студии": ярче, подложка мягче */
-.bg-video { opacity: .8; }
-.video-overlay { background: linear-gradient(to bottom, rgba(10,8,5,.42), rgba(10,8,5,.24) 45%, rgba(10,8,5,.5)); }
-
-/* Затемнение точечное, а не по всему кадру: фотография остаётся светлой,
-   мягкая подложка живёт только под текстовой колонкой. */
-.hero-overlay {
-  background:
-    linear-gradient(100deg, rgba(12,10,6,.34) 0%, rgba(12,10,6,.20) 45%, rgba(12,10,6,.10) 72%, rgba(12,10,6,.22) 100%),
-    linear-gradient(to top, rgba(12,10,6,.30), transparent 38%);
-}
-.hero-inner { position: relative; }
-.hero-inner::before {
-  content: ''; position: absolute; z-index: -1; pointer-events: none;
-  top: -70px; bottom: -40px; left: -50vw; right: -120px;
-  background: linear-gradient(100deg,
-    rgba(12,10,6,.90) 0%, rgba(12,10,6,.84) 52%, rgba(12,10,6,.64) 73%,
-    rgba(12,10,6,.30) 88%, rgba(12,10,6,0) 100%);
-}
-@media(max-width: 860px) {
-  .hero-overlay { background: linear-gradient(180deg, rgba(12,10,6,.30) 0%, rgba(12,10,6,.16) 50%, rgba(12,10,6,.34) 100%); }
-  .hero-inner::before {
-    top: -18px; bottom: -18px; left: -24px; right: -24px;
-    background: linear-gradient(180deg, rgba(12,10,6,.66) 0%, rgba(12,10,6,.58) 62%, rgba(12,10,6,.46) 100%);
+  .page-hero {
+    background-position: center 40%;
   }
 }
-
-/* та же схема на внутренних страницах */
-.page-hero::after {
-  background:
-    linear-gradient(100deg, rgba(12,10,6,.34) 0%, rgba(12,10,6,.20) 45%, rgba(12,10,6,.10) 72%, rgba(12,10,6,.22) 100%),
-    linear-gradient(to top, rgba(12,10,6,.30), transparent 38%);
+.hero-inner {
+  position: relative;
 }
-.page-hero-inner { position: relative; }
-.page-hero-inner::before {
-  content: ''; position: absolute; z-index: -1; pointer-events: none;
-  top: -30px; bottom: -30px; left: -50vw; right: 22%;
-  background: linear-gradient(100deg,
-    rgba(12,10,6,.86) 0%, rgba(12,10,6,.80) 62%, rgba(12,10,6,.55) 82%, rgba(12,10,6,0) 100%);
+.page-hero-inner {
+  position: relative;
 }
-@media(max-width: 860px) {
-  .page-hero::after { background: linear-gradient(180deg, rgba(12,10,6,.32) 0%, rgba(12,10,6,.18) 50%, rgba(12,10,6,.36) 100%); }
-  .page-hero-inner::before { left: -24px; right: -24px; background: linear-gradient(180deg, rgba(12,10,6,.68), rgba(12,10,6,.56)); }
+.page-hero-inner p {
+  font-size: var(--fs-md);
+  max-width: 40ch;
 }
-
-/* (3) внутренние страницы: тот же масштаб заголовка и та же плотность
-   вспомогательных строк, что на главной */
-.page-hero-inner h1 { font-size: clamp(30px, 4.4vw, 50px); max-width: 19ch; }
-.page-hero-inner p { font-size: var(--fs-md); max-width: 40ch; }
-.page-hero-trust { font-size: var(--fs-2xs); letter-spacing: .13em; color: rgba(255,255,255,.66); }
-.page-hero-trust li { margin-bottom: 3px; }
-.page-hero-meta { font-size: var(--fs-2xs); color: rgba(255,255,255,.66); }
-.page-hero-micro { font-size: var(--fs-2xs); color: var(--gold-lt); letter-spacing: .09em; }
-.hero-price-callout { background: rgba(12,10,6,.34); border-color: rgba(226,196,120,.5); border-radius: 2px; }
-.hero-price-sub { color: rgba(255,255,255,.72); }
-@media(max-width: 600px) { .page-hero-inner h1 { font-size: clamp(28px, 8vw, 34px); max-width: none; } }
-
-/* мелкие строки поверх фотографии получают локальную тень вместо
-   общего затемнения кадра: снимок остаётся светлым, текст читается */
-.hero-inner .eyebrow, .hero-award-text, .hero-award-verify, .hero-book-note,
-.page-hero-inner .eyebrow, .page-hero-trust, .page-hero-meta, .page-hero-micro,
+.page-hero-trust {
+  font-size: var(--fs-2xs);
+  letter-spacing: .13em;
+  color: rgba(255,255,255,.66);
+}
+.page-hero-trust li {
+  margin-bottom: 3px;
+}
+.page-hero-meta {
+  font-size: var(--fs-2xs);
+  color: rgba(255,255,255,.66);
+}
+.page-hero-micro {
+  font-size: var(--fs-2xs);
+  color: var(--gold-lt);
+  letter-spacing: .09em;
+}
+.hero-price-callout {
+  background: rgba(12,10,6,.34);
+  border-color: rgba(226,196,120,.5);
+  border-radius: 2px;
+}
+.hero-price-sub {
+  color: rgba(255,255,255,.72);
+}
+@media(max-width: 600px) {
+  .page-hero-inner h1 {
+    font-size: clamp(28px, 8vw, 34px);
+    max-width: none;
+  }
+}
 .hero-strip-item::after {
   text-shadow: 0 1px 10px rgba(12,10,6,.9), 0 0 2px rgba(12,10,6,.6);
 }
-/* надзаголовок героя: чуть плотнее золото поверх светлого кадра */
-.hero-inner .eyebrow { color: #F0DCA8; }
-/* строка награды поверх светлого участка кадра: чуть светлее золото */
-.hero-award-text, .page-hero-inner .hero-award-text { color: #F0DCA8; }
-
-/* =========================================================
-   HERO v3.2
-   - подложка светлее ещё на треть
-   - градиент гасится ДО края блока: раньше на скошенном
-     градиенте был виден вертикальный шов
-   - кадрирование внутренних страниц возвращено к center
-   ========================================================= */
-
-/* главная: общий тон почти прозрачный */
-.hero-overlay {
-  background:
-    linear-gradient(90deg, rgba(12,10,6,.20) 0%, rgba(12,10,6,.10) 45%, rgba(12,10,6,.04) 72%, rgba(12,10,6,.12) 100%),
-    linear-gradient(to top, rgba(12,10,6,.22), transparent 34%);
+.hero-inner .eyebrow {
+  color: #F0DCA8;
 }
-/* подложка под текстом: строго горизонтальная и полностью прозрачная
-   к 88% ширины блока, поэтому границы блока не видно */
-.hero-inner::before {
-  top: -70px; bottom: -40px; left: -50vw; right: 0;
-  background: linear-gradient(90deg,
-    rgba(12,10,6,.76) 0%, rgba(12,10,6,.72) 46%, rgba(12,10,6,.52) 64%,
-    rgba(12,10,6,.22) 78%, rgba(12,10,6,0) 88%);
+.hero-award-text {
+  color: #F0DCA8;
+}
+.page-hero-inner .hero-award-text {
+  color: #F0DCA8;
 }
 @media(max-width: 860px) {
-  .hero-overlay { background: linear-gradient(180deg, rgba(12,10,6,.20) 0%, rgba(12,10,6,.08) 50%, rgba(12,10,6,.22) 100%); }
   .hero-inner::before {
-    top: -18px; bottom: -18px; left: -24px; right: -24px;
-    background: linear-gradient(180deg, rgba(12,10,6,.52) 0%, rgba(12,10,6,.46) 62%, rgba(12,10,6,.34) 100%);
+    top: -18px;
+    bottom: -18px;
+    left: -24px;
+    right: -24px;
   }
 }
-
-/* внутренние страницы: кадр как был, тон светлее, шов убран */
-.page-hero { background-position: center center; }
-.massage-hero, .page-hero-manicure { background-position: center center; }
-.page-hero::after {
-  background:
-    linear-gradient(90deg, rgba(12,10,6,.20) 0%, rgba(12,10,6,.10) 45%, rgba(12,10,6,.04) 72%, rgba(12,10,6,.12) 100%),
-    linear-gradient(to top, rgba(12,10,6,.22), transparent 34%);
+.page-hero {
+  background-position: center center;
 }
-.page-hero-inner::before {
-  top: -30px; bottom: -30px; left: -50vw; right: 12%;
-  background: linear-gradient(90deg,
-    rgba(12,10,6,.76) 0%, rgba(12,10,6,.70) 56%, rgba(12,10,6,.44) 74%,
-    rgba(12,10,6,.16) 86%, rgba(12,10,6,0) 96%);
+.massage-hero {
+  background-position: center center;
+}
+.page-hero-manicure {
+  background-position: center center;
 }
 @media(max-width: 860px) {
-  .page-hero::after { background: linear-gradient(180deg, rgba(12,10,6,.22) 0%, rgba(12,10,6,.10) 50%, rgba(12,10,6,.24) 100%); }
   .page-hero-inner::before {
-    left: -24px; right: -24px;
-    background: linear-gradient(180deg, rgba(12,10,6,.54), rgba(12,10,6,.40));
+    left: -24px;
+    right: -24px;
   }
 }
-
-/* видео: ещё ярче */
-.bg-video { opacity: .92; }
-.video-overlay { background: linear-gradient(to bottom, rgba(10,8,5,.30), rgba(10,8,5,.12) 45%, rgba(10,8,5,.36)); }
-.video-title, .video-kicker { text-shadow: 0 2px 18px rgba(10,8,5,.85), 0 0 3px rgba(10,8,5,.6); }
-
-/* фотополоса под первым экраном стала навигацией */
-a.hero-strip-item { display: block; text-decoration: none; }
+.bg-video {
+  opacity: .92;
+}
+.video-overlay {
+  background: linear-gradient(to bottom, rgba(10,8,5,.30), rgba(10,8,5,.12) 45%, rgba(10,8,5,.36));
+}
+.video-title {
+  text-shadow: 0 2px 18px rgba(10,8,5,.85), 0 0 3px rgba(10,8,5,.6);
+}
+.video-kicker {
+  text-shadow: 0 2px 18px rgba(10,8,5,.85), 0 0 3px rgba(10,8,5,.6);
+}
+a.hero-strip-item {
+  display: block;
+  text-decoration: none;
+}
 a.hero-strip-item::before {
-  content: ''; position: absolute; inset: 0; z-index: 1;
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   background: linear-gradient(to top, rgba(12,10,6,.5), transparent 55%);
   transition: background .4s var(--ease);
 }
-a.hero-strip-item:hover::before { background: linear-gradient(to top, rgba(12,10,6,.65), rgba(12,10,6,.12) 70%); }
-a.hero-strip-item:hover img { transform: scale(1.05); }
-a.hero-strip-item::after { z-index: 2; }
-a.hero-strip-item:focus-visible { outline: 2px solid var(--gold-lt); outline-offset: -4px; }
-/* заголовок первого экрана лежит поверх светлой вывески: мягкая тень
-   вместо затемнения всего кадра */
-.hero-h1, .page-hero-inner h1, .hero-slogan, .page-hero-inner p {
-  text-shadow: 0 2px 22px rgba(12,10,6,.75), 0 0 4px rgba(12,10,6,.45);
+a.hero-strip-item:hover::before {
+  background: linear-gradient(to top, rgba(12,10,6,.65), rgba(12,10,6,.12) 70%);
 }
-
-/* Тень «по буквам»: тёмное только вокруг глифов, а не по всему кадру.
-   Так снимок остаётся светлым, а контраст текста держится по норме. */
-.hero-h1, .page-hero-inner h1 {
+a.hero-strip-item:hover img {
+  transform: scale(1.05);
+}
+a.hero-strip-item::after {
+  z-index: 2;
+}
+a.hero-strip-item:focus-visible {
+  outline: 2px solid var(--gold-lt);
+  outline-offset: -4px;
+}
+.hero-h1 {
   text-shadow: 0 0 34px rgba(12,10,6,.92), 0 0 14px rgba(12,10,6,.85),
                0 1px 3px rgba(12,10,6,.75);
 }
-.hero-slogan, .page-hero-inner p, .hero-inner .eyebrow, .page-hero-inner .eyebrow,
-.hero-award-text, .hero-award-verify, .hero-book-note,
-.page-hero-trust, .page-hero-meta, .page-hero-micro, .hero-service-label {
+.page-hero-inner h1 {
+  text-shadow: 0 0 34px rgba(12,10,6,.92), 0 0 14px rgba(12,10,6,.85),
+               0 1px 3px rgba(12,10,6,.75);
+}
+.hero-slogan {
   text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
                0 1px 2px rgba(12,10,6,.8);
 }
-/* подложка под колонкой остаётся, но мягче прежнего */
-.hero-inner::before {
-  background: linear-gradient(90deg,
-    rgba(12,10,6,.60) 0%, rgba(12,10,6,.55) 44%, rgba(12,10,6,.34) 62%,
-    rgba(12,10,6,.10) 76%, rgba(12,10,6,0) 88%);
+.page-hero-inner p {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
 }
-.page-hero-inner::before {
-  background: linear-gradient(90deg,
-    rgba(12,10,6,.60) 0%, rgba(12,10,6,.54) 54%, rgba(12,10,6,.30) 72%,
-    rgba(12,10,6,.08) 86%, rgba(12,10,6,0) 96%);
+.hero-inner .eyebrow {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
 }
-@media(max-width: 860px) {
-  .hero-inner::before { background: linear-gradient(180deg, rgba(12,10,6,.46) 0%, rgba(12,10,6,.40) 62%, rgba(12,10,6,.30) 100%); }
-  .page-hero-inner::before { background: linear-gradient(180deg, rgba(12,10,6,.48), rgba(12,10,6,.34)); }
+.page-hero-inner .eyebrow {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
 }
-
-/* =========================================================
-   HERO v3.3 - решаем композицией, а не затемнением.
-   Текст живёт в левой трети, где кадр и так тёмный; светлая
-   часть снимка (окно и вывеска) не глушится вообще.
-   ========================================================= */
+.hero-award-text {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
+}
+.hero-award-verify {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
+}
+.hero-book-note {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
+}
+.page-hero-trust {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
+}
+.page-hero-meta {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
+}
+.page-hero-micro {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
+}
+.hero-service-label {
+  text-shadow: 0 0 20px rgba(12,10,6,.95), 0 0 8px rgba(12,10,6,.9),
+               0 1px 2px rgba(12,10,6,.8);
+}
 @media(min-width: 1100px) {
-  .hero-inner { max-width: 660px; }
-  .page-hero-inner > * { max-width: 600px; }
+  .hero-inner {
+    max-width: 660px;
+  }
+  .page-hero-inner > * {
+    max-width: 600px;
+  }
 }
-.hero-h1 { font-size: clamp(30px, 3.5vw, 46px); }
-.page-hero-inner h1 { font-size: clamp(28px, 3.3vw, 42px); max-width: 17ch; }
-.hero-slogan { font-size: clamp(15px, 1.4vw, 17px); }
-
-.hero-inner::before {
-  background: linear-gradient(90deg,
-    rgba(12,10,6,.72) 0%, rgba(12,10,6,.66) 40%, rgba(12,10,6,.38) 54%,
-    rgba(12,10,6,.10) 66%, rgba(12,10,6,0) 76%);
+.hero-h1 {
+  font-size: clamp(30px, 3.5vw, 46px);
 }
-.page-hero-inner::before {
-  right: 0;
-  background: linear-gradient(90deg,
-    rgba(12,10,6,.72) 0%, rgba(12,10,6,.64) 34%, rgba(12,10,6,.34) 48%,
-    rgba(12,10,6,.08) 60%, rgba(12,10,6,0) 70%);
+.page-hero-inner h1 {
+  font-size: clamp(28px, 3.3vw, 42px);
+  max-width: 17ch;
+}
+.hero-slogan {
+  font-size: clamp(15px, 1.4vw, 17px);
 }
 @media(max-width: 860px) {
-  .hero-inner::before { background: linear-gradient(180deg, rgba(12,10,6,.58) 0%, rgba(12,10,6,.52) 62%, rgba(12,10,6,.40) 100%); }
-  .page-hero-inner::before { background: linear-gradient(180deg, rgba(12,10,6,.60), rgba(12,10,6,.44)); }
+  .hero-inner::before {
+    background: linear-gradient(180deg, rgba(12,10,6,.58) 0%, rgba(12,10,6,.52) 62%, rgba(12,10,6,.40) 100%);
+  }
+  .page-hero-inner::before {
+    background: linear-gradient(180deg, rgba(12,10,6,.60), rgba(12,10,6,.44));
+  }
 }
-
-/* =========================================================
-   HERO v3.4 - подложка живёт на слое самого героя.
-   Раньше она висела на .hero-inner с left:-50vw, из-за чего
-   проценты градиента считались от огромного блока за экраном
-   и реальная плотность под текстом была случайной.
-   Теперь 0-46% ширины кадра - тёмная зона под текстом,
-   после 62% - снимок вообще не тронут.
-   ========================================================= */
-.hero-inner::before, .page-hero-inner::before { display: none; }
-
 .hero-overlay {
-  background:
-    linear-gradient(90deg,
+  background: linear-gradient(90deg,
       rgba(12,10,6,.80) 0%, rgba(12,10,6,.76) 30%, rgba(12,10,6,.60) 44%,
       rgba(12,10,6,.28) 55%, rgba(12,10,6,.06) 64%, rgba(12,10,6,0) 72%),
     linear-gradient(to top, rgba(12,10,6,.26), transparent 32%);
 }
 .page-hero::after {
-  background:
-    linear-gradient(90deg,
+  background: linear-gradient(90deg,
       rgba(12,10,6,.80) 0%, rgba(12,10,6,.74) 28%, rgba(12,10,6,.56) 42%,
       rgba(12,10,6,.24) 54%, rgba(12,10,6,.05) 64%, rgba(12,10,6,0) 72%),
     linear-gradient(to top, rgba(12,10,6,.26), transparent 32%);
 }
-@media(max-width: 860px) {
-  .hero-overlay {
-    background: linear-gradient(180deg, rgba(12,10,6,.62) 0%, rgba(12,10,6,.54) 55%, rgba(12,10,6,.42) 100%);
-  }
-  .page-hero::after {
-    background: linear-gradient(180deg, rgba(12,10,6,.62) 0%, rgba(12,10,6,.52) 55%, rgba(12,10,6,.40) 100%);
-  }
-}
-/* На телефоне прятать текст некуда: колонка во всю ширину и ложится
-   прямо на вывеску. Подложка здесь плотнее, чем на десктопе, но всё
-   равно заметно легче исходной (.90). Значение подобрано по замеру:
-   минимальное, при котором вся мелочь проходит AA. */
 @media(max-width: 860px) {
   .hero-overlay {
     background: linear-gradient(180deg, rgba(12,10,6,.74) 0%, rgba(12,10,6,.67) 55%, rgba(12,10,6,.56) 100%);
@@ -2687,6 +2648,10 @@ a.hero-strip-item:focus-visible { outline: 2px solid var(--gold-lt); outline-off
     background: linear-gradient(180deg, rgba(12,10,6,.74) 0%, rgba(12,10,6,.66) 55%, rgba(12,10,6,.54) 100%);
   }
 }
+
+/* подложка под колонкой не используется: тон задаёт слой героя */
+.hero-inner::before, .page-hero-inner::before { display: none; }
+
 
 /* бургер превращается в крестик, а не поворачивается на 90° */
 .hamburger svg line {
@@ -2735,7 +2700,6 @@ body::after {
     max-height: calc(100dvh - 72px); max-height: calc(100vh - 72px);
     background: var(--white);
     box-shadow: 0 18px 40px rgba(58,44,16,.10); padding: 18px 0 0; overflow-y: auto;
-    animation: menuIn .4s var(--ease) both;
   }
   nav .nav-link {
     border-bottom: 1px solid var(--hairline);
@@ -3020,3 +2984,146 @@ body.no-scroll .sticky-whatsapp { opacity: 0; pointer-events: none; }
 /* Слоган в подвале - тоже без наклона: курсив перестал быть
    средством выделения на сайте, остался только цвет. */
 .foot-tag, .footer-tagline { font-style: normal; }
+
+/* =============================================================
+   ПЕРВЫЙ ЭКРАН: текстовая колонка не заходит на вывеску
+   Кадр полосный и делить его не будем, поэтому границу держит
+   не композиция, а ширина текстовых блоков: вывеска в кадре
+   начинается примерно на 535px при ширине 1425, значит колонка
+   заголовка и строки награды обязана закончиться раньше.
+   ============================================================= */
+
+/* заголовок: три строки вместо «две с половиной» - последнее слово
+   больше не висит одиноко. Балансировку делает браузер. */
+.hero-h1 { text-wrap: balance; }
+
+/* строка награды - обычный текст, а не флекс-ряд: трофей, подпись и
+   «verify» текут вместе и переносятся как одно предложение.
+   Флекс растягивал строку на всю колонку и отбрасывал «verify» вниз. */
+.hero-award {
+  display: block;
+  max-width: 27em;
+  margin: 10px 0 14px;
+}
+.hero-award-icon, .hero-award-text, .hero-award-verify { display: inline; }
+.hero-award-verify { margin-left: 8px; white-space: nowrap; }
+
+@media(min-width: 861px) {
+  /* колонка останавливается, не доходя до вывески */
+  .hero-h1 { max-width: 480px; }
+  .hero-award { max-width: 460px; }
+  .hero-slogan { max-width: 34ch; }
+}
+
+/* «✓ No payment to book» на телефоне стоит под золотой кнопкой, где кадр
+   светлый: единственное место на сайте, где контраст не дотягивал (3.59
+   при норме 4.5). Тот же светлый оттенок золота, что у надзаголовка. */
+@media(max-width: 860px) {
+  .hero-book-note { color: #F8EDD2; }
+}
+
+/* Промо «ногти + массаж»: плашка, кнопка и подпись - блочные элементы со
+   своей шириной. text-align: center на родителе их не центрует, поэтому
+   они стояли по левому краю колонки: кнопка на 126px левее оси заголовка,
+   подпись на 54px. Ось выправляют автополя. */
+@media (min-width: 821px) {
+  .sameday-save,
+  .sameday .btn,
+  .sameday-text .sameday-note { margin-inline: auto; }
+}
+
+/* =============================================================
+   МОБИЛЬНОЕ МЕНЮ: группы вместо плоского списка
+   Было семь равнозначных строк, где «Massage» весит столько же,
+   сколько «Team». Стало три смысловые группы с подписями и разной
+   типографикой: услуги крупной антиквой, всё остальное мелко.
+   Разметку не трогаем - состав и порядок пунктов одинаковы на всех
+   контентных страницах, поэтому группы размечены через nth-of-type,
+   а подписи подставляются по атрибуту lang.
+   ============================================================= */
+@media(max-width: 900px) {
+  nav { padding-top: 8px; }
+
+  /* убираем сплошную «лесенку» из одинаковых полос */
+  nav .nav-link { border-bottom: 0; padding: 10px 24px; }
+
+  /* ── группа 1: услуги. Это то, за чем приходят - крупно ── */
+  nav a.nav-link:nth-of-type(-n+3) {
+    font-family: var(--font-display);
+    font-size: 25px;
+    font-weight: 400;
+    letter-spacing: -.01em;
+    text-transform: none;
+    line-height: 1.25;
+    padding: 9px 24px;
+  }
+
+  /* ── группы 2 и 3: справочные разделы - мелко и капсом ── */
+  nav a.nav-link:nth-of-type(n+4) {
+    font-size: var(--fs-sm);
+    letter-spacing: .12em;
+    color: var(--mid);
+    padding: 11px 24px;
+  }
+  nav a.nav-link:nth-of-type(n+4).active { color: var(--dark); }
+
+  /* ── подписи групп ── */
+  nav a.nav-link:nth-of-type(1)::before,
+  nav a.nav-link:nth-of-type(4)::before,
+  nav a.nav-link:nth-of-type(7)::before {
+    display: block;
+    margin: 0 0 10px;
+    padding-top: 18px;
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold-accessible);
+  }
+  nav a.nav-link:nth-of-type(1)::before { padding-top: 4px; border-top: 0; }
+
+  html[lang="en"] nav a.nav-link:nth-of-type(1)::before { content: "Services"; }
+  html[lang="en"] nav a.nav-link:nth-of-type(4)::before { content: "Studio"; }
+  html[lang="en"] nav a.nav-link:nth-of-type(7)::before { content: "Get in touch"; }
+
+  html[lang="ru"] nav a.nav-link:nth-of-type(1)::before { content: "Услуги"; }
+  html[lang="ru"] nav a.nav-link:nth-of-type(4)::before { content: "Студия"; }
+  html[lang="ru"] nav a.nav-link:nth-of-type(7)::before { content: "Связаться"; }
+
+  html[lang="es"] nav a.nav-link:nth-of-type(1)::before { content: "Servicios"; }
+  html[lang="es"] nav a.nav-link:nth-of-type(4)::before { content: "Estudio"; }
+  html[lang="es"] nav a.nav-link:nth-of-type(7)::before { content: "Contacto"; }
+
+  /* стекло плотнее: сквозь прежнее просвечивал текст героя */
+  nav { background: rgba(255,255,255,.985); }
+
+  /* подвал панели прижат к низу и отделён линией */
+  nav .nav-footer { border-top: 1px solid var(--hairline); padding-top: 18px; }
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  @media(max-width: 900px) {
+    /* панель почти непрозрачная: сквозь более лёгкое стекло читался
+       текст героя и меню выглядело сломанным. Размытие оставляем -
+       оно даёт мягкий край, но фон держит собственный тон. */
+    nav { background: rgba(255,255,255,.985); }
+  }
+}
+
+/* Кнопка записи остаётся закреплённой внизу, пока меню открыто:
+   раньше липкая полоса пряталась, и в панели не было ни одного CTA.
+   Отдельную кнопку в разметку не добавляем - переиспользуем ту же
+   полосу вместе с её событиями. */
+@media(max-width: 860px) {
+  body.no-scroll .book-strip {
+    opacity: 1; pointer-events: auto;
+    /* панель меню лежит ВНУТРИ шапки, а шапка создаёт свой контекст
+       наложения на 200. Поэтому полоса должна перебивать шапку целиком,
+       а не «меню»: со 155 она уходила под весь заголовок. */
+    z-index: calc(var(--z-header) + 5);
+    box-shadow: 0 -12px 30px rgba(58,44,16,.16);
+  }
+  body.no-scroll .book-strip-text { display: none; }
+  nav { padding-bottom: 96px; }
+}
