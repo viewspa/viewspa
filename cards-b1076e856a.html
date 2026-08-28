@@ -39,6 +39,19 @@
   .ad-ok { background: rgba(39,174,96,.12); color: #1e7a45; }
   .ad-msg { padding: 16px; font-size: 15px; color: var(--mid); }
   .ad-err { background: #fdf3f3; border: 1px solid #f0c9c9; color: #a33; padding: 12px 14px; border-radius: 8px; font-size: 15px; margin-bottom: 14px; }
+
+  /* Имя карты - правится по клику прямо в таблице */
+  .ad-name { cursor: text; min-width: 150px; }
+  .ad-name-val { border-bottom: 1px dashed var(--border); }
+  .ad-name-empty { color: var(--mid); font-style: italic; }
+  .ad-name-src { font-size: 11px; color: var(--mid); margin-left: 6px; }
+  .ad-name-input {
+    width: 100%; min-width: 120px; box-sizing: border-box;
+    font-family: var(--font-body); font-size: 14px; color: var(--dark);
+    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 8px;
+  }
+  .ad-name-input:focus { outline: none; border-color: var(--gold); }
 </style>
 </head>
 <body>
@@ -57,7 +70,7 @@
   <div id="ad-stats" class="ad-stats" hidden></div>
 
   <div class="ad-tools" hidden id="ad-tools">
-    <input id="ad-search" placeholder="Поиск: последние 4 цифры, email, название">
+    <input id="ad-search" placeholder="Поиск: имя, последние 4 цифры, email">
     <button class="btn btn-dark" id="ad-csv">Скачать CSV</button>
   </div>
 
@@ -112,12 +125,20 @@
       return;
     }
     var html = '<table><thead><tr>' +
-      '<th>Карта</th><th>Что</th><th>Осталось</th><th>Баланс</th>' +
+      '<th>Карта</th><th>Имя</th><th>Что</th><th>Осталось</th><th>Баланс</th>' +
       '<th>Действует до</th><th>Покупатель</th><th>Куплена</th><th>Статус</th>' +
       '</tr></thead><tbody>';
     list.forEach(function (r) {
+      // Имя: сначала проставленное вручную, потом имя плательщика.
+      // Сертификат часто дарят - платит один, приходит другой, поэтому
+      // ручная метка важнее и перебивает данные покупки.
+      var shown = r.label || r.buyerName || '';
       html += '<tr>' +
         '<td><span class="ad-gan" data-gan="' + esc(r.gan) + '" title="Нажмите, чтобы скопировать номер целиком">…' + esc(r.last4) + '</span></td>' +
+        '<td class="ad-name" data-gan="' + esc(r.gan) + '" title="Нажмите, чтобы вписать имя">' +
+          '<span class="ad-name-val' + (shown ? '' : ' ad-name-empty') + '">' + esc(shown || 'вписать имя') + '</span>' +
+          (r.label ? '' : (r.buyerName ? ' <span class="ad-name-src">из покупки</span>' : '')) +
+        '</td>' +
         '<td>' + esc(r.name) + (r.tracked ? '' : ' <span class="ad-tag ad-warn">нет записи</span>') + '</td>' +
         '<td class="num">' + (r.sessionsLeft != null ? r.sessionsLeft + ' из ' + (r.sessionsTotal || '?') : '—') + '</td>' +
         '<td class="num">' + money(r.balanceCents) + '</td>' +
@@ -136,6 +157,8 @@
     render(rows.filter(function (r) {
       return (r.gan || '').indexOf(q) >= 0
         || (r.buyerEmail || '').toLowerCase().indexOf(q) >= 0
+        || (r.label || '').toLowerCase().indexOf(q) >= 0
+        || (r.buyerName || '').toLowerCase().indexOf(q) >= 0
         || (r.name || '').toLowerCase().indexOf(q) >= 0;
     }));
   }
@@ -172,11 +195,12 @@
   }
 
   function csv() {
-    var head = ['Карта', 'Что', 'Осталось сеансов', 'Всего сеансов', 'Баланс USD', 'Действует до', 'Покупатель', 'Куплена', 'Статус'];
+    var head = ['Карта', 'Имя', 'Что', 'Осталось сеансов', 'Всего сеансов', 'Баланс USD', 'Действует до', 'Покупатель', 'Куплена', 'Статус'];
     var lines = [head.join(';')];
     rows.forEach(function (r) {
       lines.push([
-        r.gan, r.name, r.sessionsLeft == null ? '' : r.sessionsLeft, r.sessionsTotal || '',
+        r.gan, r.label || r.buyerName || '', r.name,
+        r.sessionsLeft == null ? '' : r.sessionsLeft, r.sessionsTotal || '',
         (r.balanceCents / 100).toFixed(2), r.expiresAt ? r.expiresAt.slice(0, 10) : '',
         r.buyerEmail || '', r.createdAt ? r.createdAt.slice(0, 10) : '', r.state,
       ].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';'));
@@ -205,6 +229,70 @@
       el.textContent = 'скопировано';
       setTimeout(function () { el.textContent = was; }, 1200);
     }).catch(function () { window.prompt('Номер карты:', gan); });
+  });
+
+  // ── Имя карты ────────────────────────────────────────────────────
+  // Клик по ячейке превращает её в поле. Enter сохраняет, Esc отменяет,
+  // пустая строка снимает метку. Пишем и в таблицу, и в rows, чтобы
+  // поиск и выгрузка сразу видели новое имя без перезагрузки списка.
+  async function saveLabel(gan, label, cell) {
+    var key = $('ad-secret').value.trim();
+    cell.innerHTML = '<span class="ad-name-val ad-name-empty">сохраняю…</span>';
+    try {
+      var res = await fetch(API + '/api/admin/set-card-label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': key },
+        body: JSON.stringify({ gan: gan, label: label }),
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(data.error || ('Не сохранилось (' + res.status + ')'));
+
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].gan === gan) { rows[i].label = data.label; break; }
+      }
+      var shown = data.label || '';
+      cell.innerHTML = '<span class="ad-name-val' + (shown ? '' : ' ad-name-empty') + '">' +
+        esc(shown || 'вписать имя') + '</span>';
+      showError('');
+    } catch (err) {
+      showError(err.message);
+      applyFilter();   // возвращаем таблицу к последнему известному состоянию
+    }
+  }
+
+  $('ad-body').addEventListener('click', function (e) {
+    var cell = e.target.closest('.ad-name');
+    if (!cell || cell.querySelector('input')) return;
+
+    var gan = cell.dataset.gan;
+    var row = null;
+    for (var i = 0; i < rows.length; i++) if (rows[i].gan === gan) { row = rows[i]; break; }
+    var current = (row && (row.label || row.buyerName)) || '';
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'ad-name-input';
+    input.maxLength = 80;
+    input.value = current;
+    input.placeholder = 'Имя';
+    cell.innerHTML = '';
+    cell.appendChild(input);
+    input.focus();
+    input.select();
+
+    var settled = false;
+    function commit() {
+      if (settled) return;
+      settled = true;
+      var val = input.value.trim();
+      if (val === current) return applyFilter();
+      saveLabel(gan, val, cell);
+    }
+    input.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); commit(); }
+      else if (ev.key === 'Escape') { settled = true; applyFilter(); }
+    });
+    input.addEventListener('blur', commit);
   });
 
   if ($('ad-secret').value) load();
