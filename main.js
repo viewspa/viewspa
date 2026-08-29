@@ -488,6 +488,69 @@
     }, 4000);
   }
 
+
+  /* ── Ближайшее свободное окно у мастеров ────────────────────────
+     Раньше в карточках стояли фразы, написанные однажды руками:
+     «обычно занята на 2-3 недели» и «есть запись на этой неделе».
+     Такое устаревает молча и в какой-то момент начинает врать.
+     Теперь строка приходит из расписания и соврать не может.
+
+     Спрашиваем по русскому маникюру - это самая долгая услуга (2 часа),
+     то есть самая трудная для расписания. На короткие услуги окно найдётся
+     не позже. Так подсказка никогда не обещает раньше, чем есть на самом деле. */
+  function initMasterAvailability(){
+    const slots = document.querySelectorAll('[data-avail]');
+    if(!slots.length) return;
+
+    const API = 'https://viewspa-booking.ivanseydametov.workers.dev';
+    const lang = (document.documentElement.lang || 'en').slice(0,2);
+    const TZ = 'America/New_York';
+
+    const T = {
+      en: { soon: 'Soonest: ', today: 'today', tomorrow: 'tomorrow', none: 'No openings in the next 3 weeks' },
+      ru: { soon: 'Ближайшее окно: ', today: 'сегодня', tomorrow: 'завтра', none: 'Ближайших окон нет на 3 недели вперёд' },
+      es: { soon: 'Más pronto: ', today: 'hoy', tomorrow: 'mañana', none: 'Sin turnos en las próximas 3 semanas' },
+    }[lang] || null;
+    if(!T) return;
+
+    const locale = { en: 'en-US', ru: 'ru-RU', es: 'es-ES' }[lang];
+    const key = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year:'numeric', month:'2-digit', day:'2-digit' }).format(d);
+    const time = (d) => new Intl.DateTimeFormat(locale, { timeZone: TZ, hour:'numeric', minute:'2-digit' }).format(d);
+    const day  = (d) => new Intl.DateTimeFormat(locale, { timeZone: TZ, weekday:'short', month:'short', day:'numeric' }).format(d);
+
+    function label(iso){
+      const d = new Date(iso), now = new Date();
+      const k = key(d);
+      if(k === key(now)) return T.soon + T.today + ' ' + time(d);
+      if(k === key(new Date(now.getTime() + 86400000))) return T.soon + T.tomorrow + ' ' + time(d);
+      return T.soon + day(d) + ', ' + time(d);
+    }
+
+    const from = new Date();
+    const to = new Date(Date.now() + 21 * 86400000);
+
+    fetch(API + '/api/availability', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serviceId: 'gel-manicure', from: from.toISOString(), to: to.toISOString() }),
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d) => {
+        const first = {};
+        (d.slots || []).forEach((s) => {
+          if(!first[s.masterId] || s.startAt < first[s.masterId]) first[s.masterId] = s.startAt;
+        });
+        slots.forEach((el) => {
+          const iso = first[el.dataset.avail];
+          el.textContent = iso ? label(iso) : T.none;
+          el.classList.toggle('avail-green', !!iso);
+        });
+      })
+      .catch(() => {
+        /* Молча: без подсказки карточка остаётся с прежним текстом. */
+      });
+  }
+
   /* Initialize on DOM ready */
   document.addEventListener('DOMContentLoaded', ()=>{
     initHeaderShadow();
@@ -503,5 +566,6 @@
     initBookingPills();
     initVideoRotators();
     initScrollReveal();
+    initMasterAvailability();
   });
 })();
