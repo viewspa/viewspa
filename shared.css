@@ -3127,3 +3127,45 @@ body.no-scroll .sticky-whatsapp { opacity: 0; pointer-events: none; }
   body.no-scroll .book-strip-text { display: none; }
   nav { padding-bottom: 96px; }
 }
+
+/* =============================================================
+   «Not ready to book yet?» на странице массажа
+   Сетка была объявлена на две колонки, а карточка в ней одна -
+   отсюда пустая правая половина. Плюс скругление 22px, зеленоватый
+   градиент и эмодзи в зелёном кружке: всё это чужое для сайта, где
+   углы острые, а палитра - золото с графитом.
+   ============================================================= */
+.soft-contact-grid {
+  grid-template-columns: minmax(0, 560px);
+  justify-content: center;
+}
+.soft-contact-card {
+  border-radius: 2px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-1);
+  padding: 32px 30px;
+  gap: 14px;
+  text-align: center;
+  align-items: center;
+}
+/* зелёный градиент и кружок с эмодзи убираем: мессенджер обозначает
+   сама кнопка, у неё уже есть фирменный знак */
+.soft-contact-cta { background: var(--white); }
+.soft-contact-icon { display: none; }
+
+.soft-contact-label { margin-bottom: 2px; }
+.soft-contact-subtext { max-width: 34ch; margin-inline: auto; }
+.soft-whatsapp-btn { max-width: 320px; margin-inline: auto; }
+
+@media(max-width: 768px) {
+  .soft-contact-grid { grid-template-columns: minmax(0, 1fr); }
+  .soft-contact-card { padding: 24px 20px; }
+  .soft-whatsapp-btn { max-width: none; }
+}
+/* воздух вокруг блока: снизу было 12px и карточка упиралась в золотую
+   полосу, сверху 24px против общего ритма секций в 96px */
+.soft-contact-section { padding-top: var(--sp-5); padding-bottom: var(--sp-5); }
+@media(max-width: 768px) {
+  .soft-contact-section { padding-top: var(--sp-4); padding-bottom: var(--sp-4); }
+}
