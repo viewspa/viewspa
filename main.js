@@ -202,23 +202,15 @@
     ];
   }
 
-  function getNextAvailableLabel(){
-    const now=new Date();
-    const day=now.getDay();
-    const hour=now.getHours();
-
-    if(day === 0 || hour >= 19){
-      return 'tomorrow';
-    }
-
-    return 'today';
-  }
-
+  /* Раньше здесь «следующее свободное время» вычислялось из часов на
+     компьютере посетителя: до 19:00 в будни - «today», иначе «tomorrow».
+     Расписание не спрашивалось ни разу, то есть надпись могла обещать
+     сегодняшний приём, когда Иван занят на неделю вперёд. Теперь время
+     приходит из Square (см. initMasterAvailability), а до ответа строка
+     просто скрыта - лучше ничего, чем выдумка. */
   function updateServiceAvailability(){
-    const label = getNextAvailableLabel();
-    const nodes = document.querySelectorAll('.svc-next-available');
-    nodes.forEach((node) => {
-      node.textContent = `Next available: ${label}`;
+    document.querySelectorAll('.svc-next-available').forEach((node) => {
+      node.hidden = true;
     });
   }
 
@@ -227,6 +219,13 @@
     const headline=document.getElementById('availability-headline');
     const sub=document.getElementById('availability-sub');
     if(!banner || !headline || !sub) return;
+
+    // Эти сообщения написаны только по-английски, а страница бывает русской
+    // и испанской - там в разметке лежит свой заголовок, и затирать его
+    // чужим языком нельзя. Плюс сами сообщения выдуманы из часов: если
+    // настоящее расписание не придёт, честнее оставить статичный текст.
+    const lang = (document.documentElement.lang || 'en').slice(0, 2);
+    if(lang !== 'en'){ updateServiceAvailability(); return; }
 
     const messages=getAvailabilityMessages();
     let index=0;
@@ -237,8 +236,10 @@
     }
 
     renderMessage();
+    // Ротацию держим в переменной: как только придёт настоящее расписание,
+    // она останавливается, иначе через 5 секунд затрёт живые данные выдуманными.
     if(messages.length > 1){
-      setInterval(()=>{ index = (index + 1) % messages.length; renderMessage(); }, 5000);
+      window.__vsBannerTimer = setInterval(()=>{ index = (index + 1) % messages.length; renderMessage(); }, 5000);
     }
 
     updateServiceAvailability();
@@ -500,16 +501,18 @@
      не позже. Так подсказка никогда не обещает раньше, чем есть на самом деле. */
   function initMasterAvailability(){
     const slots = document.querySelectorAll('[data-avail]');
-    if(!slots.length) return;
+    const cards = document.querySelectorAll('.svc-next-available');
+    const solo  = document.querySelectorAll('[data-avail-svc]');
+    if(!slots.length && !cards.length && !solo.length) return;
 
     const API = 'https://viewspa-booking.ivanseydametov.workers.dev';
     const lang = (document.documentElement.lang || 'en').slice(0,2);
     const TZ = 'America/New_York';
 
     const T = {
-      en: { soon: 'Soonest: ', today: 'today', tomorrow: 'tomorrow', none: 'No openings in the next 3 weeks' },
-      ru: { soon: 'Ближайшее окно: ', today: 'сегодня', tomorrow: 'завтра', none: 'Ближайших окон нет на 3 недели вперёд' },
-      es: { soon: 'Más pronto: ', today: 'hoy', tomorrow: 'mañana', none: 'Sin turnos en las próximas 3 semanas' },
+      en: { soon: 'Soonest: ', next: 'Next available: ', today: 'today', tomorrow: 'tomorrow', none: 'No openings in the next 3 weeks' },
+      ru: { soon: 'Ближайшее окно: ', next: 'Ближайшее время: ', today: 'сегодня', tomorrow: 'завтра', none: 'Ближайших окон нет на 3 недели вперёд' },
+      es: { soon: 'Más pronto: ', next: 'Próximo disponible: ', today: 'hoy', tomorrow: 'mañana', none: 'Sin turnos en las próximas 3 semanas' },
     }[lang] || null;
     if(!T) return;
 
@@ -526,24 +529,95 @@
       return T.soon + day(d) + ', ' + time(d);
     }
 
-    const from = new Date();
-    const to = new Date(Date.now() + 21 * 86400000);
-
-    fetch(API + '/api/availability', {
+    /* Лёгкий эндпоинт: отдаёт только ближайшее время по каждому мастеру
+       и кэшируется на воркере 10 минут. Полный /api/availability тянул бы
+       полторы сотни слотов ради одной строки. */
+    const ask = (serviceId) => fetch(API + '/api/next-available', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ serviceId: 'gel-manicure', from: from.toISOString(), to: to.toISOString() }),
-    })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      body: JSON.stringify({ serviceId: serviceId }),
+    }).then((r) => (r.ok ? r.json() : Promise.reject()));
+
+    const earliestOf = (d) => {
+      const v = Object.values((d && d.next) || {});
+      return v.length ? v.sort()[0] : null;
+    };
+
+    /* Карточки услуг (страница массажа): у каждой свой serviceId в ссылке,
+       и доступность у них разная - 90 минут труднее вписать в расписание,
+       чем 45. Поэтому спрашиваем по каждой отдельно. */
+    if(cards.length){
+      const byService = new Map();
+      cards.forEach((node) => {
+        const a = node.closest('a[href*="service="]');
+        if(!a) return;
+        const id = new URLSearchParams(a.getAttribute('href').split('?')[1] || '').get('service');
+        if(!id) return;
+        if(!byService.has(id)) byService.set(id, []);
+        byService.get(id).push(node);
+      });
+
+      let earliest = null;
+      const jobs = [...byService.entries()].map(([id, nodes]) =>
+        ask(id).then((d) => {
+          const first = earliestOf(d);
+          nodes.forEach((n) => {
+            if(first){ n.textContent = T.next + label(first).replace(T.soon, ''); n.hidden = false; }
+          });
+          if(first && (!earliest || first < earliest)) earliest = first;
+        }).catch(() => {})
+      );
+
+      Promise.all(jobs).then(() => setBanner(earliest));
+    }
+
+    /* Баннер «Today / Tomorrow Availability» показывал текст, собранный из
+       часов посетителя, причём по-английски на всех языках. Ставим настоящее
+       время. Спрашиваем отдельно от карточек: баннер есть и там, где карточек
+       со ссылками нет. */
+    function setBanner(iso){
+      const head = document.getElementById('availability-headline');
+      if(!head || !iso) return;
+      if(window.__vsBannerTimer) clearInterval(window.__vsBannerTimer);
+      head.textContent = T.soon + label(iso).replace(T.soon, '');
+    }
+
+    if(document.getElementById('availability-headline') && !cards.length){
+      ask('full-body-reset').then((d) => setBanner(earliestOf(d))).catch(() => {});
+    }
+
+    /* Страницы боли: одна строка в первом экране, услуга задана в разметке. */
+    solo.forEach((el) => {
+      ask(el.dataset.availSvc).then((d) => {
+        const iso = earliestOf(d);
+        if(!iso) return;
+        el.textContent = T.next + label(iso).replace(T.soon, '');
+        el.hidden = false;
+      }).catch(() => {});
+    });
+
+    if(!slots.length) return;
+
+    ask('gel-manicure')
       .then((d) => {
-        const first = {};
-        (d.slots || []).forEach((s) => {
-          if(!first[s.masterId] || s.startAt < first[s.masterId]) first[s.masterId] = s.startAt;
-        });
+        const first = (d && d.next) || {};
         slots.forEach((el) => {
           const iso = first[el.dataset.avail];
-          el.textContent = iso ? label(iso) : T.none;
           el.classList.toggle('avail-green', !!iso);
+          const href = el.dataset.book;
+          if(iso && href){
+            // Человек прочитал время - следующая мысль уже «беру».
+            // Ссылка ведёт сразу в календарь этого мастера, без промежуточных шагов.
+            const a = document.createElement('a');
+            a.className = 'avail-link';
+            a.href = href;
+            a.setAttribute('data-track', 'booking');
+            a.textContent = label(iso) + ' \u2192';
+            el.textContent = '';
+            el.appendChild(a);
+          } else {
+            el.textContent = iso ? label(iso) : T.none;
+          }
         });
       })
       .catch(() => {

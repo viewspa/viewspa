@@ -3169,3 +3169,29 @@ body.no-scroll .sticky-whatsapp { opacity: 0; pointer-events: none; }
 @media(max-width: 768px) {
   .soft-contact-section { padding-top: var(--sp-4); padding-bottom: var(--sp-4); }
 }
+
+
+/* Ближайшее свободное окно — кликабельно, ведёт сразу в календарь мастера */
+.avail-link {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+  transition: opacity .2s ease;
+}
+
+.avail-link:hover { opacity: .7; }
+.avail-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+
+/* Ближайшее свободное время в первом экране страниц боли.
+   Скрыто до ответа: пустая строка не должна двигать вёрстку. */
+.hero-next {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-accessible);
+  letter-spacing: .2px;
+}
