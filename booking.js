@@ -384,6 +384,7 @@
          <span class="bk-master-body">
            <span class="bk-master-name">${m.name}</span>
            <span class="bk-master-role">${m.role}</span>
+           <span class="bk-master-soon" data-soon="${m.id}"></span>
          </span>
          <span class="bk-master-price">${fmtMoney(m.price)} ›</span>
        </button>`).join('');
@@ -396,6 +397,60 @@
          <span class="bk-master-price">›</span>
        </button>`;
     shell('Choose your specialist', `For ${svc.name}.`, `<div class="bk-list">${any}${cards}</div>`, { back: true });
+    fillSoonest(svc, masters);
+  }
+
+  // ── Ближайшее свободное окно у каждого мастера ─────────────────────
+  // Показываем прямо в списке, потому что иначе выбирать не из чего:
+  // имя, роль и одинаковая цена решения не подсказывают. Доступность —
+  // единственное настоящее различие, и она же грузит того, кто свободнее.
+  //
+  // Один запрос без masterId возвращает слоты всех мастеров сразу
+  // (в каждом слоте есть masterId), поэтому хватает одного обращения.
+  const soonCache = {};
+
+  function soonLabel(iso) {
+    const k = dayKey(iso);
+    const today = dayKey(new Date().toISOString());
+    const tomorrow = dayKey(new Date(Date.now() + 86400000).toISOString());
+    if (k === today) return `today ${timeLabel(iso)}`;
+    if (k === tomorrow) return `tomorrow ${timeLabel(iso)}`;
+    return `${dayLabel(iso)}, ${timeLabel(iso)}`;
+  }
+
+  async function fillSoonest(svc, masters) {
+    const cacheKey = `${svc.id}|${state.length || ''}`;
+    const paint = (map) => {
+      masters.forEach((m) => {
+        const el = document.querySelector(`[data-soon="${m.id}"]`);
+        if (!el) return;
+        const iso = map[m.id];
+        el.textContent = iso ? `Soonest: ${soonLabel(iso)}` : 'No openings in the next 3 weeks';
+        el.classList.toggle('bk-master-soon-none', !iso);
+      });
+    };
+
+    if (soonCache[cacheKey]) return paint(soonCache[cacheKey]);
+
+    // Пока грузится - ничего не обещаем, просто тихо ждём.
+    try {
+      const from = new Date();
+      const to = new Date(Date.now() + 21 * 86400000);
+      const { slots } = await api('/api/availability', {
+        serviceId: svc.id,
+        length: state.length || undefined,
+        from: from.toISOString(), to: to.toISOString(),
+      });
+      const map = {};
+      for (const sl of slots || []) {
+        if (!map[sl.masterId] || sl.startAt < map[sl.masterId]) map[sl.masterId] = sl.startAt;
+      }
+      soonCache[cacheKey] = map;
+      // За время запроса человек мог уйти на другой экран.
+      if (state.step === 'master') paint(map);
+    } catch (_) {
+      // Молча: подсказка полезная, но не обязательная - без неё экран рабочий.
+    }
   }
 
   // ── доступность по месяцам ─────────────────────────────────────────
