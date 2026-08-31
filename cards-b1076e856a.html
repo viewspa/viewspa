@@ -160,6 +160,16 @@
         </select>
       </div>
 
+      <div class="ad-field" id="iss-for-wrap" hidden>
+        <label for="iss-for">Кому <span class="ad-opt">на сертификате</span></label>
+        <input id="iss-for" type="text" maxlength="40" placeholder="Marina">
+      </div>
+
+      <div class="ad-field" id="iss-from-wrap" hidden>
+        <label for="iss-from">От кого <span class="ad-opt">на сертификате</span></label>
+        <input id="iss-from" type="text" maxlength="40" placeholder="Olga">
+      </div>
+
       <div class="ad-field" id="iss-note-wrap" hidden>
         <label for="iss-note">Чем перевёл</label>
         <input id="iss-note" type="text" maxlength="50" value="Zelle" placeholder="Zelle, Venmo…">
@@ -436,6 +446,9 @@
   function issueToggle() {
     var isPkg = $('iss-kind').value === 'package';
     $('iss-pkg-wrap').hidden = !isPkg;
+    // Имена нужны только сертификату: пакет покупают себе.
+    $('iss-for-wrap').hidden = isPkg;
+    $('iss-from-wrap').hidden = isPkg;
     $('iss-note-wrap').hidden = $('iss-tender').value !== 'EXTERNAL';
 
     var amt = $('iss-amt');
@@ -473,6 +486,8 @@
       kind: kind,
       buyerName: $('iss-name').value.replace(/\s+/g, ' ').trim(),
       buyerPhone: $('iss-phone').value.trim(),
+      forName: $('iss-for').value.trim(),
+      fromName: $('iss-from').value.trim(),
       buyerEmail: $('iss-email').value.trim(),
       tender: $('iss-tender').value,
       tenderNote: $('iss-note').value.trim(),
@@ -514,6 +529,8 @@
       box.hidden = false;
       $('iss-name').value = '';
       $('iss-phone').value = '';
+      $('iss-for').value = '';
+      $('iss-from').value = '';
       $('iss-email').value = '';
       await load();
     } catch (err) {

@@ -234,6 +234,21 @@
       </fieldset>`;
   }
 
+  // Сертификат почти всегда дарят, поэтому спрашиваем имена: они попадут
+  // на карточку в письме. Оба поля необязательные - если человек покупает
+  // себе, строка на карточке просто не появится.
+  function giftNames() {
+    return `
+      <fieldset class="bk-gift">
+        <legend>Is this a gift?</legend>
+        <p class="bk-gift-note">Optional — these names appear on the certificate.</p>
+        <div class="bk-gift-row">
+          <label>For<input name="forName" maxlength="40" placeholder="Recipient's name" autocomplete="off"></label>
+          <label>From<input name="fromName" maxlength="40" placeholder="Your name" autocomplete="off"></label>
+        </div>
+      </fieldset>`;
+  }
+
   async function renderPurchase(kind, item) {
     // kind: 'package' | 'certificate'
     trackBeginCheckout(kind, item);
@@ -248,6 +263,7 @@
         <form id="pay-form" class="bk-form">
           <label>Full name<input name="name" required autocomplete="name"></label>
           <label>Email<input name="email" type="email" required autocomplete="email"></label>
+          ${kind === 'certificate' ? giftNames() : ''}
           ${kind === 'package' ? tipBlock(item) : ''}
           <label>Card</label>
           <div id="card-container" style="padding:4px 0"></div>
@@ -338,7 +354,12 @@
       if (kind === 'package') {
         res = await api('/api/buy-package', { packageId: item.id, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc(), tipCents: tipCents(item) });
       } else {
-        res = await api('/api/buy-certificate', { amountCents: item.amountCents, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc() });
+        res = await api('/api/buy-certificate', {
+          amountCents: item.amountCents, paymentToken: token, buyer,
+          turnstileToken: tsToken, source: vsSrc(),
+          forName: (form.querySelector('[name="forName"]')?.value || '').trim(),
+          fromName: (form.querySelector('[name="fromName"]')?.value || '').trim(),
+        });
       }
       trackPurchase(kind, item, res);
       renderDone(kind, res);
