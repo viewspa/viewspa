@@ -263,6 +263,7 @@
         <form id="pay-form" class="bk-form">
           <label>Full name<input name="name" required autocomplete="name"></label>
           <label>Email<input name="email" type="email" required autocomplete="email"></label>
+          <label>Phone <span class="bk-opt">optional</span><input name="phone" type="tel" maxlength="32" autocomplete="tel" placeholder="So we can reach you about your booking"></label>
           ${kind === 'certificate' ? giftNames() : ''}
           ${kind === 'package' ? tipBlock(item) : ''}
           <label>Card</label>
@@ -349,7 +350,13 @@
       if (result.status !== 'OK') throw new Error('Card was not accepted. Please check the details.');
       const token = result.token;
       const tsToken = form.querySelector('[name="cf-turnstile-response"]')?.value;
-      const buyer = { name: form.name.value, email: form.email.value };
+      const buyer = {
+        name: form.name.value,
+        email: form.email.value,
+        // Необязательно: на самом дорогом экране сайта лишнее обязательное
+        // поле стоит дороже, чем польза от него. Кто хочет - впишет.
+        phone: (form.querySelector('[name="phone"]')?.value || '').trim(),
+      };
       let res;
       if (kind === 'package') {
         res = await api('/api/buy-package', { packageId: item.id, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc(), tipCents: tipCents(item) });

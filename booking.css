@@ -535,3 +535,11 @@
 @media (max-width: 420px) {
   .bk-gift-row { grid-template-columns: 1fr; }
 }
+
+
+/* Пометка необязательного поля в форме покупки */
+.bk-opt {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--muted, #6b6b6b);
+}
