@@ -237,8 +237,18 @@
   // иначе непонятно, сколько снимать. У сертификатов ставки нет.
   function actionButtons(r) {
     if (r.state !== 'ACTIVE') return '<span class="ad-act-no">—</span>';
-    if (r.sessionsLeft == null) return '<span class="ad-act-no">не пакет</span>';
+    if (r.sessionsLeft == null) {
+      return r.buyerEmail
+        ? '<button class="ad-btn" data-act="mail" data-gan="' + esc(r.gan) +
+          '" title="Отправить клиенту код и инструкцию">✉</button>'
+        : '<span class="ad-act-no">нет почты</span>';
+    }
     var out = '';
+    // Письмо шлём только туда, где есть адрес: без него кнопка бессмысленна.
+    if (r.buyerEmail) {
+      out += '<button class="ad-btn" data-act="mail" data-gan="' + esc(r.gan) +
+             '" title="Отправить клиенту код и инструкцию">✉</button>';
+    }
     out += '<button class="ad-btn ad-btn-minus" data-act="redeem" data-gan="' + esc(r.gan) +
            '" title="Списать один сеанс"' + (r.sessionsLeft < 1 ? ' disabled' : '') + '>− сеанс</button>';
     out += '<button class="ad-btn" data-act="return" data-gan="' + esc(r.gan) +
@@ -600,9 +610,46 @@
     }
   }
 
+  // Письмо клиенту: код, текущий остаток и инструкция. Не подтверждение
+  // покупки - его повторная отправка читается как второе списание.
+  async function mailCard(gan, btn) {
+    var row = null;
+    for (var i = 0; i < rows.length; i++) if (rows[i].gan === gan) { row = rows[i]; break; }
+    if (!row) return;
+
+    var who = row.label || row.buyerName || '';
+    if (!window.confirm('Отправить письмо клиенту?\n\n' +
+        (who ? who + '\n' : '') + row.buyerEmail +
+        '\n\nВ письме: карточка, код и как записаться.\n' +
+        (row.sessionsLeft != null
+          ? 'Остаток: ' + row.sessionsLeft + ' сеансов.'
+          : 'Баланс: ' + money(row.balanceCents) + '.'))) return;
+
+    btn.disabled = true;
+    var was = btn.textContent;
+    btn.textContent = '…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/send-card-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ gan: gan }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не отправилось (' + res.status + ')'));
+      btn.textContent = '✓';
+      btn.title = 'Отправлено на ' + d.to;
+    } catch (err) {
+      btn.textContent = was;
+      btn.disabled = false;
+      showError(err.message);
+    }
+  }
+
   $('ad-body').addEventListener('click', function (e) {
     var btn = e.target.closest('.ad-btn');
     if (!btn || btn.disabled) return;
+    if (btn.dataset.act === 'mail') return mailCard(btn.dataset.gan, btn);
     sessionOp(btn.dataset.act, btn.dataset.gan, btn);
   });
 
