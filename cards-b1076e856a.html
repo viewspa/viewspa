@@ -98,6 +98,7 @@
   }
   .ad-issue-meta { font-size: 14px; color: var(--mid); }
   .ad-sub { font-size: 12px; color: var(--mid); }
+  .ad-src { white-space: normal; max-width: 230px; font-size: 13px; color: var(--mid); }
   .ad-field input[readonly] { background: var(--beige); color: var(--mid); cursor: default; }
 </style>
 </head>
@@ -263,7 +264,7 @@
     }
     var html = '<table><thead><tr>' +
       '<th>Карта</th><th>Имя</th><th>Что</th><th>Осталось</th><th>Баланс</th>' +
-      '<th>Действует до</th><th>Покупатель</th><th>Куплена</th><th>Статус</th><th>Сеанс</th>' +
+      '<th>Действует до</th><th>Покупатель</th><th>Откуда</th><th>Куплена</th><th>Статус</th><th>Сеанс</th>' +
       '</tr></thead><tbody>';
     list.forEach(function (r) {
       // Имя: сначала проставленное вручную, потом имя плательщика.
@@ -282,6 +283,7 @@
         '<td class="num">' + date(r.expiresAt) + '</td>' +
         '<td>' + (r.buyerPhone ? esc(r.buyerPhone) + (r.buyerEmail ? '<br><span class="ad-sub">' + esc(r.buyerEmail) + '</span>' : '')
                                 : esc(r.buyerEmail || '—')) + '</td>' +
+        '<td class="ad-src">' + (r.source ? esc(r.source) : '<span class="ad-act-no">—</span>') + '</td>' +
         '<td class="num">' + date(r.createdAt) + '</td>' +
         '<td>' + statusTag(r) + '</td>' +
         '<td class="ad-act">' + actionButtons(r) + '</td>' +
@@ -340,14 +342,15 @@
   }
 
   function csv() {
-    var head = ['Карта', 'Имя', 'Что', 'Осталось сеансов', 'Всего сеансов', 'Баланс USD', 'Действует до', 'Телефон', 'Почта', 'Куплена', 'Статус'];
+    var head = ['Карта', 'Имя', 'Что', 'Осталось сеансов', 'Всего сеансов', 'Баланс USD', 'Действует до', 'Телефон', 'Почта', 'Откуда', 'Куплена', 'Статус'];
     var lines = [head.join(';')];
     rows.forEach(function (r) {
       lines.push([
         r.gan, r.label || r.buyerName || '', r.name,
         r.sessionsLeft == null ? '' : r.sessionsLeft, r.sessionsTotal || '',
         (r.balanceCents / 100).toFixed(2), r.expiresAt ? r.expiresAt.slice(0, 10) : '',
-        r.buyerPhone || '', r.buyerEmail || '', r.createdAt ? r.createdAt.slice(0, 10) : '', r.state,
+        r.buyerPhone || '', r.buyerEmail || '', r.source || '',
+        r.createdAt ? r.createdAt.slice(0, 10) : '', r.state,
       ].map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';'));
     });
     // BOM - иначе Excel открывает кириллицу кракозябрами
