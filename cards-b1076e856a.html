@@ -100,6 +100,23 @@
   .ad-sub { font-size: 12px; color: var(--mid); }
   .ad-src { white-space: normal; max-width: 230px; font-size: 13px; color: var(--mid); }
   .ad-field input[readonly] { background: var(--beige); color: var(--mid); cursor: default; }
+
+  /* Просьбы об отзыве */
+  .ad-rev-body { padding: 16px; }
+  .ad-rev-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+  .ad-rev-state { font-size: 17px; font-weight: 700; }
+  .ad-rev-state.on { color: #1e7a45; }
+  .ad-rev-state.off { color: var(--mid); }
+  .ad-rev-hint { font-size: 13px; color: var(--mid); margin-top: 3px; max-width: 52ch; }
+  .ad-rev-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .ad-rev-log { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .ad-rev-log > summary { cursor: pointer; font-size: 14px; color: var(--mid); }
+  .ad-rev-log table { margin-top: 10px; }
+  .ad-rev-empty { padding: 14px 0; font-size: 15px; color: var(--mid); }
+  .rev-will { color: #1e7a45; font-weight: 600; }
+  .rev-sent { color: #1e7a45; font-weight: 600; }
+  .rev-skip { color: var(--mid); }
+
 </style>
 </head>
 <body>
@@ -116,6 +133,33 @@
 
   <div id="ad-error" class="ad-err" hidden></div>
   <div id="ad-stats" class="ad-stats" hidden></div>
+
+  <details class="ad-issue" id="ad-rev" hidden>
+    <summary>Просьбы об отзыве после визита</summary>
+    <div class="ad-rev-body">
+
+      <div class="ad-rev-top">
+        <div>
+          <div class="ad-rev-state" id="rev-state">—</div>
+          <div class="ad-rev-hint" id="rev-hint">Письмо уходит через 30 минут после конца визита. Только тем, кто пришёл.</div>
+        </div>
+        <button class="btn" id="rev-toggle" type="button">—</button>
+      </div>
+
+      <div id="rev-table"></div>
+
+      <div class="ad-rev-actions">
+        <button class="btn btn-dark" id="rev-refresh" type="button">Обновить</button>
+        <button class="btn btn-gold" id="rev-send" type="button">Отправить сейчас</button>
+      </div>
+
+      <details class="ad-rev-log">
+        <summary id="rev-log-sum">Отправленные письма</summary>
+        <div id="rev-log"></div>
+      </details>
+
+    </div>
+  </details>
 
   <details class="ad-issue" id="ad-issue" hidden>
     <summary>Продать карту вживую — за наличные или переводом</summary>
@@ -332,6 +376,8 @@
         '<div class="ad-stat"><b>' + data.count + '</b><span>всего карт</span></div>';
       $('ad-tools').hidden = false;
       $('ad-issue').hidden = false;
+      $('ad-rev').hidden = false;
+      revLoad({}, null);
       if (!$('iss-pkg').options.length) loadPackages();
       $('ad-updated').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU');
       applyFilter();
@@ -445,6 +491,119 @@
       else if (ev.key === 'Escape') { settled = true; applyFilter(); }
     });
     input.addEventListener('blur', commit);
+  });
+
+
+  // ── Просьбы об отзыве ────────────────────────────────────────────
+  // Всё управление здесь, чтобы не лезть в конфиг и не деплоить ради
+  // переключения. Выключатель хранится в базе, планировщик спрашивает
+  // его каждые 15 минут.
+  var revState = null;
+
+  async function revCall(body) {
+    var res = await fetch(API + '/api/admin/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+      body: JSON.stringify(body || {}),
+    });
+    var d = await res.json().catch(function () { return {}; });
+    if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+    return d;
+  }
+
+  function revRender(d) {
+    revState = d;
+
+    $('rev-state').textContent = d.enabled ? 'Включено' : 'Выключено';
+    $('rev-state').className = 'ad-rev-state ' + (d.enabled ? 'on' : 'off');
+    $('rev-toggle').textContent = d.enabled ? 'Выключить' : 'Включить';
+    $('rev-toggle').className = d.enabled ? 'btn btn-dark' : 'btn btn-gold';
+    $('rev-hint').textContent = d.enabled
+      ? 'Письма уходят клиентам автоматически через 30 минут после визита.'
+      : 'Сейчас только считает, кому бы ушло. Клиентам ничего не отправляется.';
+
+    var rows = d.rows || [];
+    if (!rows.length) {
+      $('rev-table').innerHTML = '<p class="ad-rev-empty">Сейчас никого. Здесь появятся визиты, ' +
+        'закончившиеся от 30 минут до 4 часов назад.</p>';
+    } else {
+      var html = '<table><thead><tr><th>Клиент</th><th>Услуга</th><th>Мастер</th>' +
+        '<th>Закончился</th><th>Почта</th><th>Что будет</th></tr></thead><tbody>';
+      rows.forEach(function (r) {
+        var cls = (r.status === 'уйдёт' ? 'rev-will' : (r.status === 'отправлено' ? 'rev-sent' : 'rev-skip'));
+        html += '<tr>' +
+          '<td>' + esc(r.name || '—') + '</td>' +
+          '<td>' + esc(r.service || '—') + '</td>' +
+          '<td>' + esc(r.master || '—') + '</td>' +
+          '<td class="num">' + revAgo(r.endedMinutesAgo) + '</td>' +
+          '<td>' + esc(r.email || '—') + '</td>' +
+          '<td class="' + cls + '">' + esc(r.status) + '</td>' +
+          '</tr>';
+      });
+      $('rev-table').innerHTML = html + '</tbody></table>';
+    }
+
+    var log = d.log || [];
+    $('rev-log-sum').textContent = log.length
+      ? 'Отправленные письма — последние ' + log.length
+      : 'Отправленных писем пока нет';
+    if (log.length) {
+      var lh = '<table><thead><tr><th>Когда</th><th>Кому</th><th>Услуга</th><th>Мастер</th></tr></thead><tbody>';
+      log.forEach(function (x) {
+        lh += '<tr><td class="num">' + date(x.at) + '</td><td>' + esc(x.name || x.to) +
+          '</td><td>' + esc(x.service || '—') + '</td><td>' + esc(x.master || '—') + '</td></tr>';
+      });
+      $('rev-log').innerHTML = lh + '</tbody></table>';
+    } else {
+      $('rev-log').innerHTML = '';
+    }
+  }
+
+  function revAgo(min) {
+    if (min == null) return '—';
+    if (min < 60) return min + ' мин назад';
+    var h = Math.floor(min / 60), m = min % 60;
+    return h + ' ч' + (m ? ' ' + m + ' мин' : '') + ' назад';
+  }
+
+  async function revLoad(body, btn) {
+    var was = btn && btn.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+    showError('');
+    try {
+      revRender(await revCall(body));
+      // Текст выключателя ставит revRender — старый возвращаем только тем
+      // кнопкам, которых отрисовка не трогала.
+      if (btn && btn.textContent === '…') btn.textContent = was;
+    } catch (e) {
+      showError(e.message);
+      if (btn) btn.textContent = was;
+    }
+    if (btn) btn.disabled = false;
+  }
+
+  $('rev-refresh').addEventListener('click', function () { revLoad({}, this); });
+
+  $('rev-toggle').addEventListener('click', function () {
+    var on = revState && revState.enabled;
+    var text = on
+      ? 'Выключить рассылку?\n\nПисьма перестанут уходить. Планировщик продолжит показывать, кому бы они ушли.'
+      : 'Включить рассылку?\n\nС этого момента клиенты будут автоматически получать письмо с просьбой оставить отзыв через 30 минут после визита.';
+    if (!window.confirm(text)) return;
+    revLoad({ enabled: !on }, this);
+  });
+
+  $('rev-send').addEventListener('click', function () {
+    var rows = (revState && revState.rows) || [];
+    var will = rows.filter(function (r) { return r.status === 'уйдёт'; });
+    if (!will.length) {
+      showError('Сейчас некому отправлять — в списке нет строки «уйдёт».');
+      return;
+    }
+    var who = will.map(function (r) { return (r.name || r.email); }).join('\n');
+    if (!window.confirm('Отправить письма прямо сейчас?\n\n' + who +
+        '\n\nВсего: ' + will.length + '. Расписание ждать не нужно.')) return;
+    revLoad({ send: true }, this);
   });
 
   // ── Продажа карты вживую ─────────────────────────────────────────
