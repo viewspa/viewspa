@@ -116,6 +116,9 @@
   .ad-gaps-hist-row { display: grid; grid-template-columns: 62px 1fr 34px; align-items: center; gap: 8px; font-size: 12px; color: var(--mid); margin-bottom: 4px; }
   .ad-gaps-note { font-size: 13px; color: var(--mid); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
 
+  .ad-gaps-of { font-weight: 400; color: var(--mid); font-size: 12px; }
+  .ad-gaps-note-in { background: var(--beige); border-radius: 6px; padding: 9px 11px;
+    margin-top: 14px; font-size: 12px; color: var(--mid); line-height: 1.5; }
   .ad-gaps-warn { background: #fdf6f2; border: 1px solid #f0d9cc; border-radius: 6px;
     padding: 10px 12px; margin-top: 14px; font-size: 13px; color: #8a4a24; line-height: 1.5; }
   .ad-gaps-top { font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--border); }
@@ -130,6 +133,20 @@
   .ad-rev-state.on { color: #1e7a45; }
   .ad-rev-state.off { color: var(--mid); }
   .ad-rev-hint { font-size: 13px; color: var(--mid); margin-top: 3px; max-width: 52ch; }
+
+
+  .ad-wb-weeks { display: flex; gap: 14px; flex-wrap: wrap; align-items: end; margin-bottom: 8px; }
+  .ad-wb-weeks .ad-field input { width: 110px; }
+  .ad-wb-save { justify-content: flex-end; }
+  .ad-wb-cat { font-size: 12px; padding: 1px 7px; border-radius: 999px; background: var(--beige); color: var(--mid); }
+  .ad-rev-block { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .ad-rev-block-lbl { display: block; font-size: 12px; letter-spacing: .6px;
+    text-transform: uppercase; color: var(--mid); font-weight: 700; margin-bottom: 6px; }
+  .ad-rev-block select { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: var(--font-body); font-size: 15px; background: var(--white); color: var(--dark);
+    min-width: 240px; max-width: 100%; }
+  .ad-rev-block select:focus { outline: none; border-color: var(--gold); }
+  .ad-rev-block-hint { font-size: 12px; color: var(--mid); margin-top: 6px; max-width: 56ch; line-height: 1.5; }
   .ad-rev-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
   .ad-rev-log { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 12px; }
   .ad-rev-log > summary { cursor: pointer; font-size: 14px; color: var(--mid); }
@@ -166,6 +183,48 @@
     </div>
   </details>
 
+  <details class="ad-issue" id="ad-wb" hidden>
+    <summary>Письма «давно не были»</summary>
+    <div class="ad-rev-body">
+
+      <div class="ad-rev-top">
+        <div>
+          <div class="ad-rev-state" id="wb-state">—</div>
+          <div class="ad-rev-hint" id="wb-hint"></div>
+        </div>
+        <button class="btn" id="wb-toggle" type="button">—</button>
+      </div>
+
+      <div class="ad-wb-weeks">
+        <div class="ad-field">
+          <label for="wb-nails">Ногти — не был, недель</label>
+          <input id="wb-nails" type="number" min="3" max="14" step="1">
+        </div>
+        <div class="ad-field">
+          <label for="wb-massage">Массаж — не был, недель</label>
+          <input id="wb-massage" type="number" min="3" max="14" step="1">
+        </div>
+        <div class="ad-field ad-wb-save">
+          <button class="btn btn-dark" id="wb-apply" type="button">Применить сроки</button>
+        </div>
+      </div>
+      <div class="ad-rev-block-hint" id="wb-cap"></div>
+
+      <div id="wb-table"></div>
+
+      <div class="ad-rev-actions">
+        <button class="btn btn-dark" id="wb-refresh" type="button">Обновить</button>
+        <button class="btn btn-gold" id="wb-send" type="button">Отправить сейчас</button>
+      </div>
+
+      <details class="ad-rev-log">
+        <summary id="wb-log-sum">Отправленные письма</summary>
+        <div id="wb-log"></div>
+      </details>
+
+    </div>
+  </details>
+
   <details class="ad-issue" id="ad-rev" hidden>
     <summary>Просьбы об отзыве после визита</summary>
     <div class="ad-rev-body">
@@ -176,6 +235,13 @@
           <div class="ad-rev-hint" id="rev-hint">Письмо уходит утром следующего дня, в 10:00. Только тем, кто пришёл.</div>
         </div>
         <button class="btn" id="rev-toggle" type="button">—</button>
+      </div>
+
+      <div class="ad-rev-block">
+        <label class="ad-rev-block-lbl" for="rev-block">Кому не писать никогда</label>
+        <select id="rev-block"></select>
+        <div class="ad-rev-block-hint">Группа клиентов из Square. Кто в ней — не получит
+          ни одного письма. Список ведёте в Square, здесь только выбираете какой.</div>
       </div>
 
       <div id="rev-table"></div>
@@ -410,6 +476,8 @@
       $('ad-issue').hidden = false;
       $('ad-rev').hidden = false;
       $('ad-gaps').hidden = false;
+      $('ad-wb').hidden = false;
+      wbLoad({}, null);
       revLoad({}, null);
       if (!$('iss-pkg').options.length) loadPackages();
       $('ad-updated').textContent = 'обновлено ' + new Date().toLocaleTimeString('ru-RU');
@@ -542,7 +610,7 @@
 
     if (med != null) {
       h += '<div class="ad-gaps-big">' + Math.round(med / 7 * 10) / 10 + ' нед</div>' +
-        '<div class="ad-gaps-sub">обычный перерыв между визитами (' + med + ' дн)</div>';
+        '<div class="ad-gaps-sub">обычный перерыв между заходами (' + med + ' дн)</div>';
     } else {
       h += '<div class="ad-gaps-big">—</div>' +
         '<div class="ad-gaps-sub">никто пока не приходил дважды</div>';
@@ -550,9 +618,31 @@
 
     h += '<div style="margin-top:14px">';
     h += '<div class="ad-gaps-row"><span>Визитов</span><b>' + d.visits + '</b></div>';
+    if (d.episodes && d.episodes !== d.visits) {
+      h += '<div class="ad-gaps-row"><span>Из них отдельных заходов</span><b>' +
+           d.episodes + '</b></div>';
+    }
     h += '<div class="ad-gaps-row"><span>Человек</span><b>' + d.people + '</b></div>';
     h += '<div class="ad-gaps-row"><span>Вернулись хотя бы раз</span><b>' +
          d.returnedAtLeastOnce + ' (' + d.repeatRate + '%)</b></div>';
+    if (d.mailRate != null) {
+      h += '<div class="ad-gaps-row"><span>Из них с почтой</span><b>' +
+           d.peopleWithMail + ' (' + d.mailRate + '%)</b></div>';
+      h += '<div class="ad-gaps-row"><span>С телефоном</span><b>' +
+           d.peopleWithPhone + ' (' + d.phoneRate + '%)</b></div>';
+      if (d.peoplePhoneOnly) {
+        h += '<div class="ad-gaps-row"><span>Только телефон, почты нет</span><b>' +
+             d.peoplePhoneOnly + ' чел</b></div>';
+      }
+      if (d.peopleNoContact) {
+        h += '<div class="ad-gaps-row"><span>Без связи вообще</span><b>' +
+             d.peopleNoContact + ' чел</b></div>';
+      }
+    }
+    if (d.longestEpisode > 2) {
+      h += '<div class="ad-gaps-row"><span>Самый длинный курс</span><b>' +
+           d.longestEpisode + ' сеансов</b></div>';
+    }
     if (d.gapDays) {
       h += '<div class="ad-gaps-row"><span>Быстрые (25%)</span><b>' +
            Math.round(d.gapDays.p25 / 7 * 10) / 10 + ' нед</b></div>';
@@ -579,16 +669,24 @@
     // Промежуток в неделю и меньше — это не «пришёл снова», это либо
     // пробная запись, либо две услуги подряд. Если таких много, медиана
     // врёт, и об этом надо сказать прямо, а не прятать.
+    if (d.visits && d.episodes && d.visits > d.episodes) {
+      h += '<div class="ad-gaps-note-in">Визиты, идущие подряд (в пределах ' + d.episodeDays +
+           ' дн), считаются одним заходом: ' +
+           (d.episodeDays > 7
+             ? 'лечебный курс через день — это одно обращение, а не десять возвращений.'
+             : 'маникюр и педикюр в один день — это две записи, но один приход.') +
+           '</div>';
+    }
     if (d.sameWeekGaps && d.gapsCounted && d.sameWeekGaps / d.gapsCounted > 0.25) {
       h += '<div class="ad-gaps-warn"><b>' + d.sameWeekGaps + ' из ' + d.gapsCounted +
-           '</b> промежутков — неделя и меньше. Так люди не ходят: похоже на пробные ' +
-           'записи или две услуги за один заход. Пока они в данных, цифра слева занижена.</div>';
+           '</b> промежутков — неделя и меньше даже после склейки. Стоит посмотреть, ' +
+           'что это за визиты.</div>';
     }
 
     var top = d.topRepeaters || [];
     if (top.length) {
       h += '<div class="ad-gaps-hist"><div class="ad-gaps-sub" style="margin:12px 0 6px">' +
-           'Кто ходит чаще всех — узнаёте свои пробные записи?</div>';
+           'Кто ходит чаще всех</div>';
       top.forEach(function (r) {
         h += '<div class="ad-gaps-top"><b>' + esc(r.name || 'без имени') + '</b> · ' +
              r.count + ' визитов<br><span>' + (r.dates || []).join(', ') + '</span></div>';
@@ -598,20 +696,41 @@
 
     h += '<div class="ad-gaps-hist"><div class="ad-gaps-sub" style="margin:12px 0 6px">' +
          'Если поставить такой срок — столько человек получат письмо сейчас</div>';
+    var reach = d.reachableNow;
     (window.__gapThresholds || []).forEach(function (t) {
+      var all = d.overdueNow[t] || 0;
+      var can = reach ? (reach[t] || 0) : null;
       h += '<div class="ad-gaps-row"><span>не был ' + t + ' нед и дольше</span><b>' +
-           (d.overdueNow[t] || 0) + ' чел</b></div>';
+           (can != null
+             ? can + ' чел<span class="ad-gaps-of"> из ' + all + '</span>'
+             : all + ' чел') +
+           '</b></div>';
     });
     h += '</div>';
+    if (reach) {
+      h += '<div class="ad-gaps-note-in">Крупным — скольким письмо реально уйдёт. ' +
+           'Мелким — сколько всего в окне: у остальных в Square нет адреса.' +
+           (d.tooLate
+             ? ' Ещё <b>' + d.tooLate + ' чел</b> не были дольше ' + d.maxDays +
+               ' дней — им не пишем, это уже холодная рассылка.'
+             : '') +
+           '</div>';
+    }
 
     // Подсказка: срок, за которым осталась примерно четверть «медленных».
     if (d.gapDays) {
       // Порог сразу за «медленной» четвертью: три четверти вернувшихся к
       // этому сроку уже пришли, значит остальные правда пропали.
       var suggest = Math.max(3, Math.ceil(d.gapDays.p75 / 7));
+      // Порог из списка, ближайший к предложенному — чтобы назвать число людей.
+      var near = (window.__gapThresholds || []).reduce(function (a, b) {
+        return Math.abs(b - suggest) < Math.abs(a - suggest) ? b : a;
+      }, 3);
+      var cnt = d.reachableNow ? d.reachableNow[near] : d.overdueNow[near];
       h += '<div class="ad-gaps-pick">Отсюда стоит начать: <b>' + suggest + ' нед</b> — ' +
            'к этому сроку три четверти вернувшихся уже пришли. Раньше — риск ' +
-           'написать тому, кто и так шёл; позже — он уже у другого мастера.</div>';
+           'написать тому, кто и так шёл; позже — он уже у другого мастера.' +
+           (cnt != null ? ' Письмо получат примерно <b>' + cnt + ' чел</b>.' : '') + '</div>';
     }
     return h + '</div>';
   }
@@ -645,6 +764,126 @@
     btn.disabled = false; btn.textContent = was;
   });
 
+
+  // ── Письма «давно не были» ───────────────────────────────────────
+  // Та же раскладка, что у отзывов, плюс два поля со сроками: у ногтей
+  // и массажа разный ритм, и один порог на двоих был бы неправ для обоих.
+  var wbState = null;
+
+  async function wbCall(body) {
+    var res = await fetch(API + '/api/admin/winback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+      body: JSON.stringify(body || {}),
+    });
+    var d = await res.json().catch(function () { return {}; });
+    if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+    return d;
+  }
+
+  function wbRender(d) {
+    wbState = d;
+
+    $('wb-state').textContent = d.enabled ? 'Включено' : 'Выключено';
+    $('wb-state').className = 'ad-rev-state ' + (d.enabled ? 'on' : 'off');
+    $('wb-toggle').textContent = d.enabled ? 'Выключить' : 'Включить';
+    $('wb-toggle').className = d.enabled ? 'btn btn-dark' : 'btn btn-gold';
+    $('wb-hint').textContent = d.enabled
+      ? 'Письма уходят автоматически в 11:00, не больше ' + d.perDay + ' в день.'
+      : 'Сейчас только считает, кому бы ушло. Клиентам ничего не отправляется.';
+
+    if (d.weeks) {
+      $('wb-nails').value = d.weeks.nails;
+      $('wb-massage').value = d.weeks.massage;
+    }
+    $('wb-cap').textContent = 'Тем, кто не был дольше ' + d.maxDays + ' дней, не пишем: ' +
+      'это уже холодная рассылка. Не больше ' + d.perDay + ' писем в день, ' +
+      'иначе почтовые службы примут рассылку за спам. Сегодня отправлено: ' + d.alreadyToday + '.';
+
+    var rows = d.rows || [];
+    if (!rows.length) {
+      $('wb-table').innerHTML = '<p class="ad-rev-empty">Сейчас никого. ' +
+        'Здесь появятся те, кто не был дольше выбранного срока.</p>';
+    } else {
+      var html = '<table><thead><tr><th>Клиент</th><th>Раздел</th><th>Не был</th>' +
+        '<th>Визитов</th><th>Почта</th><th>Что будет</th></tr></thead><tbody>';
+      rows.forEach(function (r) {
+        var cls = (r.status === 'уйдёт' || r.status === 'отправлено') ? 'rev-will' : 'rev-skip';
+        html += '<tr>' +
+          '<td>' + esc(r.name || '—') + '</td>' +
+          '<td><span class="ad-wb-cat">' + (r.category === 'nails' ? 'ногти' : 'массаж') + '</span></td>' +
+          '<td class="num">' + r.weeksSince + ' нед</td>' +
+          '<td class="num">' + r.visits + '</td>' +
+          '<td>' + esc(r.email || '—') + '</td>' +
+          '<td class="' + cls + '">' + esc(r.status) + '</td>' +
+          '</tr>';
+      });
+      $('wb-table').innerHTML = html + '</tbody></table>';
+    }
+
+    var log = d.log || [];
+    $('wb-log-sum').textContent = log.length
+      ? 'Отправленные письма — последние ' + log.length
+      : 'Отправленных писем пока нет';
+    if (log.length) {
+      var lh = '<table><thead><tr><th>Когда</th><th>Кому</th><th>Раздел</th><th>Не был</th></tr></thead><tbody>';
+      log.forEach(function (x) {
+        lh += '<tr><td class="num">' + date(x.at) + '</td><td>' + esc(x.name || x.to) +
+          '</td><td>' + (x.category === 'nails' ? 'ногти' : 'массаж') +
+          '</td><td class="num">' + x.weeksSince + ' нед</td></tr>';
+      });
+      $('wb-log').innerHTML = lh + '</tbody></table>';
+    } else {
+      $('wb-log').innerHTML = '';
+    }
+  }
+
+  async function wbLoad(body, btn) {
+    var was = btn && btn.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+    showError('');
+    try {
+      wbRender(await wbCall(body));
+      if (btn && btn.textContent === '…') btn.textContent = was;
+    } catch (e) {
+      showError(e.message);
+      if (btn) btn.textContent = was;
+    }
+    if (btn) btn.disabled = false;
+  }
+
+  $('wb-refresh').addEventListener('click', function () { wbLoad({}, this); });
+
+  $('wb-apply').addEventListener('click', function () {
+    wbLoad({ weeks: { nails: $('wb-nails').value, massage: $('wb-massage').value } }, this);
+  });
+
+  $('wb-toggle').addEventListener('click', function () {
+    var on = wbState && wbState.enabled;
+    var will = ((wbState && wbState.rows) || []).filter(function (r) { return r.status === 'уйдёт'; });
+    var text = on
+      ? 'Выключить рассылку?\n\nПисьма перестанут уходить.'
+      : 'Включить рассылку?\n\nКлиенты, которые давно не были, начнут получать ' +
+        'письмо с приглашением записаться. Не больше ' +
+        ((wbState && wbState.perDay) || 12) + ' писем в день.\n\n' +
+        'Сейчас в очереди: ' + will.length + ' чел.';
+    if (!window.confirm(text)) return;
+    wbLoad({ enabled: !on }, this);
+  });
+
+  $('wb-send').addEventListener('click', function () {
+    var rows = (wbState && wbState.rows) || [];
+    var will = rows.filter(function (r) { return r.status === 'уйдёт'; });
+    if (!will.length) {
+      showError('Сейчас некому отправлять — в списке нет строки «уйдёт».');
+      return;
+    }
+    var who = will.map(function (r) { return (r.name || r.email); }).join('\n');
+    if (!window.confirm('Отправить письма прямо сейчас?\n\n' + who +
+        '\n\nВсего: ' + will.length + '.')) return;
+    wbLoad({ send: true }, this);
+  });
+
   // ── Просьбы об отзыве ────────────────────────────────────────────
   // Всё управление здесь, чтобы не лезть в конфиг и не деплоить ради
   // переключения. Выключатель хранится в базе, планировщик спрашивает
@@ -672,6 +911,20 @@
     $('rev-hint').textContent = d.enabled
       ? 'Письма уходят клиентам автоматически утром следующего дня, в 10:00.'
       : 'Сейчас только считает, кому бы ушло. Клиентам ничего не отправляется.';
+
+    // Список групп Square. Меняется редко, поэтому просто перерисовываем.
+    var sel = $('rev-block');
+    var groups = d.groups || [];
+    var opts = '<option value="">— никого не исключать —</option>';
+    groups.forEach(function (g) {
+      opts += '<option value="' + esc(g.id) + '"' +
+              (g.id === d.blockGroupId ? ' selected' : '') + '>' + esc(g.name) + '</option>';
+    });
+    sel.innerHTML = opts;
+    sel.disabled = !groups.length;
+    if (!groups.length) {
+      sel.innerHTML = '<option>групп в Square не найдено</option>';
+    }
 
     var rows = d.rows || [];
     if (!rows.length) {
@@ -734,6 +987,19 @@
   }
 
   $('rev-refresh').addEventListener('click', function () { revLoad({}, this); });
+
+  $('rev-block').addEventListener('change', function () {
+    var name = this.options[this.selectedIndex].textContent;
+    var text = this.value
+      ? 'Никому из группы «' + name + '» письма отправляться не будут.\n\nПрименить?'
+      : 'Исключений больше не будет — письма пойдут всем подходящим.\n\nПрименить?';
+    if (!window.confirm(text)) {
+      // Возвращаем как было, раз передумали.
+      this.value = (revState && revState.blockGroupId) || '';
+      return;
+    }
+    revLoad({ blockGroupId: this.value }, null);
+  });
 
   $('rev-toggle').addEventListener('click', function () {
     var on = revState && revState.enabled;
