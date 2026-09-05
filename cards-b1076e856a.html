@@ -115,6 +115,12 @@
   .ad-gaps-hist { margin-top: 14px; }
   .ad-gaps-hist-row { display: grid; grid-template-columns: 62px 1fr 34px; align-items: center; gap: 8px; font-size: 12px; color: var(--mid); margin-bottom: 4px; }
   .ad-gaps-note { font-size: 13px; color: var(--mid); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  .ad-gaps-warn { background: #fdf6f2; border: 1px solid #f0d9cc; border-radius: 6px;
+    padding: 10px 12px; margin-top: 14px; font-size: 13px; color: #8a4a24; line-height: 1.5; }
+  .ad-gaps-top { font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .ad-gaps-top:last-child { border-bottom: none; }
+  .ad-gaps-top span { color: var(--mid); font-size: 12px; }
   .ad-gaps-pick { background: rgba(39,174,96,.09); border: 1px solid rgba(39,174,96,.3); border-radius: 6px; padding: 10px 12px; margin-top: 12px; font-size: 14px; }
 
   /* Просьбы об отзыве */
@@ -153,7 +159,7 @@
   <details class="ad-issue" id="ad-gaps" hidden>
     <summary>Как часто клиенты возвращаются</summary>
     <div class="ad-rev-body">
-      <p class="ad-gaps-intro">Считает по истории записей за полтора года. Ничего не отправляет.
+      <p class="ad-gaps-intro">Считает по истории записей за полтора года — это занимает несколько секунд. Ничего не отправляет.
         Нужно, чтобы выбрать срок для писем «давно не были» по фактам, а не на глаз.</p>
       <button class="btn btn-dark" id="gaps-load" type="button">Посчитать</button>
       <div id="gaps-out"></div>
@@ -567,6 +573,26 @@
              '<span class="ad-gaps-bar" style="width:' + Math.round(v / maxv * 100) + '%"></span>' +
              '<span>' + v + '</span></div>';
       }
+      h += '</div>';
+    }
+
+    // Промежуток в неделю и меньше — это не «пришёл снова», это либо
+    // пробная запись, либо две услуги подряд. Если таких много, медиана
+    // врёт, и об этом надо сказать прямо, а не прятать.
+    if (d.sameWeekGaps && d.gapsCounted && d.sameWeekGaps / d.gapsCounted > 0.25) {
+      h += '<div class="ad-gaps-warn"><b>' + d.sameWeekGaps + ' из ' + d.gapsCounted +
+           '</b> промежутков — неделя и меньше. Так люди не ходят: похоже на пробные ' +
+           'записи или две услуги за один заход. Пока они в данных, цифра слева занижена.</div>';
+    }
+
+    var top = d.topRepeaters || [];
+    if (top.length) {
+      h += '<div class="ad-gaps-hist"><div class="ad-gaps-sub" style="margin:12px 0 6px">' +
+           'Кто ходит чаще всех — узнаёте свои пробные записи?</div>';
+      top.forEach(function (r) {
+        h += '<div class="ad-gaps-top"><b>' + esc(r.name || 'без имени') + '</b> · ' +
+             r.count + ' визитов<br><span>' + (r.dates || []).join(', ') + '</span></div>';
+      });
       h += '</div>';
     }
 
