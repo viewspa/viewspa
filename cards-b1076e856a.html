@@ -126,6 +126,11 @@
   .ad-gaps-top span { color: var(--mid); font-size: 12px; }
   .ad-gaps-pick { background: rgba(39,174,96,.09); border: 1px solid rgba(39,174,96,.3); border-radius: 6px; padding: 10px 12px; margin-top: 12px; font-size: 14px; }
 
+  /* Таблицы рассылок шире телефона — пусть прокручиваются внутри себя,
+     а не тянут за собой всю страницу. */
+  #rev-table, #wb-table, #rev-log, #wb-log { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #rev-table table, #wb-table table, #rev-log table, #wb-log table { min-width: 560px; }
+
   /* Просьбы об отзыве */
   .ad-rev-body { padding: 16px; }
   .ad-rev-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -208,6 +213,13 @@
           <button class="btn btn-dark" id="wb-apply" type="button">Применить сроки</button>
         </div>
       </div>
+      <div class="ad-rev-block">
+        <label class="ad-rev-block-lbl" for="wb-block">Кому не писать никогда</label>
+        <select id="wb-block"></select>
+        <div class="ad-rev-block-hint">Группа клиентов из Square. Кто в ней — не получит
+          ни одного письма: ни просьбы об отзыве, ни приглашения вернуться.</div>
+      </div>
+
       <div class="ad-rev-block-hint" id="wb-cap"></div>
 
       <div id="wb-table"></div>
@@ -796,11 +808,26 @@
       $('wb-nails').value = d.weeks.nails;
       $('wb-massage').value = d.weeks.massage;
     }
+    var wsel = $('wb-block');
+    var wgroups = d.groups || [];
+    if (wgroups.length) {
+      var wopts = '<option value="">— никого не исключать —</option>';
+      wgroups.forEach(function (g) {
+        wopts += '<option value="' + esc(g.id) + '"' +
+                 (g.id === d.blockGroupId ? ' selected' : '') + '>' + esc(g.name) + '</option>';
+      });
+      wsel.innerHTML = wopts;
+      wsel.disabled = false;
+    } else {
+      wsel.innerHTML = '<option>групп в Square не найдено</option>';
+      wsel.disabled = true;
+    }
+
     // Без выбранной группы заслон не работает — молчать об этом нельзя.
     $('wb-cap').innerHTML = (d.blockGroupId
       ? ''
-      : '<b style="color:#a0491f">Чёрный список не выбран</b> — письма уйдут всем подряд. ' +
-        'Выберите группу в блоке «Просьбы об отзыве», поле «Кому не писать никогда».<br>') +
+      : '<b style="color:#a0491f">Чёрный список не выбран</b> — письма уйдут всем подряд, ' +
+        'включая тех, кому вы писать не хотите. Выберите группу в поле выше.<br>') +
       'Тем, кто не был дольше ' + d.maxDays + ' дней, не пишем: ' +
       'это уже холодная рассылка. Не больше ' + d.perDay + ' писем в день, ' +
       'иначе почтовые службы примут рассылку за спам. Сегодня отправлено: ' + d.alreadyToday + '.';
@@ -858,6 +885,23 @@
   }
 
   $('wb-refresh').addEventListener('click', function () { wbLoad({}, this); });
+
+  $('wb-block').addEventListener('change', function () {
+    var name = this.options[this.selectedIndex].textContent;
+    var text = this.value
+      ? 'Никому из группы «' + name + '» письма отправляться не будут — ' +
+        'ни просьбы об отзыве, ни приглашения вернуться.\n\nПрименить?'
+      : 'Исключений больше не будет — письма пойдут всем подходящим.\n\nПрименить?';
+    if (!window.confirm(text)) {
+      this.value = (wbState && wbState.blockGroupId) || '';
+      return;
+    }
+    var v = this.value;
+    wbLoad({ blockGroupId: v }, null);
+    // Второй выключатель — в блоке отзывов; держим их согласованными.
+    if ($('rev-block')) $('rev-block').value = v;
+    if (revState) revState.blockGroupId = v || null;
+  });
 
   $('wb-apply').addEventListener('click', function () {
     wbLoad({ weeks: { nails: $('wb-nails').value, massage: $('wb-massage').value } }, this);
@@ -1003,7 +1047,11 @@
       this.value = (revState && revState.blockGroupId) || '';
       return;
     }
-    revLoad({ blockGroupId: this.value }, null);
+    var v = this.value;
+    revLoad({ blockGroupId: v }, null);
+    // Тот же выключатель есть в блоке «давно не были» — держим согласованно.
+    if ($('wb-block')) $('wb-block').value = v;
+    if (wbState) wbState.blockGroupId = v || null;
   });
 
   $('rev-toggle').addEventListener('click', function () {
