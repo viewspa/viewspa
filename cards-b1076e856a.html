@@ -126,6 +126,20 @@
   .ad-gaps-top span { color: var(--mid); font-size: 12px; }
   .ad-gaps-pick { background: rgba(39,174,96,.09); border: 1px solid rgba(39,174,96,.3); border-radius: 6px; padding: 10px 12px; margin-top: 12px; font-size: 14px; }
 
+  .ad-block-btn {
+    font-family: var(--font-body); font-size: 12px; line-height: 1;
+    padding: 5px 9px; background: var(--white); color: var(--mid);
+    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+    white-space: nowrap;
+  }
+  .ad-block-btn:hover:not(:disabled) { border-color: #c0392b; color: #a33; }
+  .ad-block-btn:disabled { opacity: .4; cursor: default; }
+  .ad-blocked-list { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .ad-blocked-list > summary { cursor: pointer; font-size: 14px; color: var(--mid); }
+  .ad-blocked-row { display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .ad-blocked-row:last-child { border-bottom: none; }
+
   /* Таблицы рассылок шире телефона — пусть прокручиваются внутри себя,
      а не тянут за собой всю страницу. */
   #rev-table, #wb-table, #rev-log, #wb-log { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -228,6 +242,11 @@
         <button class="btn btn-dark" id="wb-refresh" type="button">Обновить</button>
         <button class="btn btn-gold" id="wb-send" type="button">Отправить сейчас</button>
       </div>
+
+      <details class="ad-blocked-list">
+        <summary id="wb-blocked-sum">Кому не пишем</summary>
+        <div id="wb-blocked"></div>
+      </details>
 
       <details class="ad-rev-log">
         <summary id="wb-log-sum">Отправленные письма</summary>
@@ -777,6 +796,53 @@
   });
 
 
+
+  // ── Чёрный список: кнопка в строке ───────────────────────────────
+  // Решение принимается там же, где видна проблема. Ходить за этим
+  // в Square и возвращаться владелец не должен.
+  function blockBtn(email, status) {
+    if (!email) return '';
+    if (status === 'в чёрном списке') return '';
+    return '<button class="ad-block-btn" data-block="' + esc(email) + '">не писать</button>';
+  }
+
+  function blockedListHtml(list) {
+    if (!list || !list.length) {
+      return '<p class="ad-rev-empty">Список пуст — письма получают все подходящие.</p>';
+    }
+    return list.map(function (m) {
+      return '<div class="ad-blocked-row"><span>' + esc(m) + '</span>' +
+             '<button class="ad-block-btn" data-unblock="' + esc(m) + '">вернуть</button></div>';
+    }).join('');
+  }
+
+  // Одно место на обе таблицы: клик всплывает, ловим на документе.
+  document.addEventListener('click', async function (e) {
+    var add = e.target.getAttribute && e.target.getAttribute('data-block');
+    var rem = e.target.getAttribute && e.target.getAttribute('data-unblock');
+    if (!add && !rem) return;
+
+    var mail = add || rem;
+    var text = add
+      ? 'Больше не писать на ' + mail + '?\n\nНи просьб об отзыве, ни приглашений вернуться. ' +
+        'Подтверждения оплаченных покупок доходить будут — за них человек заплатил.'
+      : 'Вернуть ' + mail + ' в рассылку?';
+    if (!window.confirm(text)) return;
+
+    e.target.disabled = true;
+    showError('');
+    try {
+      // Отправляем в тот блок, из которого нажали, — он и перерисуется.
+      var inWinback = !!e.target.closest('#ad-wb');
+      var body = { block: { email: mail, on: !!add } };
+      if (inWinback) { wbRender(await wbCall(body)); }
+      else { revRender(await revCall(body)); }
+    } catch (err) {
+      showError(err.message);
+      e.target.disabled = false;
+    }
+  });
+
   // ── Письма «давно не были» ───────────────────────────────────────
   // Та же раскладка, что у отзывов, плюс два поля со сроками: у ногтей
   // и массажа разный ритм, и один порог на двоих был бы неправ для обоих.
@@ -824,10 +890,10 @@
     }
 
     // Без выбранной группы заслон не работает — молчать об этом нельзя.
-    $('wb-cap').innerHTML = (d.blockGroupId
+    $('wb-cap').innerHTML = ((d.blockGroupId || (d.blockList || []).length)
       ? ''
-      : '<b style="color:#a0491f">Чёрный список не выбран</b> — письма уйдут всем подряд, ' +
-        'включая тех, кому вы писать не хотите. Выберите группу в поле выше.<br>') +
+      : 'Чёрный список пуст. Чтобы кого-то исключить — кнопка «не писать» ' +
+        'в его строке.<br>') +
       'Тем, кто не был дольше ' + d.maxDays + ' дней, не пишем: ' +
       'это уже холодная рассылка. Не больше ' + d.perDay + ' писем в день, ' +
       'иначе почтовые службы примут рассылку за спам. Сегодня отправлено: ' + d.alreadyToday + '.';
@@ -838,7 +904,7 @@
         'Здесь появятся те, кто не был дольше выбранного срока.</p>';
     } else {
       var html = '<table><thead><tr><th>Клиент</th><th>Раздел</th><th>Не был</th>' +
-        '<th>Визитов</th><th>Почта</th><th>Что будет</th></tr></thead><tbody>';
+        '<th>Визитов</th><th>Почта</th><th>Что будет</th><th></th></tr></thead><tbody>';
       rows.forEach(function (r) {
         var cls = (r.status === 'уйдёт' || r.status === 'отправлено') ? 'rev-will' : 'rev-skip';
         html += '<tr>' +
@@ -848,10 +914,17 @@
           '<td class="num">' + r.visits + '</td>' +
           '<td>' + esc(r.email || '—') + '</td>' +
           '<td class="' + cls + '">' + esc(r.status) + '</td>' +
+          '<td>' + blockBtn(r.email, r.status) + '</td>' +
           '</tr>';
       });
       $('wb-table').innerHTML = html + '</tbody></table>';
     }
+
+    var bl = d.blockList || [];
+    $('wb-blocked-sum').textContent = bl.length
+      ? 'Кому не пишем — ' + bl.length + ' чел'
+      : 'Кому не пишем — список пуст';
+    $('wb-blocked').innerHTML = blockedListHtml(bl);
 
     var log = d.log || [];
     $('wb-log-sum').textContent = log.length
@@ -981,7 +1054,7 @@
         'вчерашние — им письмо уйдёт сегодня в 10:00.</p>';
     } else {
       var html = '<table><thead><tr><th>Клиент</th><th>Услуга</th><th>Мастер</th>' +
-        '<th>Закончился</th><th>Почта</th><th>Что будет</th></tr></thead><tbody>';
+        '<th>Закончился</th><th>Почта</th><th>Что будет</th><th></th></tr></thead><tbody>';
       rows.forEach(function (r) {
         var cls = (r.status === 'уйдёт' ? 'rev-will' : (r.status === 'отправлено' ? 'rev-sent' : 'rev-skip'));
         html += '<tr>' +
@@ -991,6 +1064,7 @@
           '<td class="num">' + revAgo(r.endedMinutesAgo) + '</td>' +
           '<td>' + esc(r.email || '—') + '</td>' +
           '<td class="' + cls + '">' + esc(r.status) + '</td>' +
+          '<td>' + blockBtn(r.email, r.status) + '</td>' +
           '</tr>';
       });
       $('rev-table').innerHTML = html + '</tbody></table>';
