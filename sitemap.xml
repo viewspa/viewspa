@@ -421,4 +421,34 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/cancellation-policy"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/cancellation-policy"/>
   </url>
+  <url>
+    <loc>https://viewspa.miami/privacy-policy</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/privacy-policy"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/ru/privacy-policy</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/privacy-policy"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/privacy-policy</loc>
+    <lastmod>2026-09-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/privacy-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/privacy-policy"/>
+  </url>
 </urlset>

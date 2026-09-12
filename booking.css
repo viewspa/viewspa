@@ -543,3 +543,12 @@
   font-style: italic;
   color: var(--muted, #6b6b6b);
 }
+
+/* Правовая строка под формой оплаты: нужна, но внимание на себя
+   не тянет — человек пришёл платить, а не читать. */
+.bk-legal {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}

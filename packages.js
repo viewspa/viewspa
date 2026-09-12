@@ -270,6 +270,8 @@
           <div id="card-container" style="padding:4px 0"></div>
           <div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>
           <button type="submit" class="btn btn-gold bk-submit">Pay ${money(baseCents)}</button>
+          <p class="bk-sub bk-legal">Card details go straight to Square - we never see them.
+            <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy policy</a></p>
           <div class="bk-error" id="pay-err" hidden></div>
         </form>
       </div>`;

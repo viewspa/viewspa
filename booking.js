@@ -698,7 +698,8 @@
              ${MASSAGE_CONCERNS.map((c) => `<button type="button" class="bk-chip" data-concern="${c}" aria-pressed="false">${c}</button>`).join('')}
            </div>
            <label>Anything else he should know? (optional)
-             <textarea name="note" rows="3" placeholder="When it started, which movement sets it off, and anything he should avoid - injuries, recent surgery, pregnancy."></textarea>
+             <span class="bk-intake-hint">Please mention allergies, medication, injuries or pregnancy - they change how Ivan works.</span>
+             <textarea name="note" rows="3" placeholder="When it started, which movement sets it off, and anything he should avoid."></textarea>
            </label>
          </div>`
       : `<label>Note (optional)<textarea name="note" rows="2"></textarea></label>`;
@@ -709,13 +710,13 @@
          <label>Phone
            <input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(305) 555-1234" title="Your mobile number - we’ll text your confirmation">
          </label>
-         <label>Email (optional)<input name="email" type="email" autocomplete="email"></label>
+         <label>Email - we’ll send your confirmation and reminder<input name="email" type="email" autocomplete="email"></label>
          ${intake}
          <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
          <div id="bk-addon"></div>
          <label class="bk-agree">
            <input type="checkbox" name="agreePolicy" required>
-           <span>I can cancel or reschedule free up to 24 hours before. Later than that is 50%, a no-show is the full price — <a href="cancellation-policy.html" target="_blank" rel="noopener">cancellation policy</a>.</span>
+           <span>I can cancel or reschedule free up to 24 hours before. Later than that is 50%, a no-show is the full price — <a href="cancellation-policy.html" target="_blank" rel="noopener">cancellation policy</a>. We keep your details only to run your appointment - <a href="privacy-policy.html" target="_blank" rel="noopener">privacy policy</a>.</span>
          </label>
          ${turnstile}
          <button type="submit" class="btn btn-gold bk-submit">Confirm booking</button>
