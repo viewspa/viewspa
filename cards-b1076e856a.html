@@ -126,6 +126,10 @@
   .ad-gaps-top span { color: var(--mid); font-size: 12px; }
   .ad-gaps-pick { background: rgba(39,174,96,.09); border: 1px solid rgba(39,174,96,.3); border-radius: 6px; padding: 10px 12px; margin-top: 12px; font-size: 14px; }
 
+  .ad-pkg-when { font-weight: 600; }
+  .ad-pkg-soon { color: #a0491f; }
+  .ad-pkg-left { font-variant-numeric: tabular-nums; }
+  .ad-pkg-by { font-size: 11px; color: var(--mid); }
   .ad-block-btn {
     font-family: var(--font-body); font-size: 12px; line-height: 1;
     padding: 5px 9px; background: var(--white); color: var(--mid);
@@ -191,6 +195,17 @@
 
   <div id="ad-error" class="ad-err" hidden></div>
   <div id="ad-stats" class="ad-stats" hidden></div>
+
+  <details class="ad-issue" id="ad-pkg" hidden open>
+    <summary>Записаны, и у них есть пакет</summary>
+    <div class="ad-rev-body">
+      <p class="ad-gaps-intro">Кто записан на ближайшие дни и держит действующий пакет.
+        Нужно, чтобы не пропустить списание, когда человек записался через Square
+        и про пакет не сказал. Списание — кнопкой, само ничего не происходит.</p>
+      <button class="btn btn-dark" id="pkg-load" type="button">Проверить</button>
+      <div id="pkg-out"></div>
+    </div>
+  </details>
 
   <details class="ad-issue" id="ad-gaps" hidden>
     <summary>Как часто клиенты возвращаются</summary>
@@ -506,6 +521,7 @@
       $('ad-tools').hidden = false;
       $('ad-issue').hidden = false;
       $('ad-rev').hidden = false;
+      $('ad-pkg').hidden = false;
       $('ad-gaps').hidden = false;
       $('ad-wb').hidden = false;
       wbLoad({}, null);
@@ -546,8 +562,10 @@
   $('ad-csv').addEventListener('click', csv);
 
   // Клик по номеру копирует его целиком - чтобы вставить в списание.
-  $('ad-body').addEventListener('click', function (e) {
-    var el = e.target.closest('.ad-gan');
+  // Слушаем документ: номер карты теперь показывается не только в таблице
+  // карт, но и в блоке «записаны с пакетом».
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('.ad-gan');
     if (!el) return;
     var gan = el.dataset.gan;
     navigator.clipboard.writeText(gan).then(function () {
@@ -796,6 +814,100 @@
   });
 
 
+
+
+  // Номер карты по четыре цифры — так его читают вслух и сверяют глазами.
+  function fmtGan(gan) {
+    return String(gan || '').replace(/(\d{4})(?=\d)/g, '$1 ');
+  }
+
+  // ── Записаны, и у них есть пакет ─────────────────────────────────
+  // Списание вручную, а не автоматом: человек мог прийти с пакетом,
+  // но заплатить отдельно — за подругу, за вторую услугу, наличными.
+  // Решает владелец, мы только не даём пропустить.
+  function pkgWhen(iso) {
+    var d = new Date(iso), now = new Date();
+    var h = (d - now) / 3600000;
+    var day = d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+    var time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    var cls = h < 24 ? ' ad-pkg-soon' : '';
+    return '<span class="ad-pkg-when' + cls + '">' + day + ' ' + time + '</span>';
+  }
+
+  $('pkg-load').addEventListener('click', async function () {
+    var btn = this, was = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Смотрю…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/upcoming-packages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: '{}',
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+
+      var rows = d.rows || [];
+      if (!rows.length) {
+        $('pkg-out').innerHTML = '<p class="ad-rev-empty">Никто из записанных на ближайшие ' +
+          d.days + ' дней пакета не держит. Проверено карт: ' + d.cards + '.</p>';
+      } else {
+        var h = '<div class="ad-scroll"><table><thead><tr><th>Когда</th><th>Клиент</th>' +
+          '<th>Услуга</th><th>Мастер</th><th>Пакет</th><th>Осталось</th><th></th></tr></thead><tbody>';
+        rows.forEach(function (r) {
+          h += '<tr>' +
+            '<td>' + pkgWhen(r.startAt) + '</td>' +
+            '<td>' + esc(r.name) + '<br><span class="ad-pkg-by">нашли по: ' + esc(r.matchedBy) + '</span></td>' +
+            '<td>' + esc(r.service || '—') + '</td>' +
+            '<td>' + esc(r.master || '—') + '</td>' +
+            '<td><span class="ad-gan" data-gan="' + esc(r.gan) + '" title="Нажмите, чтобы скопировать">' + fmtGan(r.gan) + '</span><br>' +
+              '<span class="ad-pkg-by">' + esc(r.packageName) + '</span></td>' +
+            '<td class="ad-pkg-left"><b>' + r.sessionsLeft + '</b></td>' +
+            '<td><button class="ad-block-btn" data-pkgredeem="' + esc(r.gan) +
+              '" data-name="' + esc(r.name) + '">− сеанс</button></td>' +
+            '</tr>';
+        });
+        $('pkg-out').innerHTML = h + '</tbody></table></div>' +
+          '<p class="ad-gaps-note">Совпадение ищем по почте и телефону: в записи о карте ' +
+          'нет номера клиента Square. Если у человека две карточки с разными контактами, ' +
+          'он сюда не попадёт — тогда списывайте из таблицы карт ниже.</p>';
+      }
+    } catch (e) {
+      showError(e.message);
+    }
+    btn.disabled = false; btn.textContent = was;
+  });
+
+  // Списание из этого блока — тем же эндпоинтом, что и минус в таблице карт.
+  document.addEventListener('click', async function (e) {
+    var gan = e.target.getAttribute && e.target.getAttribute('data-pkgredeem');
+    if (!gan) return;
+    var name = e.target.getAttribute('data-name') || '';
+    if (!window.confirm('Списать один сеанс у ' + name + '?\n\nКарта ' + fmtGan(gan) +
+        '.\nЕсли человек платил отдельно — не списывайте.')) return;
+
+    e.target.disabled = true;
+    var old = e.target.textContent;
+    e.target.textContent = '…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/redeem-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ gan: gan, sessions: 1 }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      e.target.textContent = 'списано';
+      // Обновляем остаток в строке, не перезагружая весь блок.
+      var cell = e.target.closest('tr').querySelector('.ad-pkg-left b');
+      if (cell && d.sessionsLeft != null) cell.textContent = d.sessionsLeft;
+    } catch (err) {
+      showError(err.message);
+      e.target.disabled = false;
+      e.target.textContent = old;
+    }
+  });
 
   // ── Чёрный список: кнопка в строке ───────────────────────────────
   // Решение принимается там же, где видна проблема. Ходить за этим
@@ -1235,7 +1347,7 @@
       var d = await res.json().catch(function () { return {}; });
       if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
 
-      var pretty = String(d.gan).replace(/(\d{4})(?=\d)/g, '$1 ');
+      var pretty = fmtGan(d.gan);
       box.innerHTML = '<div><b>' + esc(d.name) + '</b> · ' + money(d.balanceCents) + ' · ' + esc(d.tender) + '</div>' +
         '<div class="ad-issue-code" data-gan="' + esc(d.gan) + '" title="Нажмите, чтобы скопировать">' + pretty + '</div>' +
         '<div class="ad-issue-meta">' +
