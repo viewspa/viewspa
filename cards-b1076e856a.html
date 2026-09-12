@@ -126,6 +126,9 @@
   .ad-gaps-top span { color: var(--mid); font-size: 12px; }
   .ad-gaps-pick { background: rgba(39,174,96,.09); border: 1px solid rgba(39,174,96,.3); border-radius: 6px; padding: 10px 12px; margin-top: 12px; font-size: 14px; }
 
+  .ad-mail-ok { color: #1e7a45; font-size: 11px; white-space: nowrap; }
+  .ad-mail-bad { color: #a33; font-size: 11px; white-space: nowrap; }
+  .ad-mail-unk { color: var(--mid); font-size: 11px; white-space: nowrap; }
   .ad-pkg-when { font-weight: 600; }
   .ad-pkg-soon { color: #a0491f; }
   .ad-pkg-left { font-variant-numeric: tabular-nums; }
@@ -429,7 +432,7 @@
     if (r.sessionsLeft == null) {
       return r.buyerEmail
         ? '<button class="ad-btn" data-act="mail" data-gan="' + esc(r.gan) +
-          '" title="Отправить клиенту код и инструкцию">✉</button>'
+          '" title="Отправить клиенту код и инструкцию">✉</button><br>' + mailMark(r)
         : '<span class="ad-act-no">нет почты</span>';
     }
     var out = '';
@@ -442,6 +445,8 @@
            '" title="Списать один сеанс"' + (r.sessionsLeft < 1 ? ' disabled' : '') + '>− сеанс</button>';
     out += '<button class="ad-btn" data-act="return" data-gan="' + esc(r.gan) +
            '" title="Вернуть сеанс — отмена ошибочного списания">+ сеанс</button>';
+    // Отметка об отправке — последней строкой, под кнопками.
+    if (r.buyerEmail) out += '<br>' + mailMark(r);
     return out;
   }
 
@@ -908,6 +913,19 @@
       e.target.textContent = old;
     }
   });
+
+    // Отметка об отправке кода. У карт, купленных до этой правки,
+    // отметки нет — честно пишем «неизвестно», а не выдумываем.
+    function mailMark(r) {
+      if (r.emailSentAt) {
+        return '<span class="ad-mail-ok" title="Письмо с кодом ушло">✓ ' + date(r.emailSentAt) + '</span>';
+      }
+      if (r.emailFailedAt) {
+        return '<span class="ad-mail-bad" title="Почта не приняла письмо">✗ не ушло</span>';
+      }
+      if (!r.buyerEmail) return '';
+      return '<span class="ad-mail-unk" title="Отметки нет — карта старше этой проверки">неизвестно</span>';
+    }
 
   // ── Чёрный список: кнопка в строке ───────────────────────────────
   // Решение принимается там же, где видна проблема. Ходить за этим
