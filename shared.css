@@ -1581,6 +1581,13 @@ footer .logo img { height: 64px; width: 64px; aspect-ratio: 1 / 1; display: bloc
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
+  /* В русском и испанском подпись длиннее английской. Без nowrap она
+     переносится на две строки, растёт вниз и наезжает на название курса. */
+  white-space: nowrap;
+}
+@media (max-width: 400px) {
+  /* Совсем узкий экран: подпись сжимаем, но по-прежнему в одну строку. */
+  .package-badge { font-size: 10px; letter-spacing: .8px; padding: 5px 9px; }
 }
 .package-card h3 {
   font-size: 24px;

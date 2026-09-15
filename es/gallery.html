@@ -70,6 +70,30 @@
   .g-tile { margin: 0; overflow: hidden; border-radius: 10px; background: #f2efe9; aspect-ratio: 1 / 1; }
   .g-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .45s ease; }
   .g-tile:hover img { transform: scale(1.06); }
+  .g-open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .g-open:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  /* Просмотр крупно. Тег dialog сам закрывается по Esc и держит фокус. */
+  .g-view { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; }
+  .g-view::backdrop { background: rgba(20, 18, 15, .92); }
+  .g-view-body { position: relative; display: flex; align-items: center; justify-content: center;
+    width: 96vw; height: 92vh; }
+  .g-view img { max-width: 100%; max-height: 100%; width: auto; height: auto;
+    object-fit: contain; border-radius: 8px; }
+  .g-view-btn { position: absolute; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: pointer;
+    background: rgba(255,255,255,.9); color: #1E1E1E; font-size: 22px; line-height: 1;
+    display: flex; align-items: center; justify-content: center; }
+  .g-view-btn:hover { background: #fff; }
+  .g-prev { left: 8px; }
+  .g-next { right: 8px; }
+  .g-close { position: absolute; top: 8px; right: 8px; transform: none; width: 44px; height: 44px; }
+  .g-count { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,.85); font-size: 13px; letter-spacing: .5px; }
+  @media (max-width: 600px) {
+    .g-view-btn { width: 40px; height: 40px; }
+    .g-prev { left: 2px; } .g-next { right: 2px; }
+  }
   .gallery-cta { text-align: center; padding: 4px 0 56px; }
   .gallery-cta p { color: #6b6b6b; margin: 0 0 16px; }
 </style>
@@ -113,26 +137,26 @@
     </div>
 
     <div class="gallery-grid">
-      <figure class="g-tile"><img src="../img/gallery-01.webp" alt="Manicura rusa en gel con cutícula limpia - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-02.webp" alt="Diseño de uñas francés - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-03.webp" alt="Uñas chrome glazed - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-04.webp" alt="Uñas multichrome oil-slick - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-05.webp" alt="Uñas ojo de gato magnéticas - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-06.webp" alt="Smart pedicura en gel - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-07.webp" alt="Uñas ombré baby boomer - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-08.webp" alt="Manicura en gel nude - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-09.webp" alt="Manicura en gel roja - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-10.webp" alt="Nail art / diseño de uñas - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-11.webp" alt="Extensiones largas en gel - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-12.webp" alt="Pedicura con color en gel - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-13.webp" alt="Uñas chrome rosa - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-14.webp" alt="Uñas chrome en primer plano - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-15.webp" alt="Manicura en gel natural corta - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-16.webp" alt="Uñas forma almendra en gel - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-17.webp" alt="Manicura en gel pastel - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-18.webp" alt="Diseño de uñas detallado - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-19.webp" alt="Ombré rosa neón - View Spa Aventura" loading="lazy"></figure>
-      <figure class="g-tile"><img src="../img/gallery-20.webp" alt="Resultado de manicura rusa fresca - View Spa Aventura" loading="lazy"></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-01.webp" aria-label="Ver en grande: Manicura rusa en gel con cutícula limpia - View Spa Aventura"><img src="../img/gallery-01-sm.webp" alt="Manicura rusa en gel con cutícula limpia - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-02.webp" aria-label="Ver en grande: Diseño de uñas francés - View Spa Aventura"><img src="../img/gallery-02-sm.webp" alt="Diseño de uñas francés - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-03.webp" aria-label="Ver en grande: Uñas chrome glazed - View Spa Aventura"><img src="../img/gallery-03-sm.webp" alt="Uñas chrome glazed - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-04.webp" aria-label="Ver en grande: Uñas multichrome oil-slick - View Spa Aventura"><img src="../img/gallery-04-sm.webp" alt="Uñas multichrome oil-slick - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-05.webp" aria-label="Ver en grande: Uñas ojo de gato magnéticas - View Spa Aventura"><img src="../img/gallery-05-sm.webp" alt="Uñas ojo de gato magnéticas - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-06.webp" aria-label="Ver en grande: Smart pedicura en gel - View Spa Aventura"><img src="../img/gallery-06-sm.webp" alt="Smart pedicura en gel - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-07.webp" aria-label="Ver en grande: Uñas ombré baby boomer - View Spa Aventura"><img src="../img/gallery-07-sm.webp" alt="Uñas ombré baby boomer - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-08.webp" aria-label="Ver en grande: Manicura en gel nude - View Spa Aventura"><img src="../img/gallery-08-sm.webp" alt="Manicura en gel nude - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-09.webp" aria-label="Ver en grande: Manicura en gel roja - View Spa Aventura"><img src="../img/gallery-09-sm.webp" alt="Manicura en gel roja - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-10.webp" aria-label="Ver en grande: Nail art / diseño de uñas - View Spa Aventura"><img src="../img/gallery-10-sm.webp" alt="Nail art / diseño de uñas - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-11.webp" aria-label="Ver en grande: Extensiones largas en gel - View Spa Aventura"><img src="../img/gallery-11-sm.webp" alt="Extensiones largas en gel - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-12.webp" aria-label="Ver en grande: Pedicura con color en gel - View Spa Aventura"><img src="../img/gallery-12-sm.webp" alt="Pedicura con color en gel - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-13.webp" aria-label="Ver en grande: Uñas chrome rosa - View Spa Aventura"><img src="../img/gallery-13-sm.webp" alt="Uñas chrome rosa - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-14.webp" aria-label="Ver en grande: Uñas chrome en primer plano - View Spa Aventura"><img src="../img/gallery-14-sm.webp" alt="Uñas chrome en primer plano - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-15.webp" aria-label="Ver en grande: Manicura en gel natural corta - View Spa Aventura"><img src="../img/gallery-15-sm.webp" alt="Manicura en gel natural corta - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-16.webp" aria-label="Ver en grande: Uñas forma almendra en gel - View Spa Aventura"><img src="../img/gallery-16-sm.webp" alt="Uñas forma almendra en gel - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-17.webp" aria-label="Ver en grande: Manicura en gel pastel - View Spa Aventura"><img src="../img/gallery-17-sm.webp" alt="Manicura en gel pastel - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-18.webp" aria-label="Ver en grande: Diseño de uñas detallado - View Spa Aventura"><img src="../img/gallery-18-sm.webp" alt="Diseño de uñas detallado - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-19.webp" aria-label="Ver en grande: Ombré rosa neón - View Spa Aventura"><img src="../img/gallery-19-sm.webp" alt="Ombré rosa neón - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
+      <figure class="g-tile"><button type="button" class="g-open" data-full="../img/gallery-20.webp" aria-label="Ver en grande: Resultado de manicura rusa fresca - View Spa Aventura"><img src="../img/gallery-20-sm.webp" alt="Resultado de manicura rusa fresca - View Spa Aventura" loading="lazy" width="500" height="500" decoding="async"></button></figure>
     </div>
 
     <div class="gallery-cta">
@@ -202,5 +226,72 @@
 </a>
 
 <script src="../main.js"></script>
+
+<dialog class="g-view" id="g-view" aria-label="Trabajos del estudio">
+  <div class="g-view-body">
+    <img id="g-view-img" alt="">
+    <button type="button" class="g-view-btn g-prev" id="g-prev" aria-label="Anterior">‹</button>
+    <button type="button" class="g-view-btn g-next" id="g-next" aria-label="Siguiente">›</button>
+    <button type="button" class="g-view-btn g-close" id="g-close" aria-label="Cerrar">✕</button>
+    <div class="g-count" id="g-count"></div>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  // Открытие работы крупно. Без библиотек: dialog умеет Esc и фокус сам.
+  var dlg = document.getElementById('g-view');
+  if (!dlg || !dlg.showModal) return;   // очень старый браузер - плитки просто не кликаются
+
+  var img = document.getElementById('g-view-img');
+  var count = document.getElementById('g-count');
+  var tiles = [].slice.call(document.querySelectorAll('.g-open'));
+  var i = 0;
+
+  function show(n) {
+    i = (n + tiles.length) % tiles.length;
+    var b = tiles[i];
+    img.src = b.getAttribute('data-full');
+    img.alt = b.querySelector('img').alt || '';
+    count.textContent = (i + 1) + ' / ' + tiles.length;
+    // Соседние подгружаем заранее - листание не ждёт сети.
+    [1, -1].forEach(function (d) {
+      var nb = tiles[(i + d + tiles.length) % tiles.length];
+      new Image().src = nb.getAttribute('data-full');
+    });
+  }
+
+  tiles.forEach(function (b, n) {
+    b.addEventListener('click', function () { show(n); dlg.showModal(); });
+  });
+
+  document.getElementById('g-prev').addEventListener('click', function () { show(i - 1); });
+  document.getElementById('g-next').addEventListener('click', function () { show(i + 1); });
+  document.getElementById('g-close').addEventListener('click', function () { dlg.close(); });
+
+  // Клик по тёмному фону закрывает - привычное поведение.
+  dlg.addEventListener('click', function (e) {
+    if (e.target === dlg) dlg.close();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!dlg.open) return;
+    if (e.key === 'ArrowLeft') show(i - 1);
+    if (e.key === 'ArrowRight') show(i + 1);
+  });
+
+  // Свайп на телефоне. Порог в 40 пикселей, чтобы не срабатывало
+  // на случайном касании при прокрутке.
+  var x0 = null;
+  dlg.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  dlg.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1));
+    x0 = null;
+  }, { passive: true });
+})();
+</script>
+
 </body>
 </html>
