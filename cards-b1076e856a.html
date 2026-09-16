@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>Карты и пакеты · View Spa</title>
+<title>Управление · View Spa</title>
 <link rel="icon" href="img/favicon.ico" sizes="any">
 <link rel="stylesheet" href="shared.css">
 <style>
@@ -69,6 +69,22 @@
   .ad-act-no { color: var(--mid); font-size: 13px; }
 
   /* Продажа карты вживую */
+  .ad-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
+    border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .ad-tab { font: inherit; font-size: 14px; font-weight: 600; letter-spacing: .3px;
+    padding: 9px 16px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--white); color: var(--mid); cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s; }
+  .ad-tab:hover { border-color: var(--gold); color: var(--dark); }
+  .ad-tab[aria-selected="true"] { background: var(--dark); border-color: var(--dark); color: #fff; }
+  .ad-tab:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  /* Показываем только блоки текущей вкладки. Через стиль, а не через
+     свойство hidden: hidden уже занят входом по ключу, и если управлять
+     им из двух мест, блоки начнут спорить друг с другом. */
+  body[data-tab="cards"]   [data-tab]:not([data-tab="cards"]),
+  body[data-tab="mail"]    [data-tab]:not([data-tab="mail"]),
+  body[data-tab="clients"] [data-tab]:not([data-tab="clients"]) { display: none !important; }
+
   .ad-issue { background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; }
   .ad-issue > summary { padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; }
   .ad-issue > summary::-webkit-details-marker { display: none; }
@@ -187,7 +203,7 @@
 <body>
 <div class="ad-wrap">
   <div class="ad-head">
-    <h1>Карты и пакеты</h1>
+    <h1>Управление · View Spa</h1>
     <span id="ad-updated"></span>
   </div>
 
@@ -199,7 +215,16 @@
   <div id="ad-error" class="ad-err" hidden></div>
   <div id="ad-stats" class="ad-stats" hidden></div>
 
-  <details class="ad-issue" id="ad-pkg" hidden open>
+  <!-- Именно div, а не nav: в shared.css тег nav занят меню сайта,
+       и под 900px оно превращается в выпадающий бургер. -->
+  <div class="ad-tabs" id="ad-tabs" role="tablist" aria-label="Разделы" hidden>
+    <button type="button" class="ad-tab" data-tabgo="cards" role="tab" aria-selected="true">Карты и пакеты</button>
+    <button type="button" class="ad-tab" data-tabgo="mail" role="tab" aria-selected="false">Письма</button>
+    <button type="button" class="ad-tab" data-tabgo="clients" role="tab" aria-selected="false">Клиенты</button>
+  </div>
+
+
+  <details class="ad-issue" data-tab="cards" id="ad-pkg" hidden open>
     <summary>Записаны, и у них есть пакет</summary>
     <div class="ad-rev-body">
       <p class="ad-gaps-intro">Кто записан на ближайшие дни и держит действующий пакет.
@@ -210,7 +235,7 @@
     </div>
   </details>
 
-  <details class="ad-issue" id="ad-gaps" hidden>
+  <details class="ad-issue" data-tab="clients" id="ad-gaps" hidden>
     <summary>Как часто клиенты возвращаются</summary>
     <div class="ad-rev-body">
       <p class="ad-gaps-intro">Считает по истории записей за полтора года — это занимает несколько секунд. Ничего не отправляет.
@@ -220,7 +245,27 @@
     </div>
   </details>
 
-  <details class="ad-issue" id="ad-wb" hidden>
+  <details class="ad-issue" data-tab="clients" id="ad-hist" hidden>
+    <summary>История записей клиента</summary>
+    <div class="ad-rev-body">
+      <p class="ad-gaps-intro">Все записи одного человека: что состоялось, что отменили и за сколько предупредили.
+        Нужно, когда отвечаешь на отзыв и опираться надо на факты, а не на память. Ничего не отправляет.</p>
+      <div class="ad-wb-weeks">
+        <div class="ad-field">
+          <label for="hist-q">Имя или почта</label>
+          <input id="hist-q" type="text" placeholder="например, rebecca">
+        </div>
+        <div class="ad-field">
+          <label for="hist-months">Глубина, месяцев</label>
+          <input id="hist-months" type="number" min="1" max="36" step="1" value="24">
+        </div>
+      </div>
+      <button class="btn btn-dark" id="hist-load" type="button">Найти</button>
+      <div id="hist-out"></div>
+    </div>
+  </details>
+
+  <details class="ad-issue" data-tab="mail" id="ad-wb" hidden>
     <summary>Письма «давно не были»</summary>
     <div class="ad-rev-body">
 
@@ -274,7 +319,7 @@
     </div>
   </details>
 
-  <details class="ad-issue" id="ad-rev" hidden>
+  <details class="ad-issue" data-tab="mail" id="ad-rev" hidden>
     <summary>Просьбы об отзыве после визита</summary>
     <div class="ad-rev-body">
 
@@ -308,7 +353,7 @@
     </div>
   </details>
 
-  <details class="ad-issue" id="ad-issue" hidden>
+  <details class="ad-issue" data-tab="cards" id="ad-issue" hidden>
     <summary>Продать карту вживую — за наличные или переводом</summary>
     <div class="ad-issue-body">
       <div class="ad-field">
@@ -375,12 +420,12 @@
     </div>
   </details>
 
-  <div class="ad-tools" hidden id="ad-tools">
+  <div class="ad-tools" data-tab="cards" hidden id="ad-tools">
     <input id="ad-search" placeholder="Поиск: имя, последние 4 цифры, email">
     <button class="btn btn-dark" id="ad-csv">Скачать CSV</button>
   </div>
 
-  <div class="ad-scroll">
+  <div class="ad-scroll" data-tab="cards">
     <div id="ad-body"><p class="ad-msg">Введите ключ и нажмите «Показать».</p></div>
   </div>
 </div>
@@ -519,6 +564,7 @@
       rows = data.items || [];
 
       $('ad-stats').hidden = false;
+      $('ad-tabs').hidden = false;
       $('ad-stats').innerHTML =
         '<div class="ad-stat"><b>' + data.activeCount + '</b><span>активных карт</span></div>' +
         '<div class="ad-stat"><b>' + money(data.outstandingCents) + '</b><span>не отработано</span></div>' +
@@ -528,6 +574,7 @@
       $('ad-rev').hidden = false;
       $('ad-pkg').hidden = false;
       $('ad-gaps').hidden = false;
+      $('ad-hist').hidden = false;
       $('ad-wb').hidden = false;
       wbLoad({}, null);
       revLoad({}, null);
@@ -820,6 +867,130 @@
 
 
 
+
+  // ── История записей одного человека ──────────────────────────────
+  // Пригождается ровно тогда, когда разговор пошёл о фактах: кто когда
+  // записывался, что отменил и за сколько предупредил.
+
+  var HIST_STATUS = {
+    ACCEPTED: ['пришёл', 'ad-ok'],
+    PENDING: ['ждёт подтверждения', 'ad-warn'],
+    CANCELLED_BY_CUSTOMER: ['отменил клиент', 'ad-bad'],
+    CANCELLED_BY_SELLER: ['отменили мы', 'ad-warn'],
+    DECLINED: ['отклонена', 'ad-bad'],
+    NO_SHOW: ['не пришёл', 'ad-bad'],
+  };
+
+  // «за 15 мин» читается сразу, «за 900000 мс» — нет.
+  function histNotice(min) {
+    if (min == null) return '—';
+    if (min < 0) return 'уже после начала';
+    if (min < 90) return 'за ' + min + ' мин';
+    if (min < 60 * 36) return 'за ' + Math.round(min / 60) + ' ч';
+    return 'за ' + Math.round(min / 1440) + ' дн';
+  }
+
+  function histWhen(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return esc(iso || '');
+    return d.toLocaleString('ru-RU', {
+      day: '2-digit', month: '2-digit', year: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+    });
+  }
+
+  function histPerson(p) {
+    var head =
+      '<p class="ad-gaps-note"><b>' + esc(p.name) + '</b>' +
+      (p.email ? ' · ' + esc(p.email) : '') +
+      (p.phone ? ' · ' + esc(p.phone) : '') +
+      '<br>Записей: ' + p.total +
+      ' · пришёл: ' + p.kept +
+      ' · отменено: ' + p.cancelled +
+      ' · не пришёл: ' + p.noShow +
+      '<br>Из отмен позже чем за сутки: <b>' + p.lateUnder24h + '</b>' +
+      ', позже чем за час: <b>' + p.lateUnder1h + '</b>' +
+      (p.truncated ? '<br><b>Записей больше, чем помещается за один проход — показана часть.</b>' : '') +
+      '</p>';
+
+    if (!p.bookings.length) return head + '<p class="ad-gaps-note">Записей за этот срок нет.</p>';
+
+    var rows = p.bookings.map(function (b) {
+      var s = HIST_STATUS[b.status] || [b.status || '—', 'ad-warn'];
+      return '<tr>' +
+        '<td>' + histWhen(b.start) + '</td>' +
+        '<td><span class="ad-tag ' + s[1] + '">' + esc(s[0]) + '</span></td>' +
+        '<td>' + esc(b.master || '—') + '</td>' +
+        '<td>' + (b.minutes != null ? b.minutes + ' мин' : '—') + '</td>' +
+        '<td>' + histNotice(b.noticeMinutes) + '</td>' +
+        '</tr>';
+    }).join('');
+
+    return head +
+      '<div class="ad-scroll"><table><thead><tr>' +
+      '<th>Когда</th><th>Чем кончилось</th><th>Мастер</th><th>Длит.</th><th>Предупредил</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  $('hist-load').addEventListener('click', async function () {
+    var btn = this, was = btn.textContent;
+    var q = $('hist-q').value.trim();
+    if (!q) { showError('Впиши имя или почту'); return; }
+    btn.disabled = true; btn.textContent = 'Ищу…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/client-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ q: q, months: Number($('hist-months').value) || 24 }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      if (!d.found) {
+        $('hist-out').innerHTML = '<p class="ad-gaps-note">Никого не нашлось. Попробуй часть имени или адрес почты.</p>';
+      } else {
+        $('hist-out').innerHTML = d.people.map(histPerson).join('') +
+          '<p class="ad-gaps-note">История за ' + d.monthsBack + ' мес. ' +
+          'Время отмены Square отдельным полем не отдаёт — оно восстановлено по моменту ' +
+          'последнего изменения записи. Если запись после отмены трогали ещё раз, ' +
+          'колонка «предупредил» сдвинется.</p>';
+      }
+    } catch (e) {
+      showError(e.message);
+    }
+    btn.disabled = false; btn.textContent = was;
+  });
+
+
+
+  // ── Вкладки ──────────────────────────────────────────────────────
+  // Блоков накопилось столько, что стопкой в них теряешься. Раскладка
+  // по трём темам: карты, письма, клиенты. Выбор запоминается - при
+  // следующем открытии страница встречает тем же разделом.
+  (function () {
+    var TABS = ['cards', 'mail', 'clients'];
+    var saved;
+    try { saved = localStorage.getItem('ad-tab'); } catch (e) { saved = null; }
+    var current = TABS.indexOf(saved) >= 0 ? saved : 'cards';
+
+    function show(tab) {
+      if (TABS.indexOf(tab) < 0) return;
+      current = tab;
+      document.body.setAttribute('data-tab', tab);
+      var btns = document.querySelectorAll('[data-tabgo]');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].setAttribute('aria-selected', btns[i].getAttribute('data-tabgo') === tab ? 'true' : 'false');
+      }
+      try { localStorage.setItem('ad-tab', tab); } catch (e) {}
+    }
+
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-tabgo]') : null;
+      if (b) show(b.getAttribute('data-tabgo'));
+    });
+
+    show(current);
+  })();
 
   // Номер карты по четыре цифры — так его читают вслух и сверяют глазами.
   function fmtGan(gan) {
