@@ -85,6 +85,13 @@
   body[data-tab="mail"]    [data-tab]:not([data-tab="mail"]),
   body[data-tab="clients"] [data-tab]:not([data-tab="clients"]) { display: none !important; }
 
+  /* Откуда приходят записи */
+  .src-n { text-align: right; white-space: nowrap; }
+  .src-z { color: #b9b2a6; }
+  .src-part td { font-style: italic; color: var(--mid); }
+  .src-barcell { width: 30%; min-width: 80px; }
+  .src-bar { display: block; height: 8px; border-radius: 4px; background: var(--gold); min-width: 2px; }
+
   .ad-issue { background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; }
   .ad-issue > summary { padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 15px; list-style: none; }
   .ad-issue > summary::-webkit-details-marker { display: none; }
@@ -242,6 +249,23 @@
         Нужно, чтобы выбрать срок для писем «давно не были» по фактам, а не на глаз.</p>
       <button class="btn btn-dark" id="gaps-load" type="button">Посчитать</button>
       <div id="gaps-out"></div>
+    </div>
+  </details>
+
+  <details class="ad-issue" data-tab="clients" id="ad-src" hidden>
+    <summary>Откуда приходят записи</summary>
+    <div class="ad-rev-body">
+      <p class="ad-gaps-intro">Сколько записей сделали за каждую неделю и каким путём: через сайт,
+        через кнопку в Google Картах, через страницу Square или вручную. Если записей стало меньше —
+        здесь видно, какой именно путь просел. Ничего не отправляет.</p>
+      <div class="ad-wb-weeks">
+        <div class="ad-field">
+          <label for="src-months">За сколько месяцев</label>
+          <input id="src-months" type="number" min="1" max="12" step="1" value="6">
+        </div>
+      </div>
+      <button class="btn btn-dark" id="src-load" type="button">Посчитать</button>
+      <div id="src-out"></div>
     </div>
   </details>
 
@@ -575,6 +599,7 @@
       $('ad-pkg').hidden = false;
       $('ad-gaps').hidden = false;
       $('ad-hist').hidden = false;
+      $('ad-src').hidden = false;
       $('ad-wb').hidden = false;
       wbLoad({}, null);
       revLoad({}, null);
@@ -991,6 +1016,115 @@
 
     show(current);
   })();
+
+  // ── Откуда приходят записи ───────────────────────────────────────
+  // Если записей стало меньше, первым делом надо понять, какой путь
+  // пересох. Сайт, Карты, страница Square и ручные записи чинятся
+  // по-разному, и гадать тут нельзя.
+
+  var SRC_LABELS = [
+    ['API', 'Сайт'],
+    ['THIRD_PARTY_BUYER', 'Google Карты'],
+    ['FIRST_PARTY_BUYER', 'Страница Square'],
+    ['FIRST_PARTY_MERCHANT', 'Вручную'],
+  ];
+
+  function srcColumns(sources) {
+    var known = SRC_LABELS.map(function (p) { return p[0]; });
+    var cols = SRC_LABELS.filter(function (p) { return sources.indexOf(p[0]) >= 0; });
+    // Незнакомые значения показываем как есть - прятать их нельзя.
+    sources.forEach(function (s) { if (known.indexOf(s) < 0) cols.push([s, s]); });
+    return cols;
+  }
+
+  function srcWeek(iso) {
+    var p = iso.split('-');
+    return p[2] + '.' + p[1];
+  }
+
+  // Последние четыре полные недели против четырёх предыдущих - по каждому
+  // каналу. Одна неделя на таких числах - шум, четыре уже что-то значат.
+  function srcCompare(weeks, cols) {
+    var full = weeks.filter(function (w) { return !w.partial; });
+    if (full.length < 8) return '<p class="ad-gaps-note">Для сравнения нужно хотя бы восемь полных недель.</p>';
+    var last = full.slice(-4), prev = full.slice(-8, -4);
+    var sum = function (list, key) {
+      return list.reduce(function (a, w) { return a + (key ? (w.counts[key] || 0) : w.total); }, 0);
+    };
+    var pct = function (a, b) {
+      if (!a) return b ? ' <b>(появился)</b>' : '';
+      var d = Math.round((b - a) / a * 100);
+      return ' <b>(' + (d > 0 ? '+' : '') + d + '%)</b>';
+    };
+
+    var lines = cols.map(function (c) {
+      var a = sum(prev, c[0]), b = sum(last, c[0]);
+      return esc(c[1]) + ': ' + a + ' → ' + b + pct(a, b);
+    });
+    var ta = sum(prev), tb = sum(last);
+
+    // Где упало сильнее всего - в штуках, а не в процентах: с двух до
+    // одной это минус половина, но это не та просадка, которую ищем.
+    var worst = null;
+    cols.forEach(function (c) {
+      var drop = sum(prev, c[0]) - sum(last, c[0]);
+      if (drop > 0 && (!worst || drop > worst.drop)) worst = { name: c[1], drop: drop };
+    });
+
+    return '<p class="ad-gaps-note"><b>Последние 4 недели против 4 предыдущих:</b><br>' +
+      lines.join('<br>') +
+      '<br>Всего: ' + ta + ' → ' + tb + pct(ta, tb) +
+      (worst ? '<br>Сильнее всего просел канал «' + esc(worst.name) + '» — на ' + worst.drop + ' записей.' : '') +
+      '</p>';
+  }
+
+  function srcTable(d) {
+    var cols = srcColumns(d.sources);
+    var max = Math.max.apply(null, d.weeks.map(function (w) { return w.total; }).concat([1]));
+    var rows = d.weeks.slice().reverse().map(function (w) {
+      var cells = cols.map(function (c) {
+        var n = w.counts[c[0]] || 0;
+        return '<td class="src-n">' + (n || '<span class="src-z">0</span>') + '</td>';
+      }).join('');
+      var bar = '<span class="src-bar" style="width:' + Math.round(w.total / max * 100) + '%"></span>';
+      return '<tr' + (w.partial ? ' class="src-part"' : '') + '>' +
+        '<td>' + srcWeek(w.week) + (w.partial ? ' <span class="src-z">идёт</span>' : '') + '</td>' +
+        cells +
+        '<td class="src-n"><b>' + w.total + '</b></td>' +
+        '<td class="src-barcell">' + bar + '</td>' +
+        '</tr>';
+    }).join('');
+
+    return srcCompare(d.weeks, cols) +
+      '<div class="ad-scroll"><table><thead><tr><th>Неделя с</th>' +
+      cols.map(function (c) { return '<th class="src-n">' + esc(c[1]) + '</th>'; }).join('') +
+      '<th class="src-n">Всего</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="ad-gaps-note">За ' + d.monthsBack + ' мес. записей: ' + d.total + '. ' + esc(d.note) +
+      (d.truncated ? ' <b>Записей больше, чем помещается за один проход — показана часть.</b>' : '') +
+      '</p>';
+  }
+
+  $('src-load').addEventListener('click', async function () {
+    var btn = this, was = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Считаю…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/booking-sources', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ months: Number($('src-months').value) || 6 }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      $('src-out').innerHTML = d.total
+        ? srcTable(d)
+        : '<p class="ad-gaps-note">За этот срок записей не нашлось.</p>';
+    } catch (e) {
+      showError(e.message);
+    }
+    btn.disabled = false; btn.textContent = was;
+  });
+
 
   // Номер карты по четыре цифры — так его читают вслух и сверяют глазами.
   function fmtGan(gan) {
