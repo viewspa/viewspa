@@ -20,7 +20,27 @@ window.dataLayer = window.dataLayer || [];
 function gtag() { dataLayer.push(arguments); }
 window.gtag = gtag;
 gtag('js', new Date());
-gtag('config', 'G-P0GR3YZQQL', { send_page_view: true });
+
+// Одна и та же страница приходит в GA4 в двух видах. По сайту люди ходят
+// по ссылкам с .html, а из поиска приходят на адрес без расширения — именно
+// его Google показывает в выдаче, потому что так написано в canonical.
+// GitHub Pages отдаёт обе формы, и в отчёте «Страницы и экраны» одна
+// страница разбивается на две строки: /massage.html и /massage.
+//
+// Приводим адрес к тому же виду, что и в canonical. Строку запроса и якорь
+// оставляем нетронутыми: из них GA4 берёт utm-метки и gclid, без которых
+// развалится атрибуция.
+function vsCleanUrl() {
+  try {
+    var u = new URL(location.href);
+    u.pathname = u.pathname.replace(/\/index\.html$/i, '/').replace(/\.html$/i, '');
+    return u.href;
+  } catch (e) {
+    return location.href;   // очень старый браузер — пусть уйдёт как есть
+  }
+}
+
+gtag('config', 'G-P0GR3YZQQL', { send_page_view: true, page_location: vsCleanUrl() });
 if (VS_ADS_TAG_ID) gtag('config', VS_ADS_TAG_ID); // включает _gcl_aw (conversion linker в пределах домена — по умолчанию)
 
 // Вставка gtag.js — сразу, без таймера.

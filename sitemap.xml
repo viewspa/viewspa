@@ -372,6 +372,12 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/gallery"/>
   </url>
   <url>
+    <loc>https://viewspa.miami/packages</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://viewspa.miami/ru/gallery</loc>
     <lastmod>2026-08-11</lastmod>
     <changefreq>monthly</changefreq>

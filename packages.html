@@ -3,14 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Packages & Gift Cards | View Spa Aventura</title>
+<title>Gift Cards &amp; Massage Packages in Aventura, FL | View Spa</title>
 <link rel="icon" href="img/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
 <meta name="theme-color" content="#C9A84C">
-<meta name="description" content="Buy massage session packages and gift certificates at View Spa Aventura.">
-<meta name="robots" content="noindex,follow">
+<meta name="description" content="Gift cards and prepaid massage packages at View Spa Aventura. Any amount from $25, delivered by email in a minute, never expires. Massage packages from $88.75 per session.">
+<meta property="og:title" content="Gift Cards &amp; Massage Packages | View Spa Aventura">
+<meta property="og:description" content="A gift card that arrives by email in a minute and never expires. Or a prepaid massage package from $88.75 per session.">
+<meta property="og:image" content="https://viewspa.miami/img/Ivan.jpg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://viewspa.miami/packages">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Gift Cards &amp; Massage Packages | View Spa Aventura">
+<meta name="twitter:description" content="A gift card that arrives by email in a minute and never expires. Or a prepaid massage package from $88.75 per session.">
+<meta name="twitter:image" content="https://viewspa.miami/img/Ivan.jpg">
+<link rel="canonical" href="https://viewspa.miami/packages">
 <script src="analytics.js" defer></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,24 +27,121 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <link rel="stylesheet" href="booking.css">
+<style>
+  /* Таблица выгоды. Те же правила, что у таблицы штрафов на странице
+     правил отмены: в общие стили они не вынесены, поэтому копия здесь. */
+  .pol-tbl-scroll { overflow-x: auto; margin: 12px 0 4px; }
+  .pol-tbl { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 460px; }
+  .pol-tbl th { text-align: left; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+                color: var(--mid); font-weight: 700; padding: 10px 12px; border-bottom: 1px solid var(--brass); }
+  .pol-tbl td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--dark); font-variant-numeric: tabular-nums; }
+  .pol-tbl tr:last-child td { border-bottom: none; }
+</style>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Product",
+      "@id": "https://viewspa.miami/packages#giftcard",
+      "name": "View Spa Gift Card",
+      "description": "Digital gift card for massage and nail services at View Spa Aventura. Any amount from $25 to $1,000, delivered by email, never expires.",
+      "brand": {"@type": "Brand", "name": "View Spa"},
+      "category": "Gift Card",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "USD",
+        "lowPrice": "25",
+        "highPrice": "1000",
+        "availability": "https://schema.org/InStock",
+        "url": "https://viewspa.miami/packages"
+      }
+    },
+    {
+      "@type": "Product",
+      "@id": "https://viewspa.miami/packages#massage-packages",
+      "name": "Prepaid Massage Packages",
+      "description": "Prepaid packages of 60-minute Full Body Reset massage sessions with licensed massage therapist Ivan at View Spa Aventura.",
+      "brand": {"@type": "Brand", "name": "View Spa"},
+      "offers": [
+        {"@type": "Offer", "name": "4 Massage Sessions - 60 min each", "price": "360", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://viewspa.miami/packages"},
+        {"@type": "Offer", "name": "8 Massage Sessions - 60 min each", "price": "710", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://viewspa.miami/packages"}
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://viewspa.miami/packages#faq",
+      "inLanguage": "en",
+      "mainEntity": [
+        {"@type": "Question", "name": "How does the gift card arrive?", "acceptedAnswer": {"@type": "Answer", "text": "By email, usually within a minute of payment. It contains a card number that works for any service - massage or nails. Forward the email, print it, or just send the number."}},
+        {"@type": "Question", "name": "Does the gift card expire?", "acceptedAnswer": {"@type": "Answer", "text": "No. There is no expiry date and no fees that eat into the balance. If only part of it is used, the rest stays on the card for next time."}},
+        {"@type": "Question", "name": "How do I use a package when I book?", "acceptedAnswer": {"@type": "Answer", "text": "Book as usual and paste the card number into the package field on the booking form, or read it out at the studio. One session is deducted and the remaining balance is shown to you."}},
+        {"@type": "Question", "name": "Can a package be used for nails?", "acceptedAnswer": {"@type": "Answer", "text": "Packages are massage sessions - 60-minute Full Body Reset with Ivan. For nails, a gift card is the right choice: it works for any service and any specialist."}},
+        {"@type": "Question", "name": "Can someone else use my package?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Whoever has the card number can use the balance, so a package works as a gift too. Just tell us the name when booking so we know who is coming."}},
+        {"@type": "Question", "name": "How long do package sessions stay valid?", "acceptedAnswer": {"@type": "Answer", "text": "120 days for the 4-session package and 240 days for the 8-session package, counted from the day you buy it. That is one session roughly every four weeks with room to miss one - the rhythm the packages are built around. The exact date is in your confirmation email."}},
+        {"@type": "Question", "name": "Can I check how many sessions are left?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Enter the card number in the balance check on this page and it shows the sessions remaining and the date they are good through."}}
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
 <header id="site-header">
   <div class="container hdr">
     <a href="index.html" class="logo"><img src="img/logo.png" alt="View Spa Aventura logo" width="120" height="46" data-hide-on-error="true"></a>
+    <button class="hamburger" id="hamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navMenu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
     <nav id="navMenu" role="navigation" aria-label="Main navigation">
       <a href="massage.html" class="nav-link">Massage</a>
       <a href="manicure.html" class="nav-link">Nail Services</a>
-      <a href="packages.html" class="nav-link active" aria-current="page">Packages & Gift Cards</a>
+      <a href="packages.html" class="nav-link active" aria-current="page">Gift Cards</a>
       <a href="gallery.html" class="nav-link">Gallery</a>
+      <a href="index.html#contact" class="nav-link">Contact</a>
+      <div class="nav-footer">
+        <a href="booking.html" class="btn btn-gold" data-track="booking" data-close-menu="true" aria-label="Book in 60 Seconds">Book in 60 Seconds</a>
+        <div class="nav-footer-contact">
+          <a href="tel:+17542026666" aria-label="Call View Spa at 754-202-6666">(754) 202-6666</a>
+          <a href="https://wa.me/17542026666" target="_blank" rel="noopener" aria-label="Message View Spa on WhatsApp">WhatsApp</a>
+        </div>
+      </div>
     </nav>
     <div class="hdr-cta"><a href="tel:+17542026666" class="btn btn-gold btn-compact">(754) 202-6666</a></div>
   </div>
 </header>
 
 <main id="main-content">
+
+  <section class="sec">
+    <div class="container container-narrow tc">
+      <span class="eyebrow">Gift Cards &amp; Packages · Aventura, FL</span>
+      <h1>The gift nobody re-gifts.</h1>
+      <div class="gold-rule center"></div>
+      <p class="section-copy-narrow">A gift card arrives by email in about a minute and never expires. A prepaid
+        package buys your own sessions at a lower price. Both are below - pick one and you are done.</p>
+      <div class="trust-strip" aria-label="What you get">
+        <div class="trust-strip-item">
+          <span class="trust-strip-icon" aria-hidden="true">✓</span>
+          <span>Delivered by email in a minute</span>
+        </div>
+        <div class="trust-strip-item">
+          <span class="trust-strip-icon" aria-hidden="true">✦</span>
+          <span>Gift cards never expire</span>
+        </div>
+        <div class="trust-strip-item">
+          <span class="trust-strip-icon" aria-hidden="true">★</span>
+          <span>Massage or nails - their choice</span>
+        </div>
+        <div class="trust-strip-item">
+          <span class="trust-strip-icon" aria-hidden="true">❋</span>
+          <span>Card details go straight to Square</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div class="bk-wrap">
     <div id="packages-app">
       <div class="bk-card"><div class="bk-loading">Loading…</div></div>
@@ -47,7 +153,157 @@
       <a href="cancellation-policy.html">see the cancellation policy</a>.
     </p>
   </div>
+
+  <section class="sec section-white">
+    <div class="container container-narrow">
+      <span class="eyebrow">How it works</span>
+      <h2 class="sec-title">Three steps, then forget about it</h2>
+      <div class="gold-rule"></div>
+
+      <div class="expect-grid">
+        <div class="expect-item">
+          <div class="expect-num">01</div>
+          <h3>Pay once</h3>
+          <p>All sessions are paid today, which is why the per-session price drops. No bill at the end of each visit.</p>
+        </div>
+        <div class="expect-item">
+          <div class="expect-num">02</div>
+          <h3>A code arrives by email</h3>
+          <p>A card number, right away. Keep the email - it is the card. Sending it to someone else is how you gift it.</p>
+        </div>
+        <div class="expect-item">
+          <div class="expect-num">03</div>
+          <h3>Use it when you book</h3>
+          <p>Paste the number into the package field on the booking form, or read it out at the studio. One session comes off and we show you what is left.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="container container-narrow">
+      <span class="eyebrow">The arithmetic</span>
+      <h2 class="sec-title">What a package actually saves</h2>
+      <div class="gold-rule"></div>
+      <p class="section-copy">A 60-minute Full Body Reset is $100 on its own. Buy several at once and the price per
+        session drops - the studio gets a booked calendar, you get the discount. That is the whole trade.</p>
+
+      <div class="pol-tbl-scroll">
+        <table class="pol-tbl">
+          <thead>
+            <tr><th>Package</th><th>Separately</th><th>Prepaid</th><th>Per session</th><th>You save</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>4 × 60 min</td><td>$400</td><td><strong>$360</strong></td><td>$90</td><td>$40</td></tr>
+            <tr><td>8 × 60 min</td><td>$800</td><td><strong>$710</strong></td><td>$88.75</td><td>$90</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="section-copy">Sessions stay good for 120 days on the 4-pack and 240 days on the 8-pack, counted from
+        the day of purchase. That is one session roughly every four weeks, with room to miss one - the rhythm Ivan
+        recommends and the reason the packages are sized this way. Your exact date is in the confirmation email.</p>
+    </div>
+  </section>
+
+  <section class="sec section-white">
+    <div class="container container-narrow">
+      <span class="eyebrow">Gift certificate</span>
+      <h2 class="sec-title">When you don't know what they'd pick</h2>
+      <div class="gold-rule"></div>
+      <p class="section-copy">Choose any amount from <strong>$25 to $1,000</strong>. It covers anything we do - a massage
+        with Ivan, a Russian manicure, a pedicure, or part of a larger visit. Nothing is locked to one service and
+        nothing is locked to one person: whoever holds the number can use it.</p>
+      <p class="section-copy">If you want a number that maps to something specific: <strong>$100</strong> is a
+        60-minute massage, <strong>$85</strong> is a Russian gel manicure with Anastasia, <strong>$190</strong> is a
+        manicure and pedicure done at the same time by two specialists. Spend less than the balance and the rest
+        simply stays on the card.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="container container-narrow">
+      <span class="eyebrow">Gift card FAQ</span>
+      <h2 class="sec-title">The questions people actually ask</h2>
+      <div class="gold-rule"></div>
+      <ul class="faq-list">
+        <li class="faq-item">
+          <button class="faq-q"><span>How does the gift card arrive?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">By email, usually within a minute of payment. It contains a card number that works for any service - massage or nails. Forward the email, print it, or just send the number.</div></div>
+        </li>
+        <li class="faq-item">
+          <button class="faq-q"><span>Does the gift card expire?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">No. There is no expiry date and no fees that eat into the balance. If only part of it is used, the rest stays on the card for next time.</div></div>
+        </li>
+        <li class="faq-item">
+          <button class="faq-q"><span>How do I use a package when I book?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">Book as usual and paste the card number into the package field on the booking form, or read it out at the studio. One session is deducted and the remaining balance is shown to you.</div></div>
+        </li>
+        <li class="faq-item">
+          <button class="faq-q"><span>Can a package be used for nails?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">Packages are massage sessions - 60-minute Full Body Reset with Ivan. For nails, a gift card is the right choice: it works for any service and any specialist.</div></div>
+        </li>
+        <li class="faq-item">
+          <button class="faq-q"><span>Can someone else use my package?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">Yes. Whoever has the card number can use the balance, so a package works as a gift too. Just tell us the name when booking so we know who is coming.</div></div>
+        </li>
+        <li class="faq-item">
+          <button class="faq-q"><span>How long do package sessions stay valid?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">120 days for the 4-session package and 240 days for the 8-session package, counted from the day you buy it. That is one session roughly every four weeks with room to miss one - the rhythm the packages are built around. The exact date is in your confirmation email.</div></div>
+        </li>
+        <li class="faq-item">
+          <button class="faq-q"><span>Can I check how many sessions are left?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">Yes. Enter the card number in the balance check above and it shows the sessions remaining and the date they are good through.</div></div>
+        </li>
+      </ul>
+
+      <div class="tc mt-12">
+        <p class="section-copy-narrow">Still deciding? Ask us - it takes a minute and costs nothing.</p>
+        <a href="https://wa.me/17542026666?text=Hi!%20I%20have%20a%20question%20about%20gift%20cards%20at%20View%20Spa." class="btn btn-gold" target="_blank" rel="noopener" data-track="whatsapp" data-wa-location="packages">Ask on WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
 </main>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="logo" aria-label="View Spa home">
+          <img src="img/logo-light.png" alt="View Spa" loading="lazy" width="120" height="46">
+        </a>
+        <p class="footer-tagline">"Gel that holds the way<br>it's supposed to."</p>
+        <p class="footer-meta">20200 W Dixie Hwy, STE 1105B · Aventura, FL</p>
+      </div>
+      <div>
+        <p class="footer-heading">Explore</p>
+        <div class="footer-links">
+          <a href="manicure.html">Russian Manicure &amp; Nails</a>
+          <a href="massage.html">Massage Therapy in Aventura</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="packages.html">Gift Cards</a>
+          <a href="index.html">Home</a>
+        </div>
+      </div>
+      <div>
+        <p class="footer-heading">Book</p>
+        <div class="footer-links">
+          <span>Mon-Sat: 9 AM - 8 PM</span>
+          <a href="tel:+17542026666">+1 (754) 202-6666</a>
+        </div>
+        <a href="booking.html" class="btn btn-gold btn-footer" data-track="booking">Book in 60 Seconds</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 <span class="brand-name">View Spa</span> - Aventura, Florida</span>
+      <span>Nailympia International Champion 2025 · Licensed Massage Therapist on site</span>
+      <a href="cancellation-policy.html" class="footer-sitemap-link">Cancellation Policy</a>
+      <a href="privacy-policy.html" class="footer-sitemap-link">Privacy Policy</a>
+      <a href="sitemap.xml" class="footer-sitemap-link">Sitemap</a>
+    </div>
+  </div>
+</footer>
 
 <script src="main.js" defer></script>
 <script src="packages.js" defer></script>
