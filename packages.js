@@ -271,6 +271,8 @@
           <div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>
           <button type="submit" class="btn btn-gold bk-submit">Pay ${money(baseCents)}</button>
           <p class="bk-sub bk-legal">Card details go straight to Square - we never see them.
+            Buying means accepting our
+            <a href="refund-policy.html" target="_blank" rel="noopener">refund policy</a>.
             <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy policy</a></p>
           <div class="bk-error" id="pay-err" hidden></div>
         </form>

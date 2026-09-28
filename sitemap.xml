@@ -408,6 +408,36 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/cancellation-policy"/>
   </url>
   <url>
+    <loc>https://viewspa.miami/refund-policy</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/refund-policy"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/ru/refund-policy</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/refund-policy"/>
+  </url>
+  <url>
+    <loc>https://viewspa.miami/es/refund-policy</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://viewspa.miami/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://viewspa.miami/ru/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://viewspa.miami/es/refund-policy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://viewspa.miami/refund-policy"/>
+  </url>
+  <url>
     <loc>https://viewspa.miami/ru/cancellation-policy</loc>
     <lastmod>2026-08-17</lastmod>
     <changefreq>yearly</changefreq>
