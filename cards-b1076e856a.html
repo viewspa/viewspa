@@ -457,6 +457,15 @@
   <div class="ad-scroll" data-tab="cards">
     <div id="ad-body"><p class="ad-msg">Введите ключ и нажмите «Показать».</p></div>
   </div>
+
+  <details class="ad-issue" data-tab="cards" id="ad-archive" hidden>
+    <summary id="arch-sum">Архив — потраченные карты</summary>
+    <div class="ad-rev-body">
+      <p class="ad-gaps-intro">Карты с нулевым балансом. Они никуда не делись и ищутся тем же поиском —
+        просто не мешают смотреть действующие. Если списали лишнее, кнопка возврата работает и здесь.</p>
+      <div class="ad-scroll"><div id="arch-body"></div></div>
+    </div>
+  </details>
 </div>
 
 <script>
@@ -533,11 +542,29 @@
     return out;
   }
 
+  // Потраченная карта — та, где ничего не осталось. Она не исчезает, а уходит
+  // в архив: в основной таблице от неё нет пользы, а искать её иногда нужно.
+  function isSpent(r) { return r.balanceCents === 0; }
+
   function render(list) {
-    if (!list.length) {
-      $('ad-body').innerHTML = '<p class="ad-msg">Ничего не найдено.</p>';
-      return;
+    var active = list.filter(function (r) { return !isSpent(r); });
+    var spent = list.filter(isSpent);
+
+    $('ad-body').innerHTML = active.length
+      ? tableHtml(active)
+      : '<p class="ad-msg">' + (list.length ? 'Действующих карт нет — все в архиве.' : 'Ничего не найдено.') + '</p>';
+
+    var arch = $('ad-archive');
+    arch.hidden = !spent.length;
+    if (spent.length) {
+      $('arch-sum').textContent = 'Архив — потраченные карты: ' + spent.length;
+      $('arch-body').innerHTML = tableHtml(spent);
+    } else {
+      $('arch-body').innerHTML = '';
     }
+  }
+
+  function tableHtml(list) {
     var html = '<table><thead><tr>' +
       '<th>Карта</th><th>Имя</th><th>Что</th><th>Осталось</th><th>Баланс</th>' +
       '<th>Действует до</th><th>Покупатель</th><th>Откуда</th><th>Куплена</th><th>Статус</th><th>Сеанс</th>' +
@@ -565,7 +592,7 @@
         '<td class="ad-act">' + actionButtons(r) + '</td>' +
         '</tr>';
     });
-    $('ad-body').innerHTML = html + '</tbody></table>';
+    return html + '</tbody></table>';
   }
 
   function applyFilter() {
@@ -699,7 +726,14 @@
     }
   }
 
-  $('ad-body').addEventListener('click', function (e) {
+  // Таблиц теперь две — действующие карты и архив. Обработчики вешаем на обе,
+  // иначе в архиве не переименовать карту и не отменить ошибочное списание.
+  function onCardsClick(id, fn) {
+    var el = $(id);
+    if (el) el.addEventListener('click', fn);
+  }
+
+  function cardNameClick(e) {
     var cell = e.target.closest('.ad-name');
     if (!cell || cell.querySelector('input')) return;
 
@@ -732,7 +766,10 @@
       else if (ev.key === 'Escape') { settled = true; applyFilter(); }
     });
     input.addEventListener('blur', commit);
-  });
+  }
+
+  onCardsClick('ad-body', cardNameClick);
+  onCardsClick('arch-body', cardNameClick);
 
 
 
@@ -1889,7 +1926,7 @@
     }
   }
 
-  $('ad-body').addEventListener('click', function (e) {
+  function cardActionClick(e) {
     var btn = e.target.closest('.ad-btn');
     if (!btn || btn.disabled) return;
     if (btn.dataset.act === 'mail') return mailCard(btn.dataset.gan, btn);
@@ -1897,7 +1934,10 @@
       return spendOp(btn.dataset.act, btn.dataset.gan, btn);
     }
     sessionOp(btn.dataset.act, btn.dataset.gan, btn);
-  });
+  }
+
+  onCardsClick('ad-body', cardActionClick);
+  onCardsClick('arch-body', cardActionClick);
 
   if ($('ad-secret').value) load();
 })();
