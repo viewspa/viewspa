@@ -499,15 +499,24 @@
     return '<span class="ad-tag ad-ok">активна</span>';
   }
 
-  // Списать и вернуть можно только там, где известна ставка за сеанс:
-  // иначе непонятно, сколько снимать. У сертификатов ставки нет.
+  // У пакета известна ставка за сеанс, поэтому списывается «сеанс».
+  // У сертификата ставки нет — там списывается сумма, которую вводят руками:
+  // человек пришёл на услугу за $85, её и снимаем.
   function actionButtons(r) {
     if (r.state !== 'ACTIVE') return '<span class="ad-act-no">—</span>';
     if (r.sessionsLeft == null) {
-      return r.buyerEmail
-        ? '<button class="ad-btn" data-act="mail" data-gan="' + esc(r.gan) +
-          '" title="Отправить клиенту код и инструкцию">✉</button><br>' + mailMark(r)
-        : '<span class="ad-act-no">нет почты</span>';
+      var out = '';
+      if (r.buyerEmail) {
+        out += '<button class="ad-btn" data-act="mail" data-gan="' + esc(r.gan) +
+               '" title="Отправить клиенту код и инструкцию">✉</button>';
+      }
+      out += '<button class="ad-btn ad-btn-minus" data-act="spend" data-gan="' + esc(r.gan) +
+             '" title="Списать сумму с сертификата"' +
+             (r.balanceCents > 0 ? '' : ' disabled') + '>− сумма</button>';
+      out += '<button class="ad-btn" data-act="refund" data-gan="' + esc(r.gan) +
+             '" title="Вернуть сумму на сертификат — отмена ошибочного списания">+ сумма</button>';
+      if (r.buyerEmail) out += '<br>' + mailMark(r);
+      return out;
     }
     var out = '';
     // Письмо шлём только туда, где есть адрес: без него кнопка бессмысленна.
@@ -1777,6 +1786,73 @@
     }
   }
 
+  // ── Списание суммы с сертификата ─────────────────────────────────
+  // Случай из жизни: человек пришёл по сертификату, но при записи его не
+  // указал — и списать нечем. Ставки за сеанс у сертификата нет, поэтому
+  // сумму вводим руками. Square из дашборда так не умеет: уменьшить баланс
+  // там можно только продажей.
+  var CERT_MAX_CENTS = 100000;   // потолок сертификата — тот же, что при покупке
+
+  async function spendOp(kind, gan, btn) {
+    var back = kind === 'refund';
+    var row = null;
+    for (var i = 0; i < rows.length; i++) if (rows[i].gan === gan) { row = rows[i]; break; }
+    if (!row) return;
+
+    var who = row.label || row.buyerName || row.buyerEmail || ('карта …' + row.last4);
+    var raw = window.prompt(
+      (back ? 'Сколько вернуть на сертификат?' : 'Сколько списать с сертификата?') + '\n\n' + who +
+      '\nНа карте сейчас: ' + money(row.balanceCents) +
+      (back
+        ? '\n\nВведите сумму в долларах — столько, сколько списали по ошибке.'
+        : '\n\nВведите сумму в долларах — столько, сколько стоила услуга.'), '');
+    if (raw === null) return;
+
+    var dollars = Number(String(raw).replace(',', '.').replace(/[^\d.]/g, ''));
+    if (!isFinite(dollars) || dollars <= 0) { showError('Сумма должна быть числом больше нуля.'); return; }
+
+    var cents = Math.round(dollars * 100);
+    if (!back && cents > row.balanceCents) {
+      showError('На карте только ' + money(row.balanceCents) + ' — списать больше нельзя.');
+      return;
+    }
+    // Возврат ничем не ограничен на стороне Square, поэтому держим потолок здесь:
+    // опечатка в один лишний ноль иначе положит на карту чужие деньги.
+    if (back && row.balanceCents + cents > CERT_MAX_CENTS) {
+      showError('После возврата на карте будет больше ' + money(CERT_MAX_CENTS) +
+                '. Похоже на опечатку — проверьте сумму.');
+      return;
+    }
+
+    var after = back ? row.balanceCents + cents : row.balanceCents - cents;
+    if (!window.confirm((back ? 'Вернуть ' : 'Списать ') + money(cents) + '?\n\n' + who +
+        '\nСейчас: ' + money(row.balanceCents) +
+        '\nСтанет: ' + money(after) +
+        (back ? '' : '\n\nЕсли ошибётесь — вернуть можно кнопкой «+ сумма».'))) return;
+
+    var all = document.querySelectorAll('.ad-btn');
+    for (var k = 0; k < all.length; k++) all[k].disabled = true;
+    var was = btn.textContent;
+    btn.textContent = '…';
+    showError('');
+
+    try {
+      var res = await fetch(API + '/api/admin/' + (back ? 'return-session' : 'redeem-session'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ gan: gan, sessions: 1, amountCents: cents }),
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(data.error || ('Не получилось (' + res.status + ')'));
+      btn.textContent = was;
+      await load();   // баланс перечитываем из Square, а не досчитываем на месте
+    } catch (err) {
+      btn.textContent = was;
+      for (var m = 0; m < all.length; m++) all[m].disabled = false;
+      showError(err.message);
+    }
+  }
+
   // Письмо клиенту: код, текущий остаток и инструкция. Не подтверждение
   // покупки - его повторная отправка читается как второе списание.
   async function mailCard(gan, btn) {
@@ -1817,6 +1893,9 @@
     var btn = e.target.closest('.ad-btn');
     if (!btn || btn.disabled) return;
     if (btn.dataset.act === 'mail') return mailCard(btn.dataset.gan, btn);
+    if (btn.dataset.act === 'spend' || btn.dataset.act === 'refund') {
+      return spendOp(btn.dataset.act, btn.dataset.gan, btn);
+    }
     sessionOp(btn.dataset.act, btn.dataset.gan, btn);
   });
 
