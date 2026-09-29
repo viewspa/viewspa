@@ -374,6 +374,11 @@
         <div id="rev-log"></div>
       </details>
 
+      <details class="ad-rev-log">
+        <summary id="rev-skip-sum">Не ушло — нет почты</summary>
+        <div id="rev-skip"></div>
+      </details>
+
     </div>
   </details>
 
@@ -1518,6 +1523,27 @@
       $('rev-log').innerHTML = lh + '</tbody></table>';
     } else {
       $('rev-log').innerHTML = '';
+    }
+
+    // Кому письмо не ушло: в карточке Square нет адреса почты. Это не сбой,
+    // а потерянный отзыв — по длине списка видно, сколько их накопилось.
+    var skip = d.skipped || [];
+    $('rev-skip-sum').textContent = skip.length
+      ? 'Не ушло — нет почты: ' + skip.length
+      : 'Не ушло — нет почты: таких пока нет';
+    if (skip.length) {
+      var sh = '<p class="ad-rev-empty">У этих людей в Square не записан адрес почты, поэтому ' +
+        'просьба об отзыве им не ушла. Если добавить адрес в карточку, в следующий раз письмо дойдёт.</p>' +
+        '<table><thead><tr><th>Когда</th><th>Клиент</th><th>Телефон</th><th>Услуга</th><th>Мастер</th><th>Откуда запись</th></tr></thead><tbody>';
+      skip.forEach(function (x) {
+        var src = SRC_LABELS.reduce(function (a, p) { return p[0] === x.source ? p[1] : a; }, x.source || '—');
+        sh += '<tr><td class="num">' + date(x.at) + '</td><td>' + esc(x.name || '—') +
+          '</td><td>' + esc(x.phone || '—') + '</td><td>' + esc(x.service || '—') +
+          '</td><td>' + esc(x.master || '—') + '</td><td>' + esc(src) + '</td></tr>';
+      });
+      $('rev-skip').innerHTML = sh + '</tbody></table>';
+    } else {
+      $('rev-skip').innerHTML = '';
     }
   }
 
