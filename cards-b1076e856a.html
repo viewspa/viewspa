@@ -369,6 +369,27 @@
         <button class="btn btn-gold" id="rev-send" type="button">Отправить сейчас</button>
       </div>
 
+      <div class="ad-rev-block" style="margin-top:18px;border-bottom:none;padding-bottom:0">
+        <span class="ad-rev-block-lbl">Прислать себе образец</span>
+        <div class="ad-wb-weeks">
+          <div class="ad-field" style="flex:1 1 240px">
+            <label for="rev-test-to">Адрес</label>
+            <input id="rev-test-to" type="email" placeholder="ваша почта" autocomplete="email">
+          </div>
+          <div class="ad-field">
+            <label for="rev-test-cat">После чего</label>
+            <select id="rev-test-cat">
+              <option value="nails">маникюра</option>
+              <option value="massage">массажа</option>
+            </select>
+          </div>
+          <button class="btn btn-dark" id="rev-test" type="button">Прислать</button>
+        </div>
+        <div class="ad-rev-block-hint">Уходит тем же путём, что и клиентам — с адреса студии.
+          Клиентам при этом ничего не отправляется.</div>
+        <div id="rev-test-out" class="ad-rev-hint"></div>
+      </div>
+
       <details class="ad-rev-log">
         <summary id="rev-log-sum">Отправленные письма</summary>
         <div id="rev-log"></div>
@@ -1617,6 +1638,33 @@
   }
 
   $('rev-refresh').addEventListener('click', function () { revLoad({}, this); });
+
+  // Образец письма себе. Отдельный запрос, а не revLoad: ответ у него другой
+  // и таблицу кандидатов он не трогает — клиентам при этом ничего не уходит.
+  $('rev-test').addEventListener('click', async function () {
+    var to = $('rev-test-to').value.trim();
+    var out = $('rev-test-out');
+    if (!to || to.indexOf('@') < 0) { out.textContent = 'Впишите адрес почты.'; return; }
+    var btn = this, was = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Отправляю…';
+    out.textContent = '';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ testTo: to, testCategory: $('rev-test-cat').value }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      out.textContent = d.testSent
+        ? 'Отправлено на ' + d.testTo + ' — проверьте почту.'
+        : 'Почта не приняла письмо. Проверьте адрес и настройки Resend.';
+    } catch (e) {
+      showError(e.message);
+    }
+    btn.disabled = false; btn.textContent = was;
+  });
 
   $('rev-block').addEventListener('change', function () {
     var name = this.options[this.selectedIndex].textContent;
