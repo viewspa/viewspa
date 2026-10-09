@@ -83,7 +83,27 @@
      им из двух мест, блоки начнут спорить друг с другом. */
   body[data-tab="cards"]   [data-tab]:not([data-tab="cards"]),
   body[data-tab="mail"]    [data-tab]:not([data-tab="mail"]),
-  body[data-tab="clients"] [data-tab]:not([data-tab="clients"]) { display: none !important; }
+  body[data-tab="clients"] [data-tab]:not([data-tab="clients"]),
+  body[data-tab="tv"]      [data-tab]:not([data-tab="tv"]) { display: none !important; }
+
+  /* Экран в студии. Панель живёт в своём воркере на tv.viewspa.miami и
+     встроена рамкой: переписывать её сюда значило бы завести вторую копию,
+     которая начнёт отставать от оригинала. Домен общий с админкой, поэтому
+     кука входа внутри рамки работает. */
+  .ad-tv { background: var(--white); border: 1px solid var(--border); border-radius: 8px;
+           margin-bottom: 16px; overflow: hidden; }
+  .ad-tv-head { padding: 12px 16px; border-bottom: 1px solid var(--border);
+                display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .ad-tv-head b { font-size: 15px; }
+  .ad-tv-head a { margin-left: auto; font-size: 13px; color: var(--gold-accessible);
+                  font-weight: 600; text-decoration: none; }
+  .ad-tv-head a:hover { text-decoration: underline; }
+  .ad-tv-frame { width: 100%; height: min(78vh, 920px); border: 0; display: block; background: var(--beige); }
+  .ad-tv-note { padding: 12px 16px; font-size: 13px; color: var(--mid); border-top: 1px solid var(--border); }
+  @media (max-width: 700px) {
+    /* На телефоне панель внутри рамки неудобна - честнее отправить в отдельную вкладку. */
+    .ad-tv-frame { display: none; }
+  }
 
   /* Откуда приходят записи */
   .src-n { text-align: right; white-space: nowrap; }
@@ -228,8 +248,20 @@
     <button type="button" class="ad-tab" data-tabgo="cards" role="tab" aria-selected="true">Карты и пакеты</button>
     <button type="button" class="ad-tab" data-tabgo="mail" role="tab" aria-selected="false">Письма</button>
     <button type="button" class="ad-tab" data-tabgo="clients" role="tab" aria-selected="false">Клиенты</button>
+    <button type="button" class="ad-tab" data-tabgo="tv" role="tab" aria-selected="false">Экран в студии</button>
   </div>
 
+  <!-- Панель экрана в студии. Рамка грузится не сразу, а при первом открытии
+       вкладки: иначе каждое открытие админки дёргало бы ТВ-воркер впустую. -->
+  <div class="ad-tv" data-tab="tv" id="ad-tv" hidden>
+    <div class="ad-tv-head">
+      <b>Экран в студии</b>
+      <a href="https://tv.viewspa.miami/admin" target="_blank" rel="noopener">Открыть отдельно ↗</a>
+    </div>
+    <iframe class="ad-tv-frame" id="ad-tv-frame" title="Панель управления экраном в студии"
+            referrerpolicy="no-referrer" loading="lazy"></iframe>
+    <p class="ad-tv-note">Вход по ключу ТВ-панели — он свой, не от этой страницы. На телефоне панель открывается отдельной вкладкой по ссылке выше.</p>
+  </div>
 
   <details class="ad-issue" data-tab="cards" id="ad-pkg" hidden open>
     <summary>Записаны, и у них есть пакет</summary>
@@ -663,6 +695,7 @@
       $('ad-hist').hidden = false;
       $('ad-src').hidden = false;
       $('ad-wb').hidden = false;
+      $('ad-tv').hidden = false;
       wbLoad({}, null);
       revLoad({}, null);
       if (!$('iss-pkg').options.length) loadPackages();
@@ -1065,7 +1098,11 @@
   // по трём темам: карты, письма, клиенты. Выбор запоминается - при
   // следующем открытии страница встречает тем же разделом.
   (function () {
-    var TABS = ['cards', 'mail', 'clients'];
+    var TABS = ['cards', 'mail', 'clients', 'tv'];
+    // Адрес обязательно на tv.viewspa.miami, а не на workers.dev: кука входа
+    // в ТВ-панель помечена SameSite=Lax и внутри рамки уйдёт только тогда,
+    // когда рамка и страница на одном домене.
+    var TV_SRC = 'https://tv.viewspa.miami/admin';
     var saved;
     try { saved = localStorage.getItem('ad-tab'); } catch (e) { saved = null; }
     var current = TABS.indexOf(saved) >= 0 ? saved : 'cards';
@@ -1074,6 +1111,11 @@
       if (TABS.indexOf(tab) < 0) return;
       current = tab;
       document.body.setAttribute('data-tab', tab);
+      // Грузим рамку один раз и только когда она понадобилась.
+      if (tab === 'tv') {
+        var fr = document.getElementById('ad-tv-frame');
+        if (fr && !fr.getAttribute('src')) fr.setAttribute('src', TV_SRC);
+      }
       var btns = document.querySelectorAll('[data-tabgo]');
       for (var i = 0; i < btns.length; i++) {
         btns[i].setAttribute('aria-selected', btns[i].getAttribute('data-tabgo') === tab ? 'true' : 'false');
