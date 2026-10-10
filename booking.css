@@ -305,6 +305,21 @@
 .bk-done-addon-warn { color: #a33; font-size: 13px; }
 
 /* согласие с правилами отмены — обязательная галочка перед подтверждением */
+/* Текст согласия - предложение, а не подпись поля. Без этого сброса он
+   наследует от .bk-form label капс, жирность и разрядку, и шесть строк
+   про «50% и полную стоимость» кричат на человека ровно в тот момент,
+   когда он решает нажать «Confirm booking». Тот же сброс уже сделан
+   для .bk-hint - здесь просто не был доведён. */
+.bk-agree span {
+  text-transform: none;
+  font-weight: 400;
+  letter-spacing: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5d5a52;
+}
+.bk-agree span a { color: var(--gold-accessible); }
+
 .bk-agree {
   display: flex;
   align-items: flex-start;
