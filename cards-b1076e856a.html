@@ -166,6 +166,35 @@
     padding: 10px 12px; margin-top: 14px; font-size: 13px; color: #8a4a24; line-height: 1.5; }
   .ad-gaps-top { font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--border); }
   .ad-gaps-top:last-child { border-bottom: none; }
+
+  /* Карточка клиента: шапка с данными и меткой «отменял поздно».
+     Метка ничего не запрещает — она лишь добавляет предупреждение
+     в письмо о новой записи, чтобы владелец успел позвонить. */
+  .cl-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px;
+             margin-top: 14px; background: var(--white); }
+  .cl-card.flagged { border-color: #e0b4a8; background: #fdf8f6; }
+  .cl-top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .cl-name { font-size: 16px; font-weight: 700; margin: 0; }
+  .cl-contact { font-size: 13px; color: var(--mid); }
+  .cl-contact a { color: var(--gold-accessible); text-decoration: none; }
+  .cl-contact a:hover { text-decoration: underline; }
+  .cl-badge { font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
+              background: #c0392b; color: #fff; border-radius: 999px; padding: 3px 9px; }
+
+  /* Счётчики: тревожные выделены цветом, остальные спокойные. */
+  .cl-nums { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+  .cl-num { background: var(--beige); border-radius: 7px; padding: 7px 11px; font-size: 13px;
+            color: var(--mid); white-space: nowrap; }
+  .cl-num b { display: block; font-size: 18px; color: var(--dark); font-variant-numeric: tabular-nums; }
+  .cl-num.bad { background: #fdf3f3; color: #8a4a3a; }
+  .cl-num.bad b { color: #c0392b; }
+
+  .cl-act { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px;
+            padding-top: 12px; border-top: 1px dashed var(--border); flex-wrap: wrap; }
+  .cl-act input[type="text"] { flex: 1 1 220px; min-width: 0; padding: 9px 11px;
+    border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 14px; }
+  .cl-act .btn { flex: none; }
+  .cl-flagline { font-size: 13px; color: #8a4a3a; margin: 10px 0 0; }
   .ad-gaps-top span { color: var(--mid); font-size: 12px; }
   .ad-gaps-pick { background: rgba(39,174,96,.09); border: 1px solid rgba(39,174,96,.3); border-radius: 6px; padding: 10px 12px; margin-top: 12px; font-size: 14px; }
 
@@ -1029,37 +1058,83 @@
     });
   }
 
+  // Откуда пришла запись - словами, а не кодом Square.
+  var HIST_SOURCE = {
+    API: 'сайт',
+    THIRD_PARTY_BUYER: 'Google Карты',
+    FIRST_PARTY_BUYER: 'страница Square',
+    FIRST_PARTY_MERCHANT: 'вручную',
+  };
+
+  // Плитка со счётчиком. Тревожные подсвечиваем только когда они не ноль:
+  // у нормального клиента карточка должна выглядеть спокойно.
+  function clNum(label, value, bad) {
+    return '<span class="cl-num' + (bad && value > 0 ? ' bad' : '') + '"><b>' +
+      value + '</b>' + label + '</span>';
+  }
+
   function histPerson(p) {
+    var f = p.flag;
     var head =
-      '<p class="ad-gaps-note"><b>' + esc(p.name) + '</b>' +
-      (p.email ? ' · ' + esc(p.email) : '') +
-      (p.phone ? ' · ' + esc(p.phone) : '') +
-      '<br>Записей: ' + p.total +
-      ' · пришёл: ' + p.kept +
-      ' · отменено: ' + p.cancelled +
-      ' · не пришёл: ' + p.noShow +
-      '<br>Из отмен позже чем за сутки: <b>' + p.lateUnder24h + '</b>' +
-      ', позже чем за час: <b>' + p.lateUnder1h + '</b>' +
-      (p.truncated ? '<br><b>Записей больше, чем помещается за один проход — показана часть.</b>' : '') +
-      '</p>';
+      '<div class="cl-top">' +
+        '<p class="cl-name">' + esc(p.name) + '</p>' +
+        (f ? '<span class="cl-badge">отменял поздно</span>' : '') +
+      '</div>' +
+      '<p class="cl-contact">' +
+        (p.phone ? '<a href="tel:' + esc(p.phone) + '">' + esc(p.phone) + '</a>' : 'телефона нет') +
+        ' · ' +
+        (p.email ? '<a href="mailto:' + esc(p.email) + '">' + esc(p.email) + '</a>' : 'почты нет') +
+        (p.createdAt ? ' · у вас с ' + histWhen(p.createdAt) : '') +
+      '</p>' +
+      '<div class="cl-nums">' +
+        clNum(' записей', p.total) +
+        clNum(' пришёл', p.kept) +
+        clNum(' отменил', p.cancelled, true) +
+        clNum(' не пришёл', p.noShow, true) +
+        clNum(' позже суток', p.lateUnder24h, true) +
+        clNum(' позже часа', p.lateUnder1h, true) +
+      '</div>' +
+      (f ? '<p class="cl-flagline"><b>Отмечен ' + histWhen(f.at) + '.</b>' +
+           (f.note ? ' ' + esc(f.note) : '') +
+           '<br>При новой записи придёт письмо с предупреждением. Клиент этого не видит.</p>' : '') +
+      (p.truncated ? '<p class="ad-gaps-note">Записей больше, чем помещается за один проход — показана часть.</p>' : '');
 
-    if (!p.bookings.length) return head + '<p class="ad-gaps-note">Записей за этот срок нет.</p>';
+    // id клиента кладём в data-: обработчик один на все карточки сразу.
+    var act =
+      '<div class="cl-act">' +
+        (f ? '' : '<input type="text" class="cl-note" placeholder="Коротко: что случилось (необязательно)" maxlength="200">') +
+        '<button type="button" class="btn ' + (f ? 'btn-dark' : 'btn-gold') + ' cl-flag"' +
+          ' data-id="' + esc(p.id) + '" data-on="' + (f ? '0' : '1') + '">' +
+          (f ? 'Снять метку' : 'Отметить: отменял поздно') +
+        '</button>' +
+      '</div>';
 
-    var rows = p.bookings.map(function (b) {
-      var s = HIST_STATUS[b.status] || [b.status || '—', 'ad-warn'];
-      return '<tr>' +
-        '<td>' + histWhen(b.start) + '</td>' +
-        '<td><span class="ad-tag ' + s[1] + '">' + esc(s[0]) + '</span></td>' +
-        '<td>' + esc(b.master || '—') + '</td>' +
-        '<td>' + (b.minutes != null ? b.minutes + ' мин' : '—') + '</td>' +
-        '<td>' + histNotice(b.noticeMinutes) + '</td>' +
-        '</tr>';
-    }).join('');
+    var table;
+    if (!p.bookings.length) {
+      table = '<p class="ad-gaps-note">Записей за этот срок нет.</p>';
+    } else {
+      var rows = p.bookings.map(function (b) {
+        var s = HIST_STATUS[b.status] || [b.status || '—', 'ad-warn'];
+        return '<tr>' +
+          '<td>' + histWhen(b.start) + '</td>' +
+          '<td><span class="ad-tag ' + s[1] + '">' + esc(s[0]) + '</span></td>' +
+          '<td>' + esc(b.master || '—') + '</td>' +
+          '<td>' + (b.minutes != null ? b.minutes + ' мин' : '—') + '</td>' +
+          '<td>' + histNotice(b.noticeMinutes) + '</td>' +
+          '<td>' + (b.editedAt ? 'меняли ' + histWhen(b.editedAt) : '—') + '</td>' +
+          '<td>' + (HIST_SOURCE[b.source] || '—') + '</td>' +
+          '</tr>';
+      }).join('');
+      table =
+        '<div class="ad-scroll"><table><thead><tr>' +
+        '<th>Когда</th><th>Чем кончилось</th><th>Мастер</th><th>Длит.</th>' +
+        '<th>Предупредил</th><th>Правки</th><th>Откуда</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+        '<p class="ad-gaps-note-in">«Правки» — запись меняли после создания. Square не сообщает, ' +
+        'что именно изменилось и кто это сделал: сдвинуть время мог и клиент, и мастер.</p>';
+    }
 
-    return head +
-      '<div class="ad-scroll"><table><thead><tr>' +
-      '<th>Когда</th><th>Чем кончилось</th><th>Мастер</th><th>Длит.</th><th>Предупредил</th>' +
-      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+    return '<div class="cl-card' + (f ? ' flagged' : '') + '">' + head + act + table + '</div>';
   }
 
   $('hist-load').addEventListener('click', async function () {
@@ -1089,6 +1164,35 @@
       showError(e.message);
     }
     btn.disabled = false; btn.textContent = was;
+  });
+
+  // Метка «отменял поздно». Обработчик один на все карточки: они
+  // перерисовываются при каждом поиске, и вешать слушатель на каждую
+  // кнопку значило бы плодить их при повторных запросах.
+  $('hist-out').addEventListener('click', async function (e) {
+    var b = e.target.closest ? e.target.closest('.cl-flag') : null;
+    if (!b) return;
+    var card = b.closest('.cl-card');
+    var noteEl = card ? card.querySelector('.cl-note') : null;
+    var on = b.dataset.on === '1';
+    var was = b.textContent;
+    b.disabled = true; b.textContent = 'Сохраняю…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/client-flag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ customerId: b.dataset.id, on: on, note: noteEl ? noteEl.value.trim() : '' }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      // Перечитываем по той же строке поиска: карточка перерисуется
+      // с настоящим состоянием из базы, а не с нарисованным на глаз.
+      $('hist-load').click();
+    } catch (err) {
+      showError(err.message);
+      b.disabled = false; b.textContent = was;
+    }
   });
 
 
