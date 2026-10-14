@@ -773,6 +773,15 @@
     } catch (e2) {
       // Капча одноразовая - после ошибки берём свежий токен, иначе повтор «протухнет».
       resetTurnstile();
+
+      // Воркер может вернуть не текст, а разбор: это время не подходит,
+      // вот подходящие. Показываем их кнопками, чтобы человек не искал заново.
+      const compact = parseCompact(e2.message);
+      if (compact) {
+        renderCompactChoice(compact);
+        return;
+      }
+
       const spam = /turnstile|spam check/i.test(e2.message || '');
       err.textContent = spam
         ? 'Couldn’t verify you’re human. Please tap Confirm to try again - or call/WhatsApp us and we’ll book you in.'
@@ -780,6 +789,48 @@
       err.hidden = false;
       btn.disabled = false; btn.textContent = 'Confirm booking';
     }
+  }
+
+  /** Ответ «нужно другое время» приходит разбором внутри сообщения об ошибке. */
+  function parseCompact(msg) {
+    if (!msg || msg.indexOf('needs_compact_slot') < 0) return null;
+    try {
+      const d = JSON.parse(msg);
+      return d && d.code === 'needs_compact_slot' && Array.isArray(d.times) ? d : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /**
+   * Экран «выберите из этих окон».
+   * Говорим правду: время не занято, оно требует подтверждения с нашей
+   * стороны. Писать «уже занято» нельзя - человек может видеть его
+   * свободным в соседней вкладке, и это поймают.
+   */
+  function renderCompactChoice(d) {
+    const times = d.times.map((t) => `
+      <button type="button" class="bk-slot" data-compact="${t}">
+        <span>${timeLabel(t)}</span>
+        <span class="bk-slot-who">${dayLabel(t)}</span>
+      </button>`).join('');
+
+    shell('Let’s pick another time', d.message,
+      times
+        ? `<div class="bk-slots">${times}</div>
+           <p class="bk-sub" style="margin-top:18px">Or call <a href="tel:+17542026666">(754) 202-6666</a> and we’ll set it up.</p>`
+        : `<p class="bk-sub">Please call <a href="tel:+17542026666">(754) 202-6666</a> and we’ll find a time together.</p>`,
+      { back: true, eyebrow: 'Online booking' });
+
+    const root2 = document.getElementById('booking-app');
+    root2.addEventListener('click', (ev) => {
+      const b = ev.target.closest && ev.target.closest('[data-compact]');
+      if (!b) return;
+      // Возвращаемся к форме с уже выбранным новым временем: всё,
+      // что человек ввёл, сохранено в state и подставится заново.
+      state.slot = Object.assign({}, state.slot, { startAt: b.dataset.compact });
+      renderDetails();
+    }, { once: true });
   }
 
   function renderDone(res) {
