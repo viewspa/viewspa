@@ -330,6 +330,22 @@
     </div>
   </details>
 
+  <details class="ad-issue" data-tab="clients" id="ad-trouble" hidden>
+    <summary>Кто отменял и переносил</summary>
+    <div class="ad-rev-body">
+      <p class="ad-gaps-intro">Все отмены, неявки и переносы за период, сгруппированные по людям.
+      Сверху те, с кем проблем больше. Отсюда же можно поставить метку. Ничего не отправляет.</p>
+      <div class="ad-wb-weeks">
+        <div class="ad-field">
+          <label for="trb-months">Период, месяцев</label>
+          <input id="trb-months" type="number" min="1" max="24" step="1" value="3">
+        </div>
+      </div>
+      <button class="btn btn-dark" id="trb-load" type="button">Показать</button>
+      <div id="trb-out"></div>
+    </div>
+  </details>
+
   <details class="ad-issue" data-tab="clients" id="ad-hist" hidden>
     <summary>История записей клиента</summary>
     <div class="ad-rev-body">
@@ -722,6 +738,7 @@
       $('ad-pkg').hidden = false;
       $('ad-gaps').hidden = false;
       $('ad-hist').hidden = false;
+      $('ad-trouble').hidden = false;
       $('ad-src').hidden = false;
       $('ad-wb').hidden = false;
       $('ad-tv').hidden = false;
@@ -1166,10 +1183,84 @@
     btn.disabled = false; btn.textContent = was;
   });
 
+  // ── Кто отменял и переносил ──────────────────────────────────────
+  // Поиск по имени отвечает «что с этим клиентом». Этот список отвечает
+  // «на кого вообще смотреть»: фамилии тех, кто отменял три месяца назад,
+  // в голове не держатся.
+  function troublePerson(p) {
+    var f = p.flag;
+    var rows = p.events.map(function (e) {
+      var s = HIST_STATUS[e.status] || [e.status || '—', 'ad-warn'];
+      return '<tr>' +
+        '<td>' + histWhen(e.start) + '</td>' +
+        '<td><span class="ad-tag ' + (e.kind === 'edit' ? 'ad-warn' : s[1]) + '">' +
+          (e.kind === 'edit' ? 'перенесли' : esc(s[0])) + '</span></td>' +
+        '<td>' + esc(e.master || '—') + '</td>' +
+        '<td>' + (e.kind === 'cancel' ? histNotice(e.noticeMinutes) : '—') + '</td>' +
+        '<td>' + (HIST_SOURCE[e.source] || '—') + '</td>' +
+        '</tr>';
+    }).join('');
+
+    return '<div class="cl-card' + (f ? ' flagged' : '') + '">' +
+      '<div class="cl-top">' +
+        '<p class="cl-name">' + esc(p.name) + '</p>' +
+        (f ? '<span class="cl-badge">отменял поздно</span>' : '') +
+      '</div>' +
+      '<p class="cl-contact">' +
+        (p.phone ? '<a href="tel:' + esc(p.phone) + '">' + esc(p.phone) + '</a>' : 'телефона нет') +
+        ' · ' +
+        (p.email ? '<a href="mailto:' + esc(p.email) + '">' + esc(p.email) + '</a>' : 'почты нет') +
+      '</p>' +
+      '<div class="cl-nums">' +
+        clNum(' отменил', p.cancelled, true) +
+        clNum(' не пришёл', p.noShow, true) +
+        clNum(' перенёс', p.edited) +
+        clNum(' позже суток', p.lateUnder24h, true) +
+        clNum(' позже часа', p.lateUnder1h, true) +
+      '</div>' +
+      '<div class="cl-act">' +
+        (f ? '' : '<input type="text" class="cl-note" placeholder="Коротко: что случилось (необязательно)" maxlength="200">') +
+        '<button type="button" class="btn ' + (f ? 'btn-dark' : 'btn-gold') + ' cl-flag"' +
+          ' data-id="' + esc(p.id) + '" data-on="' + (f ? '0' : '1') + '" data-from="trb">' +
+          (f ? 'Снять метку' : 'Отметить: отменял поздно') +
+        '</button>' +
+      '</div>' +
+      '<div class="ad-scroll"><table><thead><tr>' +
+      '<th>Когда</th><th>Что было</th><th>Мастер</th><th>Предупредил</th><th>Откуда</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '</div>';
+  }
+
+  $('trb-load').addEventListener('click', async function () {
+    var btn = this, was = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Считаю…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/trouble-list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ months: Number($('trb-months').value) || 3 }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      $('trb-out').innerHTML = d.found
+        ? '<p class="ad-gaps-note">Людей с отменами или переносами: <b>' + d.found + '</b>. ' +
+          'Просмотрено записей: ' + d.scanned + ' за ' + d.monthsBack + ' мес.</p>' +
+          d.people.map(troublePerson).join('')
+        : '<p class="ad-gaps-note">За ' + d.monthsBack + ' мес. ни одной отмены и ни одного переноса. ' +
+          'Просмотрено записей: ' + d.scanned + '.</p>';
+    } catch (e) {
+      showError(e.message);
+    }
+    btn.disabled = false; btn.textContent = was;
+  });
+
   // Метка «отменял поздно». Обработчик один на все карточки: они
   // перерисовываются при каждом поиске, и вешать слушатель на каждую
   // кнопку значило бы плодить их при повторных запросах.
-  $('hist-out').addEventListener('click', async function (e) {
+  // Один обработчик на оба списка: карточки перерисовываются при каждом
+  // запросе, и вешать слушатель на каждую кнопку значило бы плодить их.
+  document.addEventListener('click', async function (e) {
     var b = e.target.closest ? e.target.closest('.cl-flag') : null;
     if (!b) return;
     var card = b.closest('.cl-card');
@@ -1186,9 +1277,9 @@
       });
       var d = await res.json().catch(function () { return {}; });
       if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
-      // Перечитываем по той же строке поиска: карточка перерисуется
+      // Перечитываем тот список, из которого нажали: карточка перерисуется
       // с настоящим состоянием из базы, а не с нарисованным на глаз.
-      $('hist-load').click();
+      $(b.dataset.from === 'trb' ? 'trb-load' : 'hist-load').click();
     } catch (err) {
       showError(err.message);
       b.disabled = false; b.textContent = was;
