@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a massage with Ivan | View Spa</title>
+<!-- Короткая ссылка для профиля в Instagram: viewspa.miami/ivan
+     Ведёт сразу к Ивану на Full Body Reset (60 минут), минуя выбор
+     «массаж или ногти» и выбор услуги. Источник зашит в адрес перехода:
+     браузер Instagram часто не передаёт, откуда пришёл человек, и запись
+     из профиля уходила бы в «прямой заход». Страница в поиск не попадает
+     и счётчик не грузит. -->
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0; url=booking.html?service=full-body-reset&amp;master=ivan&amp;utm_source=instagram&amp;utm_medium=bio_ivan&amp;utm_campaign=profile">
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         font-family: -apple-system, "Segoe UI", sans-serif; background: #faf9f5; color: #1e1e1e; }
+  a { color: #8a6d1f; }
+</style>
+</head>
+<body>
+<p>Opening booking&hellip; <a href="booking.html?service=full-body-reset&amp;master=ivan&amp;utm_source=instagram&amp;utm_medium=bio_ivan&amp;utm_campaign=profile">Tap here if nothing happens</a></p>
+<script>
+  // replace не оставляет эту страницу в истории, и «назад» не возвращает
+  // в пустую заглушку. Приписанные к ссылке параметры переносим дальше,
+  // свои метки остаются главными.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var t = new URLSearchParams({
+      service: 'full-body-reset', master: 'ivan',
+      utm_source: 'instagram', utm_medium: 'bio_ivan', utm_campaign: 'profile'
+    });
+    q.forEach(function (v, k) { if (!t.has(k)) t.set(k, v); });
+    location.replace('booking.html?' + t.toString());
+  })();
+</script>
+</body>
+</html>
