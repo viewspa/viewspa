@@ -24,7 +24,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <link rel="stylesheet" href="booking.css">
 <style>
@@ -75,18 +75,37 @@
       "@id": "https://viewspa.miami/packages#faq",
       "inLanguage": "en",
       "mainEntity": [
-        {"@type": "Question", "name": "How does the gift card arrive?", "acceptedAnswer": {"@type": "Answer", "text": "By email, usually within a minute of payment. It contains a card number that works for any service - massage or nails. Forward the email, print it, or just send the number."}},
+        {"@type": "Question", "name": "How does the gift card arrive?", "acceptedAnswer": {"@type": "Answer", "text": "By email, usually within a minute of payment. It contains a card number that works for any service - massage or nails, with any of us - and a link to the certificate itself, in the design you picked. Print it, save it as a PDF, or just send the link."}},
         {"@type": "Question", "name": "Does the gift card expire?", "acceptedAnswer": {"@type": "Answer", "text": "No. There is no expiry date and no fees that eat into the balance. If only part of it is used, the rest stays on the card for next time."}},
         {"@type": "Question", "name": "How do I use a package when I book?", "acceptedAnswer": {"@type": "Answer", "text": "Book as usual and paste the card number into the package field on the booking form, or read it out at the studio. One session is deducted and the remaining balance is shown to you."}},
         {"@type": "Question", "name": "Can a package be used for nails?", "acceptedAnswer": {"@type": "Answer", "text": "Packages are massage sessions - 60-minute Full Body Reset with Ivan. For nails, a gift card is the right choice: it works for any service and any specialist."}},
-        {"@type": "Question", "name": "Can someone else use my package?", "acceptedAnswer": {"@type": "Answer", "text": "No - a package belongs to the person named on it, and only they can use the sessions. Buying one as a gift is easy: enter that person's name in the Full name field at checkout and the package is theirs from the start. If you would rather leave the choice open, a gift card suits better - it works for whoever holds the number."}},
-        {"@type": "Question", "name": "How long do package sessions stay valid?", "acceptedAnswer": {"@type": "Answer", "text": "120 days for the 4-session package and 240 days for the 8-session package, counted from the day you buy it. That is one session roughly every four weeks with room to miss one - the rhythm the packages are built around. The exact date is in your confirmation email."}},
-        {"@type": "Question", "name": "Can I check how many sessions are left?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Enter the card number in the balance check on this page and it shows the sessions remaining and the date they are good through."}}
+        {"@type": "Question", "name": "Can someone else use my package?", "acceptedAnswer": {"@type": "Answer", "text": "No - a package belongs to the person named on it, and only they can use the sessions. Buying one as a gift is easy: write that person's name in the For field on the card and the package is theirs from the start. Your own details stay in the contact fields below it - that is where the email and the receipt go. If you would rather leave the choice open, a gift card suits better: it works for whoever holds the number."}},
+        {"@type": "Question", "name": "Do package sessions expire?", "acceptedAnswer": {"@type": "Answer", "text": "No. There is no expiry date on a package - the sessions stay yours until you use them. What the package is built around is a rhythm: a session at least once every four weeks. That is Ivan's recommendation, not a deadline, and we will remind you when it has been a while."}},
+        {"@type": "Question", "name": "Can I check how many sessions are left?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Enter the card number in the balance check on this page and it shows how many sessions are left."}}
       ]
     }
   ]
 }
 </script>
+
+<link rel="stylesheet" href="gift-card.css">
+
+<style>
+  /* Сезонная полоса к праздникам. Тёмная с золотом — как подарочная
+     карточка в письме, чтобы страница и подарок читались как одно. */
+  .season { background: #1a1713; color: #fbf9f5; padding: 26px 0 28px; }
+  .season-kicker { margin: 0 0 10px; font-size: 11px; letter-spacing: 3px;
+    text-transform: uppercase; color: #c9a84c; }
+  .season-lead { margin: 0 0 18px; font-size: 17px; line-height: 1.5; max-width: 54ch; }
+  .season-amounts { list-style: none; margin: 0 0 14px; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px 22px; }
+  .season-amounts li { display: flex; align-items: baseline; gap: 10px;
+    border-top: 1px solid rgba(201,168,76,.3); padding-top: 9px; }
+  .season-amounts b { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 27px;
+    color: #c9a84c; font-variant-numeric: tabular-nums; flex: none; }
+  .season-amounts span { font-size: 14px; line-height: 1.4; color: rgba(251,249,245,.8); }
+  .season-note { margin: 0; font-size: 13px; color: rgba(251,249,245,.55); }
+</style>
 </head>
 <body>
 
@@ -113,6 +132,25 @@
 </header>
 
 <main id="main-content">
+
+  <!-- Сезонная полоса. Показывается сама с 15 ноября по 31 декабря и так же
+       сама исчезает: про неё не придётся вспоминать в январе. Скрыта по
+       умолчанию, поэтому вне сезона её не видно и без скриптов. -->
+  <div class="season" id="season" hidden>
+    <div class="container container-narrow">
+      <p class="season-kicker">Holiday gifting</p>
+      <p class="season-lead">Arrives by email in about a minute — even on December 24th.
+        No shipping, nothing to wrap, nothing to lose.</p>
+      <ul class="season-amounts">
+        <li><b>$95</b><span>Russian manicure, or a Smart gel pedicure</span></li>
+        <li><b>$100</b><span>60-minute therapeutic massage</span></li>
+        <li><b>$190</b><span>Manicure and pedicure together</span></li>
+        <li><b>$235</b><span>90-minute massage and a gel manicure</span></li>
+      </ul>
+      <p class="season-note">Any amount from $25 works — these are just the ones that land
+        exactly on a service.</p>
+    </div>
+  </div>
 
   <section class="sec">
     <div class="container container-narrow tc">
@@ -169,7 +207,7 @@
         <div class="expect-item">
           <div class="expect-num">02</div>
           <h3>A code arrives by email</h3>
-          <p>A card number, right away. Keep the email - it is what you show when booking. A package belongs to the name entered at checkout, so if it is a gift, put their name there.</p>
+          <p>A card number, right away, plus a link to the card itself - print it, save it as a PDF, or send the link. Buying it for someone? Write their name in the <strong>For</strong> field on the card and the sessions are theirs.</p>
         </div>
         <div class="expect-item">
           <div class="expect-num">03</div>
@@ -200,9 +238,9 @@
         </table>
       </div>
 
-      <p class="section-copy">Sessions stay good for 120 days on the 4-pack and 240 days on the 8-pack, counted from
-        the day of purchase. That is one session roughly every four weeks, with room to miss one - the rhythm Ivan
-        recommends and the reason the packages are sized this way. Your exact date is in the confirmation email.</p>
+      <p class="section-copy">Sessions never expire - there is no date to race. What the packages are built around is a
+        rhythm: a session at least once every four weeks, which is what Ivan recommends and the reason they are sized
+        this way. Fall behind and nothing is lost; we will just nudge you when it has been a while.</p>
     </div>
   </section>
 
@@ -230,7 +268,7 @@
       <ul class="faq-list">
         <li class="faq-item">
           <button class="faq-q"><span>How does the gift card arrive?</span><span class="faq-icon"></span></button>
-          <div class="faq-body"><div class="faq-body-inner">By email, usually within a minute of payment. It contains a card number that works for any service - massage or nails. Forward the email, print it, or just send the number.</div></div>
+          <div class="faq-body"><div class="faq-body-inner">By email, usually within a minute of payment. It contains a card number that works for any service - massage or nails, with any of us - and a link to the certificate itself, in the design you picked. Print it, save it as a PDF, or just send the link.</div></div>
         </li>
         <li class="faq-item">
           <button class="faq-q"><span>Does the gift card expire?</span><span class="faq-icon"></span></button>
@@ -246,15 +284,15 @@
         </li>
         <li class="faq-item">
           <button class="faq-q"><span>Can someone else use my package?</span><span class="faq-icon"></span></button>
-          <div class="faq-body"><div class="faq-body-inner">No - a package belongs to the person named on it, and only they can use the sessions. Buying one as a gift is easy: enter that person's name in the <strong>Full name</strong> field at checkout and the package is theirs from the start. If you would rather leave the choice open, a gift card suits better - it works for whoever holds the number.</div></div>
+          <div class="faq-body"><div class="faq-body-inner">No - a package belongs to the person named on it, and only they can use the sessions. Buying one as a gift is easy: write that person's name in the <strong>For</strong> field on the card and the package is theirs from the start. Your own details stay in the contact fields below it - that is where the email and the receipt go. If you would rather leave the choice open, a gift card suits better: it works for whoever holds the number.</div></div>
         </li>
         <li class="faq-item">
-          <button class="faq-q"><span>How long do package sessions stay valid?</span><span class="faq-icon"></span></button>
-          <div class="faq-body"><div class="faq-body-inner">120 days for the 4-session package and 240 days for the 8-session package, counted from the day you buy it. That is one session roughly every four weeks with room to miss one - the rhythm the packages are built around. The exact date is in your confirmation email.</div></div>
+          <button class="faq-q"><span>Do package sessions expire?</span><span class="faq-icon"></span></button>
+          <div class="faq-body"><div class="faq-body-inner">No. There is no expiry date on a package - the sessions stay yours until you use them. What the package is built around is a rhythm: a session at least once every four weeks. That is Ivan's recommendation, not a deadline, and we will remind you when it has been a while.</div></div>
         </li>
         <li class="faq-item">
           <button class="faq-q"><span>Can I check how many sessions are left?</span><span class="faq-icon"></span></button>
-          <div class="faq-body"><div class="faq-body-inner">Yes. Enter the card number in the balance check above and it shows the sessions remaining and the date they are good through.</div></div>
+          <div class="faq-body"><div class="faq-body-inner">Yes. Enter the card number in the balance check above and it shows how many sessions are left.</div></div>
         </li>
       </ul>
 
@@ -307,6 +345,23 @@
   </div>
 </footer>
 
+<script>
+  // Сезонная полоса включается и выключается сама. Даты считаем по
+  // местному времени посетителя: ошибка в несколько часов тут не важна,
+  // зато не надо помнить, что в январе её пора убрать.
+  (function () {
+    var SHOW_FROM = [10, 15];   // 15 ноября (месяцы с нуля)
+    var SHOW_TO = [11, 31];     // 31 декабря включительно
+    var now = new Date();
+    var m = now.getMonth(), d = now.getDate();
+    var after = m > SHOW_FROM[0] || (m === SHOW_FROM[0] && d >= SHOW_FROM[1]);
+    var before = m < SHOW_TO[0] || (m === SHOW_TO[0] && d <= SHOW_TO[1]);
+    if (after && before) {
+      var el = document.getElementById('season');
+      if (el) el.hidden = false;
+    }
+  })();
+</script>
 <script src="main.js" defer></script>
 <script src="packages.js" defer></script>
 </body>

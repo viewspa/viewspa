@@ -712,7 +712,7 @@
          </label>
          <label>Email - we’ll send your confirmation and reminder<input name="email" type="email" autocomplete="email"></label>
          ${intake}
-         <label>Package / gift card code (optional)<input name="packageGan" placeholder="Have a prepaid package? Enter code to redeem"></label>
+         <label>Package or gift certificate code (optional)<input name="packageGan" placeholder="16 digits from your card - we apply it to this visit"></label>
          <div id="bk-addon"></div>
          <label class="bk-agree">
            <input type="checkbox" name="agreePolicy" required>

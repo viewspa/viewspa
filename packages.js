@@ -16,6 +16,11 @@
 
   const money = (c) => '$' + (c / 100).toFixed(c % 100 ? 2 : 0);
 
+  // Всё, что попадает в разметку через шаблонную строку, проходит здесь.
+  const esc = (v) => String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
   // Первое касание, записанное analytics.js на любой странице сайта.
   const vsSrc = () => (typeof window.vsSource === 'function' ? window.vsSource() : null) || undefined;
 
@@ -237,16 +242,229 @@
   // Сертификат почти всегда дарят, поэтому спрашиваем имена: они попадут
   // на карточку в письме. Оба поля необязательные - если человек покупает
   // себе, строка на карточке просто не появится.
-  function giftNames() {
+  // Оформление карточки. Порядок и названия должны совпадать со списком
+  // в воркере: он принимает только эти три значения.
+  const GIFT_DESIGNS = [
+    { id: 'botanical', label: 'Botanical' },
+    { id: 'engraved', label: 'Engraved' },
+    { id: 'seal', label: 'Seal' },
+    { id: 'night', label: 'Night' },
+  ];
+
+  // Украшение карточки: рамки, уголки и ветка. Разметка одна на все
+  // оформления, а показывает каждое только своё — так макет не
+  // переписывается при смене оформления.
+  const CORNER = (pos) => `
+    <svg class="gc-corner gc-corner-${pos}" viewBox="0 0 30 30" aria-hidden="true"
+         fill="none" stroke="#c9a84c" stroke-width="1">
+      <path d="M0 24 A24 24 0 0 0 24 0"></path>
+      <path d="M0 17 A17 17 0 0 0 17 0"></path>
+      <path d="M0 10 A10 10 0 0 0 10 0"></path>
+      <circle cx="4" cy="4" r="1.6" fill="#c9a84c" stroke="none"></circle>
+    </svg>`;
+
+  const DECO = `
+    <div class="gc-deco" aria-hidden="true">
+      <span class="gc-f1"></span>
+      <span class="gc-f2"></span>
+      <svg class="gc-sprig" viewBox="0 0 156 60" fill="none"
+           stroke="currentColor" stroke-width="1" stroke-linecap="round">
+        <path d="M152 26 C 116 20, 66 38, 8 34"></path>
+        <g transform="translate(136 23) rotate(-150)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+        <g transform="translate(122 23) rotate(152)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+        <g transform="translate(104 25) rotate(-142)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+        <g transform="translate(88 28) rotate(146)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+        <g transform="translate(68 31) rotate(-148)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+        <g transform="translate(50 33) rotate(150)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+        <g transform="translate(30 34) rotate(-158)"><path d="M0 0 C4 -4.5 12 -4.5 17 0 C12 4.5 4 4.5 0 0Z"></path><path d="M3 0 H13"></path></g>
+        <g transform="translate(9 34) rotate(184)"><path d="M0 0 C3 -4 10 -4 14 0 C10 4 3 4 0 0Z"></path></g>
+        <path d="M96 27 L94 39"></path><circle cx="94" cy="42" r="3" fill="#c9a84c" stroke="none"></circle>
+        <path d="M60 33 L63 45"></path><circle cx="63.5" cy="48" r="3" fill="#c9a84c" stroke="none"></circle>
+        <path d="M114 23 L118 11"></path><circle cx="119" cy="8" r="2.6" fill="#c9a84c" stroke="none"></circle>
+      </svg>
+      ${CORNER('tl')}${CORNER('tr')}${CORNER('br')}${CORNER('bl')}
+    </div>`;
+
+  // Повод — отдельная ось от оформления. У прописи заголовок в две строки,
+  // поэтому у каждого повода есть и обычная формулировка, и пара слов.
+  // Список и порядок должны совпадать с воркером: он принимает только их.
+  const GIFT_OCCASIONS = [
+    { id: 'none', label: 'No occasion', line: 'This is a gift for you', script: ['gift', 'for you'], path: '' },
+    { id: 'birthday', label: 'Birthday', line: 'Happy Birthday', script: ['happy', 'birthday'],
+      path: 'M16 28V13M16 13c0-3 3-4 3-7 0 0 3 3 3 6s-3 4-6 4-6-1-6-4 3-6 3-6c0 3 3 4 3 7z' },
+    { id: 'love', label: 'With love', line: 'With love', script: ['with', 'love'],
+      path: 'M16 27C9 22 4 18 4 12.5A6 6 0 0 1 16 9a6 6 0 0 1 12 3.5C28 18 23 22 16 27z' },
+    { id: 'thanks', label: 'Thank you', line: 'Thank you', script: ['thank', 'you'],
+      path: 'M5 22c7 3 15 0 19-7M9 21c-2-7 2-13 8-15M17 6c4 4 5 10 3 15' },
+    { id: 'holiday', label: 'Holidays', line: 'Happy Holidays', script: ['happy', 'holidays'],
+      path: 'M16 4v24M5 11l22 10M27 11L5 21M16 4l-4 4M16 4l4 4M16 28l-4-4M16 28l4-4' },
+  ];
+
+  /**
+   * Макет подарка, на котором сразу и вводят данные.
+   *
+   * Отдельная форма под картинкой заставляла бы человека переводить
+   * взгляд и догадываться, как это будет выглядеть. Здесь поля стоят
+   * там же, где потом окажется текст, - что набрал, то и получится.
+   *
+   * У сертификата и пакета имя получателя значит разное: на сертификате
+   * это надпись, а пакет именной - сеансами пользуется тот, чьё имя
+   * указано. Поэтому подписи разные.
+   */
+  function giftNames(kind, item) {
+    const pkg = kind === 'package';
+    const amount = money(pkg ? item.priceCents : item.amountCents);
+    // Пакет чаще покупают себе, поэтому подарочной обвязки на нём нет:
+    // ни «это подарок для тебя», ни строки «от кого». Остаётся одно поле
+    // с именем — по нему мы знаем, чьи это сеансы.
+    // У пакета берём название из каталога — там уже сказано и сколько
+    // сеансов, и по сколько минут: «4 Massage Sessions (60 min each)».
+    const sub = pkg ? item.name : 'Nails or massage';
+    // У пакета строки над суммой нет вовсе: «4 massage sessions» рядом
+    // с ценой говорит то же самое, а вторая строка только шумит.
+    const kicker = 'This is a gift for you';
+
     return `
       <fieldset class="bk-gift">
-        <legend>Is this a gift?</legend>
-        <p class="bk-gift-note">Optional — these names appear on the certificate.</p>
-        <div class="bk-gift-row">
-          <label>For<input name="forName" maxlength="40" placeholder="Recipient's name" autocomplete="off"></label>
-          <label>From<input name="fromName" maxlength="40" placeholder="Your name" autocomplete="off"></label>
+        <legend>${pkg ? 'Whose sessions are these?' : 'Make it a gift'}</legend>
+        <p class="bk-gift-note">${pkg
+          ? 'Type straight onto the card. Buying it for someone else? Put their name here — the sessions belong to whoever is named.'
+          : 'Type straight onto the card. This is exactly what they will see.'}</p>
+
+        <div class="gc ${pkg ? 'gc-formal' : 'gc-botanical'}" id="gc-preview">
+          ${DECO}
+          <div class="gc-head">
+            <div class="gc-head-left">
+              <div class="gc-logo" role="img" aria-label="View Spa"></div>
+              ${pkg ? '' : `
+              <p class="gc-kicker">
+                <svg class="gc-mark" viewBox="0 0 32 32" aria-hidden="true" hidden><path d=""/></svg>
+                <span class="gc-occ-1">${kicker}</span>
+              </p>`}
+            </div>
+            <div class="gc-head-right">
+              <p class="gc-amount"><span class="gc-cur">$</span>${esc(amount.replace('$', ''))}</p>
+              <p class="gc-amount-sub">${esc(sub)}</p>
+            </div>
+          </div>
+          <div class="gc-divider"><span class="gc-diamond"></span></div>
+          <div class="gc-fields">
+            <label class="gc-name">
+              <span class="gc-name-lbl">${pkg ? 'Name' : 'For'}</span>
+              <input class="gc-name-val" name="forName" maxlength="40"
+                     placeholder="${pkg ? 'your name' : 'their name'}" autocomplete="off">
+            </label>
+            ${pkg ? '' : `
+            <label class="gc-name">
+              <span class="gc-name-lbl">From</span>
+              <input class="gc-name-val" name="fromName" maxlength="40"
+                     placeholder="your name" autocomplete="off">
+            </label>`}
+          </div>
+          ${pkg ? `
+          <ol class="gc-sessions">
+            ${Array.from({ length: item.sessions }, (_, i) => `
+              <li class="gc-session">
+                <span class="gc-session-no">${i + 1}</span>
+                <span class="gc-session-date"></span>
+              </li>`).join('')}
+          </ol>
+          <p class="gc-sessions-note">Each visit is stamped here automatically &mdash;
+            the card above is live, so it always shows what is left.</p>` : `
+          <textarea class="gc-msg" name="message" rows="1" maxlength="120"
+                    placeholder="a line for them (optional)"></textarea>`}
+          <p class="gc-howto">${pkg
+            ? 'To book, open viewspa.miami, pick a date and time with Ivan, and enter the code in &ldquo;Package or gift certificate code&rdquo;. One session comes off automatically.'
+            : 'To book, open viewspa.miami, pick a date and time, and enter the code in &ldquo;Package or gift certificate code&rdquo;.'}</p>
+          <div class="gc-foot">
+            <p class="gc-addr">20200 W Dixie Hwy, STE 1105B<br>Aventura, FL 33180 &middot; (754) 202-6666</p>
+            <p class="gc-codebox">
+              <span class="gc-code-lbl">Gift code</span>
+              <span class="gc-code">in your email</span>
+            </p>
+          </div>
         </div>
+
+        ${pkg ? `
+        <input type="hidden" name="design" value="formal">` : `
+        <div class="gc-picker" role="group" aria-label="Card design">
+          ${GIFT_DESIGNS.map((d, i) => `
+            <button type="button" class="gc-swatch gc-swatch-${d.id}"
+                    data-design="${d.id}" aria-pressed="${i === 0}">${d.label}</button>`).join('')}
+        </div>
+        <input type="hidden" name="design" value="${GIFT_DESIGNS[0].id}">
+
+        `}
+        ${pkg ? '' : `
+        <div class="gc-occasions" role="group" aria-label="Occasion">
+          ${GIFT_OCCASIONS.map((o, i) => `
+            <button type="button" class="gc-occ-btn"
+                    data-occasion="${o.id}" aria-pressed="${i === 0}">${o.label}</button>`).join('')}
+        </div>
+        <input type="hidden" name="occasion" value="${GIFT_OCCASIONS[0].id}">`}
       </fieldset>`;
+  }
+
+  /** Переключение оформления и повода плюс подгонка высоты пожелания. */
+  function wireGiftPreview(form) {
+    const card = form.querySelector('#gc-preview');
+    if (!card) return;
+    const designInput = form.querySelector('[name="design"]');
+    const occInput = form.querySelector('[name="occasion"]');
+
+    // Высоту пожелания пересчитываем и при смене оформления: у каждого
+    // своя ширина колонки, и строка, занимавшая одну строку, может стать
+    // двумя. Без этого поле оставалось с устаревшей высотой.
+    function fitMessage() {
+      const t = form.querySelector('[name="message"]');
+      if (!t) return;
+      t.style.height = 'auto';
+      t.style.height = t.scrollHeight + 'px';
+    }
+
+    const line1 = card.querySelector('.gc-occ-1');
+    const mark = card.querySelector('.gc-mark');
+
+    // Повод - одна строка капсом плюс значок. Оформление на неё не
+    // влияет, но перерисовываем и при смене оформления: у тёмной
+    // карточки другой цвет, и значок надо переставить вместе с ним.
+    function paintOccasion() {
+      // У пакета повода нет: в шапке стоит «Prepaid package», и
+      // перекрашивать её в «это подарок для тебя» нельзя.
+      if (!occInput) return;
+      const occ = GIFT_OCCASIONS.find((o) => o.id === occInput.value) || GIFT_OCCASIONS[0];
+      line1.textContent = occ.line;
+      mark.firstElementChild.setAttribute('d', occ.path);
+      mark.hidden = !occ.path;
+    }
+
+    form.querySelectorAll('.gc-swatch').forEach((b) => {
+      b.addEventListener('click', () => {
+        form.querySelectorAll('.gc-swatch').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        b.setAttribute('aria-pressed', 'true');
+        card.className = 'gc gc-' + b.dataset.design;
+        designInput.value = b.dataset.design;
+        paintOccasion();
+        fitMessage();
+      });
+    });
+
+    form.querySelectorAll('.gc-occ-btn').forEach((b) => {
+      b.addEventListener('click', () => {
+        form.querySelectorAll('.gc-occ-btn').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        b.setAttribute('aria-pressed', 'true');
+        occInput.value = b.dataset.occasion;
+        paintOccasion();
+      });
+    });
+
+    paintOccasion();
+
+    const msg = form.querySelector('[name="message"]');
+    if (msg) {
+      msg.addEventListener('input', fitMessage);
+      fitMessage();
+    }
   }
 
   async function renderPurchase(kind, item) {
@@ -264,7 +482,7 @@
           <label>Full name<input name="name" required autocomplete="name"></label>
           <label>Email<input name="email" type="email" required autocomplete="email"></label>
           <label>Phone <span class="bk-opt">optional</span><input name="phone" type="tel" maxlength="32" autocomplete="tel" placeholder="So we can reach you about your booking"></label>
-          ${kind === 'certificate' ? giftNames() : ''}
+          ${giftNames(kind, item)}
           ${kind === 'package' ? tipBlock(item) : ''}
           <label>Card</label>
           <div id="card-container" style="padding:4px 0"></div>
@@ -278,6 +496,7 @@
         </form>
       </div>`;
     renderTurnstile();
+    wireGiftPreview(document.getElementById('pay-form'));
     if (kind === 'package') bindTip(item, baseCents);
 
     // init Square card
@@ -361,15 +580,27 @@
         // поле стоит дороже, чем польза от него. Кто хочет - впишет.
         phone: (form.querySelector('[name="phone"]')?.value || '').trim(),
       };
+      // Имена нужны обоим: на сертификате это надпись, в пакете - кто
+      // именно имеет право на сеансы.
+      const gift = {
+        forName: (form.querySelector('[name="forName"]')?.value || '').trim(),
+        fromName: (form.querySelector('[name="fromName"]')?.value || '').trim(),
+        message: (form.querySelector('[name="message"]')?.value || '').trim(),
+        design: (form.querySelector('[name="design"]')?.value || '').trim(),
+        occasion: (form.querySelector('[name="occasion"]')?.value || '').trim(),
+      };
       let res;
       if (kind === 'package') {
-        res = await api('/api/buy-package', { packageId: item.id, paymentToken: token, buyer, turnstileToken: tsToken, source: vsSrc(), tipCents: tipCents(item) });
+        res = await api('/api/buy-package', {
+          packageId: item.id, paymentToken: token, buyer,
+          turnstileToken: tsToken, source: vsSrc(), tipCents: tipCents(item),
+          ...gift,
+        });
       } else {
         res = await api('/api/buy-certificate', {
           amountCents: item.amountCents, paymentToken: token, buyer,
           turnstileToken: tsToken, source: vsSrc(),
-          forName: (form.querySelector('[name="forName"]')?.value || '').trim(),
-          fromName: (form.querySelector('[name="fromName"]')?.value || '').trim(),
+          ...gift,
         });
       }
       trackPurchase(kind, item, res);
@@ -382,7 +613,7 @@
   function renderDone(kind, res) {
     const code = (res.gan || '').replace(/(\d{4})(?=\d)/g, '$1 ');
     const detail = kind === 'package'
-      ? `<div>${res.name}</div><div><b>${res.sessions} sessions</b> · valid until ${new Date(res.expiresAt).toLocaleDateString()}</div>`
+      ? `<div>${res.name}</div><div><b>${res.sessions} sessions</b> · no expiry date</div>`
         + (res.tipCents > 0 ? `<div class="bk-tip-note">Includes a ${money(res.tipCents)} tip for Ivan · charged ${money(res.totalCents)} today</div>` : '')
       : `<div>Gift certificate</div><div><b>${money(res.balanceCents)}</b> balance</div>`;
     root.innerHTML = `
@@ -411,19 +642,16 @@
     try {
       const r = await api('/api/package-balance', { gan: code });
       // Остаток - главное число: человек пришёл узнать, сколько у него есть.
-      // Дата словами читается лучше цифр, а строка про ритм превращает
-      // остаток в план и заодно ведёт к записи прямо сейчас.
-      const validUntil = r.expiresAt
-        ? new Date(r.expiresAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-        : null;
+      // Срока у пакета нет, поэтому вместо даты - строка про ритм: она
+      // превращает остаток в план и ведёт к записи прямо сейчас.
       const isPackage = r.sessionsLeft != null;
       box.innerHTML = `<div class="bk-summary bk-balance" style="margin-top:12px">
         ${r.name ? `<div><b>${r.name}</b></div>` : ''}
         ${isPackage
           ? `<div class="bk-balance-count"><b>${r.sessionsLeft}</b> of ${r.sessionsTotal} sessions left</div>`
           : `<div class="bk-balance-count"><b>${money(r.balanceCents)}</b> balance</div>`}
-        <div class="bk-balance-meta">${isPackage ? `Balance ${money(r.balanceCents)}` : 'Gift certificate'}${validUntil ? ` · valid until ${validUntil}` : ''}${r.state !== 'ACTIVE' ? ` · ${r.state}` : ''}</div>
-        ${isPackage && r.sessionsLeft > 0 ? '<div class="bk-balance-meta">Ivan recommends one session every 4 weeks.</div>' : ''}
+        <div class="bk-balance-meta">${isPackage ? `Balance ${money(r.balanceCents)}` : 'Gift certificate'} · no expiry date${r.state !== 'ACTIVE' ? ` · ${r.state}` : ''}</div>
+        ${isPackage && r.sessionsLeft > 0 ? '<div class="bk-balance-meta">Ivan recommends a session at least once every 4 weeks.</div>' : ''}
         ${r.sessionsLeft !== 0 && r.state === 'ACTIVE'
           ? `<a href="booking.html${isPackage ? '?service=full-body-reset&master=ivan' : ''}" class="btn btn-gold" style="display:inline-block;margin-top:10px" data-track="booking">${isPackage ? 'Book your next session' : 'Book an appointment'} &rarr;</a>`
           : ''}

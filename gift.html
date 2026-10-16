@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gift Certificate | View Spa Aventura</title>
+<!-- Страница открывается по коду сертификата. Код — предъявительский
+     документ, поэтому адрес не должен попасть в поиск и не должен утечь
+     в заголовке Referer при переходе по ссылкам. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<meta name="theme-color" content="#1E1E1E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="gift-card.css">
+
+<style>
+  :root {
+    --ink: #1a1713;
+    --gold: #c9a84c;
+    --gold-dk: #8a6d1f;
+    --paper: #fbf9f5;
+    --muted: #6b6459;
+    --line: rgba(201, 168, 76, .4);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #ece9e3; color: var(--ink);
+    font-family: Geist, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 48px; min-height: 100vh;
+  }
+
+  /* Сама карточка описана в gift-card.css - она общая со страницей
+     покупки, чтобы покупатель видел ровно то, что получит адресат. */
+  .gc { max-width: 560px; }
+
+  /* ── Служебное: не попадает на печать ──────────────────────── */
+  .tools { max-width: 560px; width: 100%; margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    flex: 1 1 150px; font: inherit; font-size: 14px; font-weight: 600;
+    padding: 13px 18px; border-radius: 9px; cursor: pointer; text-align: center;
+    border: 1px solid var(--ink); background: var(--ink); color: #fff; text-decoration: none;
+  }
+  .btn-ghost { background: transparent; color: var(--ink); }
+  .btn:hover { opacity: .88; }
+  .note {
+    max-width: 560px; width: 100%; margin-top: 18px; font-size: 13px;
+    color: var(--muted); line-height: 1.6; text-align: center;
+  }
+  .state {
+    max-width: 560px; width: 100%; margin-top: 16px; padding: 13px 15px;
+    border-radius: 9px; font-size: 14px; text-align: center;
+  }
+  .state.bad { background: #fdf3f3; border: 1px solid #f0c9c9; color: #a33; }
+  .state.part { background: #fff8e8; border: 1px solid #f0dfb4; color: #8a6d1f; }
+
+  @media print {
+    body { background: #fff; padding: 0; display: block; }
+    .tools, .note, .state { display: none !important; }
+    .gc { max-width: 100%; margin: 0 auto; }
+    @page { margin: 14mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="gc gc-botanical" id="cert" hidden>
+  <div class="gc-deco" aria-hidden="true">
+  <span class="gc-f1"></span>
+  <span class="gc-f2"></span>
+
+  <svg class="gc-sprig" viewBox="0 0 156 60" fill="none"
+       stroke="currentColor" stroke-width="1" stroke-linecap="round">
+    <path d="M152 26 C 116 20, 66 38, 8 34"></path>
+    <g transform="translate(136 23) rotate(-150)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+    <g transform="translate(122 23) rotate(152)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+    <g transform="translate(104 25) rotate(-142)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+    <g transform="translate(88 28) rotate(146)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+    <g transform="translate(68 31) rotate(-148)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+    <g transform="translate(50 33) rotate(150)"><path d="M0 0 C5 -5.5 15 -5.5 21 0 C15 5.5 5 5.5 0 0Z"></path><path d="M3 0 H17"></path></g>
+    <g transform="translate(30 34) rotate(-158)"><path d="M0 0 C4 -4.5 12 -4.5 17 0 C12 4.5 4 4.5 0 0Z"></path><path d="M3 0 H13"></path></g>
+    <g transform="translate(9 34) rotate(184)"><path d="M0 0 C3 -4 10 -4 14 0 C10 4 3 4 0 0Z"></path></g>
+    <path d="M96 27 L94 39"></path><circle cx="94" cy="42" r="3" fill="#c9a84c" stroke="none"></circle>
+    <path d="M60 33 L63 45"></path><circle cx="63.5" cy="48" r="3" fill="#c9a84c" stroke="none"></circle>
+    <path d="M114 23 L118 11"></path><circle cx="119" cy="8" r="2.6" fill="#c9a84c" stroke="none"></circle>
+  </svg>
+
+  <svg class="gc-corner gc-corner-tl" viewBox="0 0 30 30" fill="none" stroke="#c9a84c" stroke-width="1"><path d="M0 24 A24 24 0 0 0 24 0"></path><path d="M0 17 A17 17 0 0 0 17 0"></path><path d="M0 10 A10 10 0 0 0 10 0"></path><circle cx="4" cy="4" r="1.6" fill="#c9a84c" stroke="none"></circle></svg>
+  <svg class="gc-corner gc-corner-tr" viewBox="0 0 30 30" fill="none" stroke="#c9a84c" stroke-width="1"><path d="M0 24 A24 24 0 0 0 24 0"></path><path d="M0 17 A17 17 0 0 0 17 0"></path><path d="M0 10 A10 10 0 0 0 10 0"></path><circle cx="4" cy="4" r="1.6" fill="#c9a84c" stroke="none"></circle></svg>
+  <svg class="gc-corner gc-corner-br" viewBox="0 0 30 30" fill="none" stroke="#c9a84c" stroke-width="1"><path d="M0 24 A24 24 0 0 0 24 0"></path><path d="M0 17 A17 17 0 0 0 17 0"></path><path d="M0 10 A10 10 0 0 0 10 0"></path><circle cx="4" cy="4" r="1.6" fill="#c9a84c" stroke="none"></circle></svg>
+  <svg class="gc-corner gc-corner-bl" viewBox="0 0 30 30" fill="none" stroke="#c9a84c" stroke-width="1"><path d="M0 24 A24 24 0 0 0 24 0"></path><path d="M0 17 A17 17 0 0 0 17 0"></path><path d="M0 10 A10 10 0 0 0 10 0"></path><circle cx="4" cy="4" r="1.6" fill="#c9a84c" stroke="none"></circle></svg>
+  </div>
+
+  <div class="gc-head">
+    <div class="gc-head-left">
+      <div class="gc-logo" role="img" aria-label="View Spa"></div>
+      <p class="gc-kicker" id="kicker">
+        <svg class="gc-mark" id="mark" viewBox="0 0 32 32" aria-hidden="true" hidden><path id="markPath" d=""/></svg>
+        <span id="occLine">This is a gift for you</span>
+      </p>
+    </div>
+    <div class="gc-head-right">
+      <p class="gc-amount"><span class="gc-cur">$</span><span id="amount">—</span></p>
+      <p class="gc-amount-sub" id="amountSub"></p>
+    </div>
+  </div>
+
+  <div class="gc-divider"><span class="gc-diamond"></span></div>
+
+  <div class="gc-fields" id="names" hidden>
+    <div class="gc-name" id="forBox" hidden>
+      <span class="gc-name-lbl">For</span>
+      <span class="gc-name-val" id="forName"></span>
+    </div>
+    <div class="gc-name" id="fromBox" hidden>
+      <span class="gc-name-lbl">From</span>
+      <span class="gc-name-val" id="fromName"></span>
+    </div>
+  </div>
+
+  <ol class="gc-sessions" id="sessions" hidden></ol>
+  <p class="gc-sessions-note" id="sessionsNote" hidden>Each visit is stamped here automatically.</p>
+
+  <p class="gc-msg" id="msg" hidden></p>
+
+  <p class="gc-howto">To book, open viewspa.miami, pick a date and time, and
+    enter the code in &ldquo;Package or gift certificate code&rdquo;.</p>
+
+  <div class="gc-foot">
+    <p class="gc-addr">20200 W Dixie Hwy, STE 1105B<br>Aventura, FL 33180 &middot; (754) 202-6666</p>
+    <p class="gc-codebox">
+      <span class="gc-code-lbl">Gift code</span>
+      <span class="gc-code" id="code"></span>
+    </p>
+  </div>
+</div>
+
+<div class="state" id="status">Loading your certificate…</div>
+
+<div class="tools" id="tools" hidden>
+  <button type="button" class="btn" id="print">Print or save as PDF</button>
+  <a class="btn btn-ghost" id="share" href="#" hidden>Send it</a>
+</div>
+
+<p class="note" id="note" hidden>
+  Print it, save it as a PDF, or just send a photo of this screen.<br>
+  The code is what matters — whoever has it can use it.
+</p>
+
+<script>
+(function () {
+  var API = 'https://viewspa-booking.ivanseydametov.workers.dev';
+  var $ = function (id) { return document.getElementById(id); };
+  var status = $('status');
+
+  function money(cents) {
+    return '$' + (cents / 100).toFixed(2).replace(/\.00$/, '');
+  }
+
+  // Знак доллара живёт отдельным элементом: он мельче и приподнят.
+  function amountDigits(cents) {
+    return (cents / 100).toFixed(2).replace(/\.00$/, '');
+  }
+
+  var code = new URLSearchParams(location.search).get('code') || '';
+  code = code.replace(/\s+/g, '');
+  if (!code) {
+    status.className = 'state bad';
+    status.textContent = 'This link has no certificate code. Check the link from your email.';
+    return;
+  }
+
+  fetch(API + '/api/gift-info?code=' + encodeURIComponent(code))
+    .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+    .then(function (res) {
+      if (!res.ok) throw new Error(res.d && res.d.error ? res.d.error : 'Certificate not found');
+      var d = res.d;
+
+      $('amount').textContent = amountDigits(d.amountCents);
+      // Группами по четыре, как в письме: номер диктуют по телефону и
+      // вводят руками, слитные шестнадцать цифр для этого непригодны.
+      $('code').textContent = String(d.gan || '').replace(/(\d{4})(?=\d)/g, '$1 ');
+
+      // Оформление выбрал покупатель. Класс ставим только из известного
+      // списка — строка приходит снаружи и в разметку как есть не идёт.
+      var DESIGNS = ['botanical', 'engraved', 'seal', 'night', 'formal'];
+      var design = DESIGNS.indexOf(d.design) >= 0 ? d.design : DESIGNS[0];
+      $('cert').className = 'gc gc-' + design;
+
+      // Повод — одна строка капсом и значок линиями. Список закрытый,
+      // как и у оформления: значение приходит снаружи.
+      var OCCASIONS = {
+        none:     { line: 'This is a gift for you', path: '' },
+        birthday: { line: 'Happy Birthday',
+          path: 'M16 28V13M16 13c0-3 3-4 3-7 0 0 3 3 3 6s-3 4-6 4-6-1-6-4 3-6 3-6c0 3 3 4 3 7z' },
+        love:     { line: 'With love',
+          path: 'M16 27C9 22 4 18 4 12.5A6 6 0 0 1 16 9a6 6 0 0 1 12 3.5C28 18 23 22 16 27z' },
+        thanks:   { line: 'Thank you',
+          path: 'M5 22c7 3 15 0 19-7M9 21c-2-7 2-13 8-15M17 6c4 4 5 10 3 15' },
+        holiday:  { line: 'Happy Holidays',
+          path: 'M16 4v24M5 11l22 10M27 11L5 21M16 4l-4 4M16 4l4 4M16 28l-4-4M16 28l4-4' }
+      };
+      var occ = OCCASIONS[d.occasion] || OCCASIONS.none;
+
+      if (d.kind === 'package') {
+        // У пакета повод ни при чём: это оплаченные сеансы, не открытка.
+        // Строки над суммой у пакета нет: «4 massage sessions» рядом с
+        // ценой говорит то же самое.
+        $('kicker').hidden = true;
+        // Подпись под суммой стоит в углу: длинную строку там не разместить.
+        $('amountSub').textContent = d.name || 'Prepaid package';
+
+        // Места под сеансы: номер и линейка, на которую сама встаёт дата
+        // визита. Даты приходят из истории списаний, их никто не вводит.
+        var total = d.sessionsTotal || 0;
+        if (total > 0) {
+          var used = Array.isArray(d.usedAt) ? d.usedAt : [];
+          var box = $('sessions');
+          box.innerHTML = '';
+          for (var i = 0; i < total; i++) {
+            var li = document.createElement('li');
+            li.className = 'gc-session';
+            var no = document.createElement('span');
+            no.className = 'gc-session-no';
+            no.textContent = String(i + 1);
+            var when = document.createElement('span');
+            when.className = 'gc-session-date';
+            if (used[i]) {
+              var t = Date.parse(used[i]);
+              if (!isNaN(t)) {
+                when.textContent = new Date(t).toLocaleDateString('en-US',
+                  { month: 'short', day: 'numeric' });
+              }
+            }
+            li.appendChild(no);
+            li.appendChild(when);
+            box.appendChild(li);
+          }
+          box.hidden = false;
+          // Пояснение нужно, пока есть незаполненные места: на полностью
+          // использованном пакете объяснять уже нечего.
+          $('sessionsNote').hidden = used.length >= total;
+        }
+      } else {
+        $('occLine').textContent = occ.line;
+        if (occ.path) {
+          $('markPath').setAttribute('d', occ.path);
+          $('mark').hidden = false;
+        }
+        $('amountSub').textContent = 'Nails or massage';
+      }
+
+      if (d.message) { $('msg').textContent = d.message; $('msg').hidden = false; }
+
+      if (d.forName) { $('forName').textContent = d.forName; $('forBox').hidden = false; $('names').hidden = false; }
+      if (d.fromName) { $('fromName').textContent = d.fromName; $('fromBox').hidden = false; $('names').hidden = false; }
+
+      $('cert').hidden = false;
+      $('tools').hidden = false;
+      $('note').hidden = false;
+
+      // Остаток показываем только если он отличается от номинала:
+      // на подарке, который ещё не тронут, лишняя строка ни к чему.
+      if (d.state && d.state !== 'ACTIVE') {
+        status.className = 'state bad';
+        status.textContent = 'This certificate is no longer active. Call us and we will sort it out.';
+      } else if (d.kind === 'package' && d.sessionsLeft != null && d.sessionsTotal) {
+        // У пакета остаток в долларах ничего не говорит: человек считает
+        // сеансами, а не балансом карты.
+        if (d.sessionsLeft === 0) {
+          status.className = 'state part';
+          status.textContent = 'All sessions used. Thank you for the whole course.';
+        } else if (d.sessionsLeft < d.sessionsTotal) {
+          status.className = 'state part';
+          status.textContent = d.sessionsLeft + ' of ' + d.sessionsTotal + ' sessions left.';
+        } else {
+          status.hidden = true;
+        }
+      } else if (d.balanceCents != null && d.amountCents != null && d.balanceCents < d.amountCents) {
+        status.className = 'state part';
+        status.textContent = 'Already used in part. Remaining balance: ' + money(d.balanceCents) + '.';
+      } else {
+        status.hidden = true;
+      }
+    })
+    .catch(function (e) {
+      status.className = 'state bad';
+      status.textContent = e.message === 'Сертификат не найден'
+        ? 'We could not find this certificate. Check the code or call (754) 202-6666.'
+        : 'Could not load the certificate. Please try again, or call (754) 202-6666.';
+    });
+
+  $('print').addEventListener('click', function () { window.print(); });
+
+  // «Отправить» показываем только там, где системное меню обмена есть:
+  // на компьютере такая кнопка ничего не делает и только мешает.
+  if (navigator.share) {
+    var share = $('share');
+    share.hidden = false;
+    share.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      navigator.share({
+        title: 'Gift certificate — View Spa',
+        text: 'A gift certificate for View Spa in Aventura.',
+        url: location.href,
+      }).catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+/* ─────────────────────────────────────────────────────────────────
+   Подарочная карточка View Spa.
+
+   Один файл на две страницы: на packages.html покупатель вводит данные
+   прямо в макет, на gift.html получатель видит то же самое для чтения.
+   Если бы макет жил в двух местах, они бы разошлись после первой правки.
+
+   Четыре оформления перенесены из макетов один в один: размеры, отступы,
+   толщины линий и цвета взяты оттуда, а не подобраны. Базовый размер
+   карточки 528×408, поэтому все величины переведены в cqw от её ширины
+   (528px = 100cqw) — пропорции держатся на любой ширине. В vw их держать
+   нельзя: vw считается от окна, и на широком экране текст уходит за край.
+
+   Повод — отдельная ось: он меняет только строку, но не оформление,
+   поэтому четыре макета дают двадцать сочетаний.
+   ───────────────────────────────────────────────────────────────── */
+
+/* Карточка не должна зависеть от того, объявил ли border-box хозяин
+   страницы: иначе при width:100% к ней прибавляются отступы и она
+   вылезает за свою колонку. */
+.gc,  .gc *,  .gc *::before,  .gc *::after { box-sizing: border-box; }
+
+.gc {
+  --gc-ink: #1e1e1e;
+  --gc-soft: #6b655c;
+  --gc-gold: #c9a84c;
+  --gc-paper: #fbf9f5;
+
+  /* Отступы содержимого и высота знака — у каждого оформления свои. */
+  --gc-pad-x: 11.36%;   /* 60px */
+  --gc-pad-t: 10.23%;   /* 54px */
+  --gc-pad-b: 9.47%;    /* 50px */
+  --gc-logo-h: 12.12cqw;  /* 64px */
+  --gc-num: 11.74cqw;     /* 62px */
+
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  /* Без этого длинное слово внутри задаёт карточке минимальную ширину,
+     она раздувается шире своей ячейки, а aspect-ratio тянет высоту. */
+  min-width: 0;
+  aspect-ratio: 528 / 408;
+  overflow: hidden;
+  background: var(--gc-paper);
+  color: var(--gc-ink);
+  font-family: Geist, -apple-system, 'Segoe UI', sans-serif;
+  padding: var(--gc-pad-t) var(--gc-pad-x) var(--gc-pad-b);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  box-shadow: 0 14px 40px rgba(30, 30, 30, .14);
+}
+.gc > * { position: relative; z-index: 2; }
+
+/* display:flex по классу перебивает hidden из браузерного стиля, и при
+   ошибке загрузки на экране оставалась пустая карточка. То же касается
+   любой части карточки, которую прячут атрибутом: у пакета это строка
+   повода и ряд «от кого». */
+.gc[hidden],
+.gc .gc-kicker[hidden],
+.gc .gc-name[hidden],
+.gc .gc-fields[hidden],
+.gc .gc-msg[hidden],
+.gc .gc-sessions[hidden] { display: none; }
+
+/* ── Украшение: рамки, уголки, ветка ─────────────────────────────
+   Все слои лежат в одном контейнере и включаются по оформлению. */
+.gc .gc-deco { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.gc .gc-deco > * { position: absolute; display: none; }
+
+.gc .gc-f1, .gc .gc-f2 { inset: 0; }
+.gc .gc-sprig { height: auto; }
+.gc .gc-corner { width: 5.68cqw; height: 5.68cqw; }
+
+/* ── Шапка ──────────────────────────────────────────────────────── */
+.gc .gc-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 3.03cqw;
+}
+.gc .gc-head-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4.17cqw;              /* 22px */
+  min-width: 0;
+}
+.gc .gc-head-right { text-align: right; flex: none; }
+
+.gc .gc-logo {
+  height: var(--gc-logo-h);
+  aspect-ratio: 394 / 289;
+  /* Знак занимает не весь файл: вокруг него прозрачные поля. Измерено —
+     ink лежит в x 60..453, y 119..407 из 512, — кадрируем фоном по этим
+     числам, иначе лого «плавает» в пустоте. */
+  background-image: url("img/logo.png");
+  background-repeat: no-repeat;
+  background-size: calc(var(--gc-logo-h) * 512 / 289) auto;
+  background-position:
+    calc(var(--gc-logo-h) * -60 / 289)
+    calc(var(--gc-logo-h) * -119 / 289);
+}
+
+/* ── Повод: золотой штрих и строка капсом ───────────────────────── */
+.gc .gc-kicker {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.89cqw;              /* 10px */
+  font-size: clamp(9px, 2.27cqw, 15px);
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gc-ink);
+  white-space: nowrap;
+}
+.gc .gc-kicker::before {
+  content: "";
+  flex: none;
+  width: 4.55cqw;            /* 24px */
+  height: 1px;
+  background: var(--gc-gold);
+}
+.gc .gc-mark {
+  width: 1.5em;
+  height: 1.5em;
+  flex: none;
+  fill: none;
+  stroke: var(--gc-gold);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+.gc .gc-mark[hidden] { display: none; }
+
+/* ── Сумма: доллар мельче и приподнят ───────────────────────────── */
+.gc .gc-amount {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  font-family: 'Newsreader', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(30px, var(--gc-num), 80px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.gc .gc-cur { font-size: .452em; margin-top: .145em; margin-right: .048em; }
+.gc .gc-amount-sub {
+  margin: 1.14cqw 0 0;
+  font-size: clamp(7.5px, 1.89cqw, 12px);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gc-soft);
+}
+
+/* ── Разделитель: линия с ромбом посередине ─────────────────────── */
+.gc .gc-divider { display: none; align-items: center; gap: 1.89cqw; }
+.gc .gc-divider::before,
+.gc .gc-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--gc-gold);
+}
+.gc .gc-diamond {
+  width: 1.14cqw;
+  height: 1.14cqw;
+  min-width: 5px;
+  min-height: 5px;
+  flex: none;
+  transform: rotate(45deg);
+  border: 1px solid var(--gc-gold);
+}
+
+/* ── Поля ───────────────────────────────────────────────────────── */
+.gc .gc-fields { display: flex; flex-direction: column; gap: 1.70cqw; }
+.gc .gc-name {
+  display: flex;
+  /* Поля — это <label>, а страница покупки задаёт своим label колонку,
+     капс и жирность. Перечисляем всё, что надо вернуть: без этого
+     подпись вставала над значением, а имя печаталось капсом. */
+  flex-direction: row;
+  text-transform: none;
+  font-weight: 400;
+  letter-spacing: normal;
+  font-size: inherit;
+  color: inherit;
+  align-items: baseline;
+  gap: 2.27cqw;              /* 12px */
+  padding-bottom: .76cqw;
+  border-bottom: 1px dotted var(--gc-ink);
+}
+.gc .gc-name-lbl {
+  flex: none;
+  width: 8.71cqw;            /* 46px */
+  min-width: 32px;
+  font-size: clamp(8px, 2.27cqw, 15px);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gc-soft);
+}
+.gc .gc-name-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: 'Newsreader', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(13px, 3.22cqw, 21px);
+  line-height: 1.2;
+  color: var(--gc-ink);
+  overflow-wrap: anywhere;
+}
+
+.gc .gc-msg {
+  /* Две строки — потолок. Пожелание длиннее выдавливало адрес и код,
+     а код на карточке важнее красивой фразы. */
+  max-height: 2.9em;
+  overflow: hidden;
+  flex: 0 1 auto;
+  min-height: 0;
+  margin: 0;
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(10px, 2.65cqw, 17px);
+  line-height: 1.35;
+  color: var(--gc-ink);
+  text-wrap: pretty;
+}
+
+.gc .gc-howto {
+  margin: 0;
+  font-size: clamp(8px, 2.27cqw, 15px);
+  line-height: 1.4;
+  color: var(--gc-soft);
+  text-wrap: pretty;
+}
+
+/* ── Подвал: адрес слева, код справа ────────────────────────────── */
+.gc .gc-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 3.03cqw;
+}
+.gc .gc-addr {
+  margin: 0;
+  font-size: clamp(8px, 2.27cqw, 15px);
+  line-height: 1.45;
+  color: var(--gc-soft);
+}
+.gc .gc-codebox {
+  margin: 0;
+  flex: none;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .57cqw;
+}
+.gc .gc-code-lbl {
+  font-size: clamp(8px, 2.27cqw, 15px);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gc-soft);
+}
+.gc .gc-code {
+  font-family: 'Geist Mono', ui-monospace, Menlo, Consolas, monospace;
+  font-weight: 500;
+  font-size: clamp(10px, 2.84cqw, 18px);
+  letter-spacing: .05em;
+  word-spacing: .35em;
+  white-space: nowrap;
+  color: var(--gc-ink);
+}
+
+/* ── Режим ввода: поля выглядят частью макета ────────────────────
+   Человек печатает прямо на карточке, а не в форме под ней. */
+.gc input,
+.gc textarea {
+  /* Только семья и начертание. Шорткат font: inherit сбрасывал бы и
+     размер, а он у каждого поля свой и задан выше по классу. */
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: inherit;
+  color: inherit;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  text-align: inherit;
+  padding: 0;
+  border-radius: 0;
+  resize: none;
+  overflow: hidden;
+}
+.gc input::placeholder,
+.gc textarea::placeholder { color: var(--gc-soft); opacity: .65; }
+.gc input:focus,
+.gc textarea:focus { outline: none; }
+.gc .gc-name:focus-within { border-bottom-color: var(--gc-gold); }
+.gc textarea.gc-msg { border-bottom: 1px dotted rgba(30, 30, 30, .3); }
+.gc textarea.gc-msg:not(:placeholder-shown) { border-bottom-color: transparent; }
+
+/* ═════════════════════════════════════════════════════════════════
+   1. BOTANICAL — золотая перфорация по краю, волосяная рамка и ветка
+   с листьями в правом верхнем углу.
+   ════════════════════════════════════════════════════════════════ */
+.gc.gc-botanical {
+  --gc-pad-x: 11.36%; --gc-pad-t: 10.23%; --gc-pad-b: 9.47%;
+  /* Шалфей и светлая бумага: зелень ветки задаёт тон всей карточке. */
+  --gc-ink: #2d322b;
+  --gc-soft: #6f7768;
+  --gc-gold: #7f8a6a;
+  --gc-paper: #f4f5ef;
+}
+/* Перфорация: сетка кружков, прикрытая бумагой так, что остаётся
+   только полоса по периметру. */
+.gc.gc-botanical .gc-f1 {
+  display: block;
+  inset: 3.79cqw 4.55cqw;
+  background-image: radial-gradient(circle at 8px 8px,
+    transparent 6.4px, var(--gc-gold) 6.6px,
+    var(--gc-gold) 7.6px, transparent 7.8px);
+  background-size: 16px 16px;
+}
+/* Бумага закрывает середину, оставляя от перфорации только полосу по
+   периметру. Тени здесь быть не должно: она закрашивала саму полосу. */
+.gc.gc-botanical .gc-f2 {
+  display: block;
+  inset: 5.30cqw 6.06cqw;
+  background: var(--gc-paper);
+}
+.gc.gc-botanical .gc-f2::after {
+  content: "";
+  position: absolute;
+  inset: 1.52cqw;
+  border: 1px solid var(--gc-ink);
+}
+.gc.gc-botanical .gc-sprig {
+  display: block;
+  top: 8.71cqw;
+  right: 10.23cqw;
+  width: 29.55cqw;           /* 156px */
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   2. ENGRAVED — двойная рамка, золотые дуги по углам и разделитель
+   с ромбом. Самый «гравированный» из четырёх.
+   ════════════════════════════════════════════════════════════════ */
+.gc.gc-engraved {
+  --gc-pad-x: 9.09%;       /* 48px */
+  --gc-pad-t: 8.33%;       /* 44px */
+  --gc-pad-b: 7.58%;       /* 40px */
+  --gc-logo-h: 15.15cqw;     /* 80px */
+  --gc-num: 12.5cqw;         /* 66px */
+  /* Тёплое золото на слоновой кости — самый «документный» из трёх. */
+  --gc-ink: #2a2318;
+  --gc-soft: #7a6a4a;
+  --gc-gold: #a8842a;
+  --gc-paper: #fdf8ee;
+}
+.gc.gc-engraved .gc-f1 { display: block; inset: 2.65cqw; border: 1px solid var(--gc-ink); }
+.gc.gc-engraved .gc-f2 { display: block; inset: 3.60cqw; border: 1px solid var(--gc-gold); }
+.gc.gc-engraved .gc-corner { display: block; }
+.gc .gc-corner-tl { top: 3.79cqw; left: 3.79cqw; }
+.gc .gc-corner-tr { top: 3.79cqw; right: 3.79cqw; transform: rotate(90deg); }
+.gc .gc-corner-br { bottom: 3.79cqw; right: 3.79cqw; transform: rotate(180deg); }
+.gc .gc-corner-bl { bottom: 3.79cqw; left: 3.79cqw; transform: rotate(270deg); }
+.gc.gc-engraved .gc-divider { display: flex; }
+.gc.gc-engraved .gc-head { align-items: flex-start; }
+.gc.gc-engraved .gc-name { border-bottom: 1px solid var(--gc-gold); }
+.gc.gc-engraved .gc-name-val { font-size: clamp(13px, 3.41cqw, 22px); }
+.gc.gc-engraved .gc-msg { font-size: clamp(10px, 2.84cqw, 18px); }
+
+/* ═════════════════════════════════════════════════════════════════
+   3. NIGHT — тёмная с золотом, всё по центру. Содержимое то же.
+   ════════════════════════════════════════════════════════════════ */
+.gc.gc-night {
+  --gc-ink: #fbf9f5;
+  --gc-soft: #b3ac9f;
+  --gc-paper: #1e1e1e;
+  --gc-pad-x: 9.47%;       /* 50px */
+  --gc-pad-t: 7.20%;       /* 38px */
+  --gc-pad-b: 6.44%;       /* 34px */
+  text-align: center;
+  align-items: center;
+}
+.gc.gc-night .gc-logo { background-image: url("img/logo-light.png"); }
+.gc.gc-night .gc-f1 { display: block; inset: 3.03cqw; border: 1px solid var(--gc-gold); }
+.gc.gc-night .gc-f2 { display: block; inset: 3.98cqw; border: 1px solid var(--gc-gold); opacity: .55; }
+.gc.gc-night .gc-head { flex-direction: column; align-items: center; gap: 1.52cqw; }
+.gc.gc-night .gc-head-left { align-items: center; gap: 2.27cqw; }
+.gc.gc-night .gc-head-right { text-align: center; }
+.gc.gc-night .gc-amount { justify-content: center; }
+.gc.gc-night .gc-kicker { color: var(--gc-gold); letter-spacing: .2em; }
+/* Штрихи с обеих сторон — в макете строка повода обрамлена. */
+.gc.gc-night .gc-kicker::after {
+  content: "";
+  flex: none;
+  width: 5.30cqw;
+  height: 1px;
+  background: var(--gc-gold);
+}
+.gc.gc-night .gc-kicker::before { width: 5.30cqw; }
+.gc.gc-night .gc-fields { align-items: center; }
+.gc.gc-night .gc-name { border-bottom: 0; padding-bottom: 0; justify-content: center; }
+.gc.gc-night .gc-name-lbl { width: auto; }
+.gc.gc-night .gc-name-val { flex: 0 1 auto; text-align: center; }
+.gc.gc-night .gc-msg { max-width: 75.76cqw; text-align: center; text-wrap: balance; }
+.gc.gc-night .gc-howto { width: 100%; text-align: left; }
+.gc.gc-night .gc-foot {
+  width: 100%;
+  text-align: left;
+  padding-top: 1.52cqw;
+  border-top: 1px solid var(--gc-gold);
+}
+.gc.gc-night textarea.gc-msg { border-bottom-color: rgba(201, 168, 76, .4); }
+
+/* ═════════════════════════════════════════════════════════════════
+   4. SEAL — сумма в тройной круглой печати, поля на золотых линейках.
+   ════════════════════════════════════════════════════════════════ */
+.gc.gc-seal {
+  --gc-pad-x: 8.33%;       /* 44px */
+  --gc-pad-t: 6.44%;       /* 34px */
+  --gc-pad-b: 5.68%;       /* 30px */
+  /* Пудровая терракота: самый «подарочный» тон из светлых. */
+  --gc-ink: #45302a;
+  --gc-soft: #8a6b5d;
+  --gc-gold: #b5765c;
+  --gc-paper: #faf1ec;
+}
+.gc.gc-seal .gc-f1 { display: block; inset: 3.41cqw; border: 1px solid var(--gc-ink); }
+.gc.gc-seal .gc-head { align-items: center; }
+/* Печать: три кольца — сплошное, золотое и пунктирное. */
+.gc.gc-seal .gc-head-right {
+  position: relative;
+  width: 23.48cqw;           /* 124px */
+  aspect-ratio: 1;
+  border: 1px solid var(--gc-ink);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.gc.gc-seal .gc-head-right::before,
+.gc.gc-seal .gc-head-right::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+.gc.gc-seal .gc-head-right::before { inset: .95cqw; border: 1px solid var(--gc-gold); }
+.gc.gc-seal .gc-head-right::after { inset: 1.89cqw; border: 1px dotted var(--gc-gold); }
+.gc.gc-seal .gc-amount { justify-content: center; font-size: clamp(20px, 6.82cqw, 44px); }
+/* В печати подпись под суммой не помещается, и в макете на её месте
+   стоит слово VALUE. Текст подменяем стилем, чтобы разметка осталась
+   одна на все оформления. */
+.gc.gc-seal .gc-amount-sub {
+  order: -1;
+  margin: 0 0 .38cqw -.2em;
+  letter-spacing: .2em;
+  font-size: 0;
+}
+.gc.gc-seal .gc-amount-sub::before {
+  content: "Value";
+  font-size: clamp(7.5px, 2.27cqw, 15px);
+}
+.gc.gc-seal .gc-fields { gap: 1.14cqw; }
+.gc.gc-seal .gc-name {
+  gap: 1.89cqw;
+  padding-bottom: .38cqw;
+  border-bottom: 1px solid var(--gc-gold);
+}
+.gc.gc-seal .gc-name-lbl { width: 7.95cqw; }
+.gc.gc-seal .gc-name-val { font-style: italic; font-size: clamp(13px, 3.41cqw, 22px); line-height: 1.3; }
+
+/* ── Сеансы пакета ───────────────────────────────────────────────
+   Места под сеансы, как в абонементной книжке: номер и линейка, на
+   которой проставляется дата визита. Даты приходят из истории
+   списаний, вручную их никто не пишет. */
+.gc .gc-sessions {
+  /* Показываем по наличию мест, а не по оформлению: у пакета, купленного
+     до появления строгого вида, оформление другое, и привязка к нему
+     прятала бы ряд с датами. */
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2.27cqw;
+}
+.gc .gc-session { flex: 1 1 0; min-width: 0; text-align: center; }
+.gc .gc-session-no {
+  display: block;
+  font-size: clamp(7px, 1.89cqw, 11px);
+  letter-spacing: .16em;
+  color: var(--gc-soft);
+  margin-bottom: .38cqw;
+}
+.gc .gc-session-date {
+  display: block;
+  padding-bottom: .76cqw;
+  border-bottom: 1px solid var(--gc-line, rgba(30, 30, 30, .22));
+  font-size: clamp(8px, 2.27cqw, 14px);
+  line-height: 1.3;
+  color: var(--gc-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Неиспользованный сеанс — пустая линейка, а не прочерк. */
+.gc .gc-session-date:empty::before { content: "\00a0"; }
+
+/* Пояснение под рядом: без него пустые линейки читаются как недоделка,
+   а не как места, которые заполнятся сами. */
+.gc .gc-sessions-note {
+  display: none;
+  margin: 1.14cqw 0 0;
+  font-size: clamp(7px, 1.89cqw, 11px);
+  line-height: 1.4;
+  color: var(--gc-soft);
+}
+.gc .gc-sessions-note:not([hidden]) { display: block; }
+
+/* ═════════════════════════════════════════════════════════════════
+   5. FORMAL — оформление пакета. Пакет чаще покупают себе, поэтому
+   здесь нет ни орнамента, ни золота: одна линейка, одна рамка и
+   документная сетка. Выбора оформления у пакета нет.
+   ════════════════════════════════════════════════════════════════ */
+.gc.gc-formal {
+  --gc-ink: #1e1e1e;
+  --gc-soft: #6b655c;
+  --gc-gold: #8c8575;
+  --gc-paper: #fbfaf7;
+  --gc-pad-x: 9.09%;
+  --gc-pad-t: 8.33%;
+  --gc-pad-b: 7.58%;
+}
+.gc.gc-formal .gc-f1 { display: block; inset: 2.65cqw; border: 1px solid rgba(30, 30, 30, .45); }
+/* Без разделителя: линейки полей уже задают сетку, а лишняя полоса
+   между знаком и именем только дробила карточку. */
+.gc.gc-formal .gc-divider { display: none; }
+/* Строки повода у пакета нет, но если разметка её принесёт — без штриха. */
+.gc.gc-formal .gc-kicker::before { display: none; }
+.gc.gc-formal .gc-name { border-bottom: 1px solid rgba(30, 30, 30, .22); }
+.gc .gc-sessions:not([hidden]) { display: flex; }
+/* Название пакета длиннее подписи сертификата: капс и широкий трекинг
+   на такой строке нечитаемы, а переносить её лучше по словам. */
+.gc.gc-formal .gc-amount-sub {
+  text-transform: none;
+  letter-spacing: .04em;
+  max-width: 48cqw;
+  margin-left: auto;
+}
+
+/* ── Выбор оформления ───────────────────────────────────────────── */
+.gc-picker { display: flex; gap: 9px; flex-wrap: wrap; margin: 14px 0 0; }
+.gc-swatch {
+  flex: 1 1 86px;
+  height: 46px;
+  border-radius: 9px;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(46, 42, 36, .18);
+  cursor: pointer;
+  padding: 0 6px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  /* Подпись по центру кнопки: раньше она прижималась к низу и тонула. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--sw-bg, #fbf9f5);
+  color: var(--sw-ink, #3a352d);
+}
+.gc-swatch[aria-pressed="true"] { border-color: var(--gold, #c9a84c); }
+.gc-swatch:focus-visible { outline: 3px solid var(--gold, #c9a84c); outline-offset: 2px; }
+.gc-swatch-botanical { --sw-bg: #f4f5ef; --sw-ink: #3b4336; }
+.gc-swatch-engraved { --sw-bg: #fdf8ee; --sw-ink: #6b5417; }
+.gc-swatch-night { --sw-bg: #1e1e1e; --sw-ink: #e8d9a6; }
+.gc-swatch-seal { --sw-bg: #faf1ec; --sw-ink: #7a4c38; }
+
+/* ── Выбор повода ───────────────────────────────────────────────── */
+.gc-occasions { display: flex; gap: 7px; flex-wrap: wrap; margin: 12px 0 0; }
+.gc-occ-btn {
+  font: inherit;
+  font-size: 12px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(46, 42, 36, .2);
+  background: transparent;
+  color: #4a4439;
+  cursor: pointer;
+}
+.gc-occ-btn[aria-pressed="true"] {
+  border-color: var(--gold, #c9a84c);
+  background: rgba(201, 168, 76, .12);
+  color: #1e1e1e;
+}
+.gc-occ-btn:focus-visible { outline: 3px solid var(--gold, #c9a84c); outline-offset: 2px; }
+
+/* На узкой карточке минимальные размеры шрифта упираются в предел, текст
+   перестаёт уменьшаться вместе с ней, и нижняя строка уходит под обрез.
+   Читаемость важнее формы: даём карточке вырасти по высоте. Точная
+   пропорция нужна на печати, и там она возвращается. */
+@media (max-width: 560px) {
+  .gc { aspect-ratio: auto; gap: 3.5%; }
+}
+
+@media print {
+  .gc-picker,  .gc-occasions { display: none !important; }
+  .gc { aspect-ratio: 528 / 408; box-shadow: none; break-inside: avoid; }
+  .gc textarea.gc-msg { border-bottom-color: transparent !important; }
+}
