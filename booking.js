@@ -1117,17 +1117,24 @@
     }));
 
     cells.forEach((el) => {
-      const credit = el.dataset.credit || '';
+      const credit = (el.dataset.credit || '').trim();
       const id = el.dataset.master;
       const word = next[id] ? whenWord(next[id]) : null;
+
+      let tail = null;
       if (word) {
-        el.textContent = `${credit} · next opening ${word}`;
+        tail = `next opening ${word}`;
       } else if (asked[id]) {
         // Ответ пришёл, но мастера в нём нет — значит в горизонте поиска
         // у него пусто. Это и есть занятость, сказанная честно.
-        el.textContent = `${credit} · booked ${Math.round(NEXT_HORIZON_DAYS / 7)}+ weeks out`;
+        tail = `booked ${Math.round(NEXT_HORIZON_DAYS / 7)}+ weeks out`;
       }
       // Запрос не прошёл — оставляем запасной текст из разметки.
+      if (!tail) return;
+
+      // Склеиваем только непустые части: у мастера может не быть заслуги,
+      // и точка-разделитель не должна висеть в начале строки.
+      el.textContent = [credit, tail].filter(Boolean).join(' · ');
     });
   }
 
