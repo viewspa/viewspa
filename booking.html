@@ -57,12 +57,16 @@
     </div>
 
     <div class="bk-specialists">
+      <!-- Строка под именем состоит из двух частей: заслуга статична и не
+           устаревает, ближайшее окно подставляется живым из /api/next-available.
+           В разметке лежит запасной вариант без даты: он виден, пока данные
+           не пришли, и остаётся, если воркер не ответил. -->
       <div class="bk-spec-card">
         <img src="img/Kseniia.webp" alt="Ksenia - Head Nail Artist" class="bk-spec-photo" loading="lazy" width="64" height="64">
         <div class="bk-spec-body">
           <strong class="bk-spec-name">Ksenia</strong>
           <span class="bk-spec-role">Russian Manicure · Pedicure</span>
-          <span class="bk-spec-avail">★ Nailympia Champion · 2-3 weeks ahead</span>
+          <span class="bk-spec-avail" data-master="ksenia" data-credit="★ Nailympia Champion 2025">★ Nailympia Champion 2025</span>
         </div>
       </div>
       <div class="bk-spec-card">
@@ -70,7 +74,7 @@
         <div class="bk-spec-body">
           <strong class="bk-spec-name">Ivan</strong>
           <span class="bk-spec-role">Licensed Massage Therapist · AMTA Member</span>
-          <span class="bk-spec-avail">✓ Available this week</span>
+          <span class="bk-spec-avail" data-master="ivan" data-credit="✓ Deep tissue · lymphatic drainage">✓ Deep tissue · lymphatic drainage</span>
         </div>
       </div>
       <div class="bk-spec-card">
@@ -78,7 +82,7 @@
         <div class="bk-spec-body">
           <strong class="bk-spec-name">Anastasia</strong>
           <span class="bk-spec-role">Russian Manicure · Pedicure</span>
-          <span class="bk-spec-avail">✓ Full Russian technique · booking this week</span>
+          <span class="bk-spec-avail" data-master="anastasia" data-credit="✓ Full Russian technique">✓ Full Russian technique</span>
         </div>
       </div>
     </div>

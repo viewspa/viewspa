@@ -1064,9 +1064,79 @@
     renderCategory();
   }
 
+  // ── Ближайшее окно каждого мастера ────────────────────────────────
+  //
+  // Раньше под именами стояли зашитые обещания: «2-3 weeks ahead»,
+  // «available this week». Они устаревали молча и работали против нас:
+  // в свободную неделю отпугивали, в занятую обещали несуществующее.
+  // Теперь дата берётся из /api/next-available — он уже считает ближайший
+  // свободный слот каждого мастера и кеширует ответ на стороне воркера.
+  //
+  // Ногти спрашиваем один раз: у гель-маникюра оба мастера, и один ответ
+  // покрывает и Ксению, и Анастасию.
+  const NEXT_FOR = [
+    { serviceId: 'gel-manicure', masters: ['ksenia', 'anastasia'] },
+    { serviceId: 'full-body-reset', masters: ['ivan'] },
+  ];
+  const NEXT_HORIZON_DAYS = 21;   // настолько вперёд ищет воркер
+
+  /** «today», «tomorrow», «Thursday», «Nov 4» — чем ближе, тем короче. */
+  function whenWord(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return null;
+    const startOf = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const days = Math.round((startOf(d) - startOf(new Date())) / 86400000);
+    if (days <= 0) return 'today';
+    if (days === 1) return 'tomorrow';
+    // В пределах недели день недели читается как расстояние, а дата
+    // заставляет считать.
+    if (days < 7) return d.toLocaleDateString(CONFIG.locale, { weekday: 'long' });
+    return d.toLocaleDateString(CONFIG.locale, { month: 'short', day: 'numeric' });
+  }
+
+  async function paintNextAvailable() {
+    const cells = document.querySelectorAll('.bk-spec-avail[data-master]');
+    if (!cells.length) return;
+
+    const next = {};     // мастер → ISO ближайшего слота
+    const asked = {};     // мастер → ответил ли ЕГО запрос
+    await Promise.all(NEXT_FOR.map(async (g) => {
+      let res = null;
+      try {
+        res = await api('/api/next-available', { serviceId: g.serviceId });
+      } catch (_) {
+        // Молча: в разметке уже стоит запасной текст без даты.
+      }
+      for (const m of g.masters) {
+        // Признак ведём по каждому мастеру отдельно. Иначе упавший запрос
+        // по ногтям в паре с удачным по массажу выдал бы Ксении «занято
+        // на 3+ недели» — ложь из-за сетевой ошибки, а не из-за занятости.
+        asked[m] = !!res;
+        if (res && res.next && res.next[m]) next[m] = res.next[m];
+      }
+    }));
+
+    cells.forEach((el) => {
+      const credit = el.dataset.credit || '';
+      const id = el.dataset.master;
+      const word = next[id] ? whenWord(next[id]) : null;
+      if (word) {
+        el.textContent = `${credit} · next opening ${word}`;
+      } else if (asked[id]) {
+        // Ответ пришёл, но мастера в нём нет — значит в горизонте поиска
+        // у него пусто. Это и есть занятость, сказанная честно.
+        el.textContent = `${credit} · booked ${Math.round(NEXT_HORIZON_DAYS / 7)}+ weeks out`;
+      }
+      // Запрос не прошёл — оставляем запасной текст из разметки.
+    });
+  }
+
   // ── boot ───────────────────────────────────────────────────────────
   (async function init() {
     captureClickIds();
+    // Не ждём: карточки мастеров живут отдельно от формы записи, и сбой
+    // здесь не должен мешать записаться.
+    paintNextAvailable().catch(() => {});
     try {
       const cat = await api('/api/catalog');
       state.business = cat.business; state.masters = cat.masters; state.categories = cat.categories;
