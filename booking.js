@@ -710,7 +710,7 @@
          <label>Phone
            <input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(305) 555-1234" title="Your mobile number - we’ll text your confirmation">
          </label>
-         <label>Email - we’ll send your confirmation and reminder<input name="email" type="email" autocomplete="email"></label>
+         <label>Email - we’ll send your confirmation and directions<input name="email" type="email" required autocomplete="email" inputmode="email" placeholder="you@example.com" title="Your confirmation and directions are sent here"></label>
          ${intake}
          <label>Package or gift certificate code (optional)<input name="packageGan" placeholder="16 digits from your card - we apply it to this visit"></label>
          <div id="bk-addon"></div>
