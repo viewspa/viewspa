@@ -158,6 +158,16 @@
    аватар не тянет за собой базовую линию текста */
 .bk-spec-card { align-items: flex-start; gap: 14px; padding: 16px; }
 
+/* Ряд мастеров перестраивается под число видимых карточек: без этого
+   две карточки оставляли бы справа пустую треть, а одна растягивалась бы
+   на всю ширину. */
+.bk-spec-card[hidden] { display: none; }
+.bk-specialists[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 640px; margin-left: auto; margin-right: auto; }
+.bk-specialists[data-count="1"] { grid-template-columns: minmax(0, 1fr); max-width: 320px; margin-left: auto; margin-right: auto; }
+@media (max-width: 600px) {
+  .bk-specialists[data-count="2"], .bk-specialists[data-count="1"] { grid-template-columns: 1fr; max-width: none; }
+}
+
 /* Карточка мастера - ссылка: ведёт в меню записи этого мастера. Цвет и
    подчёркивание сбрасываем, чтобы вид остался прежним, а кликабельность
    показываем так же, как у плиток выбора: рамка и лёгкий подъём. */

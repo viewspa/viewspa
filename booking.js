@@ -326,7 +326,45 @@
       `<span class="bk-pstep ${i <= cur ? 'on' : ''}">${labels[s]}</span>`).join('<span class="bk-pline"></span>')}</div>`;
   }
 
+  // ── Мастера над меню зависят от выбранного раздела ──────────────────
+  // Пришёл с ногтевой страницы - Ivan в списке лишний; пришёл с массажной -
+  // лишние мастера маникюра. На первом экране («ногти или массаж») видны все.
+  // Список считаем по каталогу, чтобы он не разошёлся с самим меню.
+  // Запасной вариант нужен на время, пока каталог ещё грузится: иначе ряд
+  // карточек сначала рисовался бы весь, а потом дёргался.
+  const CATEGORY_MASTERS_FALLBACK = { nail: ['ksenia', 'anastasia'], massage: ['ivan'] };
+
+  function mastersOfCategory(catId) {
+    if (!catId) return null;
+    const cat = state.categories && state.categories.find((c) => c.id === catId);
+    if (cat) {
+      const ids = new Set();
+      for (const sub of cat.subcategories) {
+        for (const svc of sub.services) {
+          (svc.masters || []).forEach((m) => ids.add(m.masterId));
+          (svc.dualMaster || []).forEach((m) => ids.add(m.masterId));
+        }
+      }
+      return ids;
+    }
+    return CATEGORY_MASTERS_FALLBACK[catId] ? new Set(CATEGORY_MASTERS_FALLBACK[catId]) : null;
+  }
+
+  function syncSpecialists(catId) {
+    const box = document.querySelector('.bk-specialists');
+    if (!box) return;
+    const allowed = mastersOfCategory(catId);
+    let shown = 0;
+    box.querySelectorAll('a[data-master-link]').forEach((a) => {
+      const show = !allowed || allowed.has(a.dataset.masterLink);
+      a.hidden = !show;
+      if (show) shown++;
+    });
+    box.dataset.count = String(shown);   // сетке в CSS нужно знать, сколько колонок
+  }
+
   function shell(title, sub, inner, opts = {}) {
+    syncSpecialists(state.step === 'category' ? null : state.categoryId);
     root.innerHTML = `
       ${progressHtml()}
       <div class="bk-card">
@@ -786,6 +824,13 @@
     // Телефон нормализуем при отправке (см. normalizePhone), а НЕ по ходу ввода - чтобы
     // клиент мог писать привычно: (305) 555-1234. Код страны (+1) подставляется сам.
     _form.addEventListener('submit', submitBooking);
+    // Гель-маникюр к массажу не предлагается тому, кто платит пакетом или сертификатом.
+    _form.elements.packageGan.addEventListener('input', () => { renderAddonBlock(); updateAddonSummary(); });
+  }
+
+  function isMassageNow() {
+    const s = getService(state.serviceId);
+    return !!(s && s.cat && s.cat.id === 'massage');
   }
 
   async function submitBooking(e) {
@@ -812,7 +857,9 @@
         serviceVariationVersion: state.slot.serviceVariationVersion,
         customer: { name: fd.get('name'), email: fd.get('email'), phone, note },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
-        addon: state.addon ? { serviceId: state.addon.serviceId, startAt: state.addon.startAt } : undefined,
+        addon: state.addon && !(isMassageNow() && fd.get('packageGan'))
+          ? { serviceId: state.addon.serviceId, startAt: state.addon.startAt, masterId: state.addon.masterId, length: state.addon.length || undefined }
+          : undefined,
         gclid: storedClickId('gclid') || undefined,
         gbraid: storedClickId('gbraid') || undefined,
         wbraid: storedClickId('wbraid') || undefined,
@@ -936,11 +983,13 @@
          </div>`
       : (res.addonFailed
           ? `<div class="bk-done-addon bk-done-addon-warn">
-               We couldn’t hold the massage slot — we’ll call you to sort it out.
+               We couldn’t hold the extra slot — we’ll call you to sort it out.
              </div>`
           : '');
 
-    shell('You’re booked! 🎉', 'We’ll confirm your appointment shortly.',
+    // Запись принимается сразу, а письмо с адресом и подсказкой про парковку
+    // уходит при записи, поэтому «подтвердим позже» было бы неправдой.
+    shell('You’re booked! 🎉', 'Your confirmation and directions are on their way to your email.',
       `<div class="bk-summary bk-summary-done">
          <div><b>${svc.name}</b></div>
          <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)}</div>
@@ -1025,7 +1074,9 @@
       const opt = (state.addonOptions || [])[i];
       if (!opt) return;
       // повторный клик снимает выбор
-      state.addon = (state.addon && state.addon.startAt === opt.startAt && state.addon.serviceId === opt.serviceId) ? null : opt;
+      const same = state.addon && state.addon.startAt === opt.startAt && state.addon.serviceId === opt.serviceId
+        && state.addon.masterId === opt.masterId && state.addon.length === opt.length;
+      state.addon = same ? null : opt;
       renderAddonBlock();
       updateAddonSummary();
       return;
@@ -1099,11 +1150,12 @@
   // (сразу после или прямо перед), чтобы не обещать невозможное.
   async function loadAddonOptions() {
     const svc = getService(state.serviceId);
-    if (!svc || svc.cat.id !== 'nail' || svc.dualMaster) return;   // только к ногтям
+    if (!svc || svc.dualMaster || (svc.cat.id !== 'nail' && svc.cat.id !== 'massage')) return;
     try {
       const r = await api('/api/addon-slots', {
         startAt: state.slot.startAt,
         durationMin: state.slot.durationMin || svc.durationMin,
+        fromCategory: svc.cat.id,
       });
       state.addonOptions = r.options || [];
       state.addonDiscount = r.discountUsd || 20;
@@ -1115,14 +1167,21 @@
     const box = document.getElementById('bk-addon');
     if (!box) return;
     const opts = state.addonOptions || [];
-    if (!opts.length) { box.innerHTML = ''; return; }
+    const form = document.getElementById('bk-form');
+    const withPackage = isMassageNow() && form && form.elements.packageGan && form.elements.packageGan.value.trim();
+    if (!opts.length || withPackage) { if (withPackage) state.addon = null; box.innerHTML = ''; return; }
+    const toNails = isMassageNow();
 
     const rows = opts.map((o, i) => {
-      const on = state.addon && state.addon.startAt === o.startAt && state.addon.serviceId === o.serviceId;
-      const when = o.when === 'after' ? 'right after your nails' : 'right before your nails';
+      const on = state.addon && state.addon.startAt === o.startAt && state.addon.serviceId === o.serviceId
+        && state.addon.masterId === o.masterId && state.addon.length === o.length;
+      const when = o.when === 'after' ? `right after your ${toNails ? 'massage' : 'nails'}` : `right before your ${toNails ? 'massage' : 'nails'}`;
+      const label = toNails
+        ? `Gel manicure${o.lengthName ? ' (' + o.lengthName.toLowerCase() + ')' : ''} · ${o.masterName}`
+        : `${o.durationMin} min massage · ${o.masterName}`;
       return `<button type="button" class="bk-addon-opt${on ? ' on' : ''}" data-act="addon" data-i="${i}" aria-pressed="${on}">
           <span class="bk-addon-main">
-            <span class="bk-addon-name">${o.durationMin} min massage · ${o.masterName}</span>
+            <span class="bk-addon-name">${label}</span>
             <span class="bk-addon-when">${when} · ${timeLabel(o.startAt)}</span>
           </span>
           <span class="bk-addon-price"><s>${fmtMoney(o.price)}</s> ${fmtMoney(o.priceWithDiscount)}</span>
@@ -1131,8 +1190,8 @@
 
     box.innerHTML = `
       <div class="bk-addon-box">
-        <p class="bk-addon-title">Add a massage the same day — save $${state.addonDiscount || 20}</p>
-        <p class="bk-addon-sub">One visit instead of two. Ivan is free around your appointment.</p>
+        <p class="bk-addon-title">${toNails ? 'Add a Russian manicure' : 'Add a massage'} the same day — save $${state.addonDiscount || 20}</p>
+        <p class="bk-addon-sub">One visit instead of two. ${toNails ? 'Only times right next to your massage are shown.' : 'Ivan is free around your appointment.'}</p>
         ${rows}
       </div>`;
   }
@@ -1143,7 +1202,7 @@
     if (!el) return;
     if (!state.addon) { el.innerHTML = ''; return; }
     const total = (Number(state.slot.price) || 0) + (Number(state.addon.priceWithDiscount) || 0);
-    el.innerHTML = `<div class="bk-total">+ ${state.addon.durationMin} min massage · <b>${fmtMoney(total)} total</b></div>`;
+    el.innerHTML = `<div class="bk-total">+ ${isMassageNow() ? 'gel manicure' : state.addon.durationMin + ' min massage'} · <b>${fmtMoney(total)} total</b></div>`;
   }
 
   // ── диплинк по параметрам ссылки ───────────────────────────────────
@@ -1268,6 +1327,10 @@
   // ── boot ───────────────────────────────────────────────────────────
   (async function init() {
     captureClickIds();
+    // Раздел из адреса применяем сразу, не дожидаясь каталога: страница
+    // ногтей ведёт сюда с ?category=nail, и ряд мастеров не должен сначала
+    // показать всех троих, а потом убрать лишнего.
+    try { syncSpecialists(new URLSearchParams(location.search).get('category')); } catch (_) {}
     // Не ждём: карточки мастеров живут отдельно от формы записи, и сбой
     // здесь не должен мешать записаться.
     paintNextAvailable().catch(() => {});
