@@ -40,6 +40,7 @@
     subcategoryId: null,
     serviceId: null,
     masterId: null, // null = «любой/сравнить»
+    preferMaster: null, // запись «к конкретному мастеру»: меню урезано до его услуг
     length: null, // выбранная длина (short/medium/long) для услуг с длинами
     slot: null,
     selectedDay: null,
@@ -69,6 +70,43 @@
         for (const svc of sub.services) if (svc.id === id) return { ...svc, cat, sub };
     return null;
   }
+  // ── Запись к конкретному мастеру ────────────────────────────────────
+  // Клик по карточке мастера открывает меню записи, где остались только его
+  // услуги, а сам мастер уже выбран: шаг «Specialist» пропускается. Комбо на
+  // двух мастеров остаётся у каждого из двух.
+  // Услуги, которые в меню конкретного мастера не показываем, хотя он в них
+  // участвует. Комбо «маникюр + педикюр» занимает обоих мастеров сразу, и в
+  // меню любого из них оно лишнее; остаётся только в общем меню.
+  const HIDDEN_IN_MASTER_MENU = {
+    ksenia: ['mani-pedi-combo'],
+    anastasia: ['mani-pedi-combo'],
+  };
+  const masterDoes = (svc, id) => {
+    if ((HIDDEN_IN_MASTER_MENU[id] || []).includes(svc.id)) return false;
+    return svc.dualMaster
+      ? svc.dualMaster.some((s) => s.masterId === id)
+      : (svc.masters || []).some((m) => m.masterId === id);
+  };
+  const visibleServices = (sub) => state.preferMaster
+    ? sub.services.filter((s) => masterDoes(s, state.preferMaster))
+    : sub.services;
+  // Подразделы и разделы без услуг мастера пропадают, а не показываются пустыми.
+  const visibleSubs = (cat) => cat.subcategories
+    .map((s) => ({ ...s, services: visibleServices(s) }))
+    .filter((s) => s.services.length);
+  const visibleCats = () => state.categories
+    .map((c) => ({ ...c, subcategories: visibleSubs(c) }))
+    .filter((c) => c.subcategories.length);
+  const nServices = (n) => `${n} service${n === 1 ? '' : 's'}`;
+
+  /** Строка над меню: напоминает, к кому идёт запись, и даёт выйти из режима. */
+  function masterBanner() {
+    const m = state.preferMaster && state.masters && state.masters[state.preferMaster];
+    if (!m) return '';
+    return `<p class="bk-pref">Booking with <b>${m.name}</b> · `
+      + `<button type="button" class="bk-pref-clear" data-act="allmasters">Show all specialists</button></p>`;
+  }
+
   function priceRange(svc) {
     if (svc.dualMaster) return fmtMoney(svc.price);
     const ps = svc.masters.map((m) => m.price);
@@ -306,30 +344,33 @@
   // ── steps ──────────────────────────────────────────────────────────
   function renderCategory() {
     state.step = 'category';
-    const cards = state.categories.map((c) =>
+    const cards = visibleCats().map((c) =>
       `<button class="bk-tile" data-act="cat" data-id="${c.id}">
          <span class="bk-tile-name">${c.name}</span>
-         <span class="bk-tile-meta">${c.subcategories.reduce((n, s) => n + s.services.length, 0)} services ›</span>
+         <span class="bk-tile-meta">${nServices(c.subcategories.reduce((n, s) => n + s.services.length, 0))} ›</span>
        </button>`).join('');
-    shell('What would you like to book?', 'Choose a service category to start.', `<div class="bk-grid">${cards}</div>`);
+    shell('What would you like to book?', 'Choose a service category to start.', `${masterBanner()}<div class="bk-grid">${cards}</div>`);
   }
 
   function renderSubcategory() {
     state.step = 'subcategory';
-    const cat = state.categories.find((c) => c.id === state.categoryId);
+    const cat = visibleCats().find((c) => c.id === state.categoryId);
     // если всего одна подкатегория - пропускаем
     if (cat.subcategories.length === 1) { state.subcategoryId = cat.subcategories[0].id; return renderService(); }
     const cards = cat.subcategories.map((s) =>
       `<button class="bk-tile" data-act="sub" data-id="${s.id}">
          <span class="bk-tile-name">${s.name}</span>
-         <span class="bk-tile-meta">${s.services.length} services ›</span>
+         <span class="bk-tile-meta">${nServices(s.services.length)} ›</span>
        </button>`).join('');
-    shell(cat.name, 'Pick a category.', `<div class="bk-grid">${cards}</div>`, { back: true });
+    // Назад ведёт к выбору раздела; если у мастера раздел один, выбирать
+    // там нечего, и кнопка привела бы на экран с единственной плиткой.
+    const canBack = !(state.preferMaster && visibleCats().length === 1);
+    shell(cat.name, 'Pick a category.', `${masterBanner()}<div class="bk-grid">${cards}</div>`, { back: canBack });
   }
 
   function renderService() {
     state.step = 'service';
-    const cat = state.categories.find((c) => c.id === state.categoryId);
+    const cat = visibleCats().find((c) => c.id === state.categoryId);
     const sub = cat.subcategories.find((s) => s.id === state.subcategoryId);
     const rows = sub.services.map((svc) =>
       `<button class="bk-svc" data-act="svc" data-id="${svc.id}">
@@ -339,7 +380,9 @@
          </span>
          <span class="bk-svc-price">${priceRange(svc)} ›</span>
        </button>`).join('');
-    shell(sub.name, 'Select a service.', `<div class="bk-list">${rows}</div>`, { back: true });
+    // Один раздел и один подраздел у мастера: возвращаться некуда.
+    const canBack = !(state.preferMaster && visibleCats().length === 1 && cat.subcategories.length === 1);
+    shell(sub.name, 'Select a service.', `${masterBanner()}<div class="bk-list">${rows}</div>`, { back: canBack });
   }
 
   // Длины услуги для мастера (или null, если у услуги нет тарифов по длине).
@@ -375,6 +418,11 @@
     state.step = 'master';
     state.length = null;
     const svc = getService(state.serviceId);
+    // Пришли с карточки мастера: он уже выбран, спрашивать второй раз незачем.
+    if (state.preferMaster && svc.masters.some((m) => m.masterId === state.preferMaster)) {
+      state.masterId = state.preferMaster;
+      return maybeLengthThenTime();
+    }
     const masters = svc.masters.map((m) => ({ ...state.masters[m.masterId], price: m.price }));
     // один мастер - пропускаем выбор
     if (masters.length === 1) { state.masterId = masters[0].id; return maybeLengthThenTime(); }
@@ -913,7 +961,7 @@
       length: 'master',
       master: 'service',
       service: () => {
-        const cat = state.categories.find((c) => c.id === state.categoryId);
+        const cat = visibleCats().find((c) => c.id === state.categoryId);
         return cat.subcategories.length === 1 ? 'category' : 'subcategory';
       },
       subcategory: 'category',
@@ -924,6 +972,9 @@
     if (prev === 'master') {
       const svc = getService(state.serviceId);
       if (svc.masters.length === 1) prev = 'service';
+      // Мастер выбран карточкой: этого шага вперёд не было, назад его тоже
+      // нет. Иначе renderMaster сам бы отправил клиента вперёд, по кругу.
+      else if (state.preferMaster && svc.masters.some((m) => m.masterId === state.preferMaster)) prev = 'service';
     }
     ({ category: renderCategory, subcategory: renderSubcategory, service: renderService, master: renderMaster, length: renderLength, time: loadTime, details: renderDetails }[prev] || renderCategory)();
   }
@@ -934,6 +985,13 @@
     if (!t) return;
     const act = t.dataset.act;
     if (act === 'back') return back();
+    if (act === 'allmasters') {
+      // Выход из режима «к мастеру»: полное меню и ссылка без ?master.
+      state.preferMaster = null;
+      state.serviceId = null; state.masterId = null; state.slot = null; state.length = null;
+      setUrlParams({ master: null });
+      return renderCategory();
+    }
     if (act === 'cat') { state.categoryId = t.dataset.id; state.subcategoryId = null; return renderSubcategory(); }
     if (act === 'sub') { state.subcategoryId = t.dataset.id; return renderService(); }
     if (act === 'svc') {
@@ -970,6 +1028,68 @@
       return;
     }
   });
+
+  /** Правим параметры адресной строки без перезагрузки; null убирает параметр. */
+  function setUrlParams(changes) {
+    try {
+      const u = new URL(location.href);
+      for (const [k, v] of Object.entries(changes)) {
+        if (v == null) u.searchParams.delete(k); else u.searchParams.set(k, v);
+      }
+      history.replaceState(null, '', u.pathname + u.search + u.hash);
+    } catch (_) { /* адресная строка - удобство, не необходимость */ }
+  }
+
+  /**
+   * Открыть меню записи конкретного мастера. Зовётся и по клику на карточку
+   * мастера, и из ссылки booking.html?master=ksenia.
+   */
+  function startWithMaster(id, { catId, subId } = {}) {
+    if (!state.masters || !state.masters[id]) return false;
+    state.preferMaster = id;
+    state.serviceId = null; state.masterId = null; state.slot = null; state.length = null;
+    state.addon = null; state.addonOptions = null;
+    const cats = visibleCats();
+    if (!cats.length) { state.preferMaster = null; return false; }
+
+    const cat = cats.find((c) => c.id === catId) || (cats.length === 1 ? cats[0] : null);
+    if (!cat) { renderCategory(); return true; }
+    state.categoryId = cat.id;
+    const sub = subId && cat.subcategories.find((s) => s.id === subId);
+    if (sub) { state.subcategoryId = sub.id; renderService(); return true; }
+    state.subcategoryId = null;
+    renderSubcategory();
+    return true;
+  }
+
+  // Клик по карточке мастера на странице записи. Без перезагрузки: клиент уже
+  // здесь, и выбор не должен сбрасываться миганием страницы. Ссылка остаётся
+  // настоящей, поэтому «открыть в новой вкладке» и копирование адреса работают.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-master-link]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (!state.categories) return;   // каталог ещё не пришёл: пусть ссылка откроет страницу заново
+    if (!startWithMaster(a.dataset.masterLink)) return;
+    e.preventDefault();
+    setUrlParams({ master: a.dataset.masterLink, category: null, subcategory: null, service: null });
+    scrollToMenu();
+  });
+
+  /**
+   * Подвести страницу к меню записи. Карточки мастеров стоят над ним, и на
+   * телефоне меню после клика оказывается ниже экрана: без прокрутки человек
+   * решит, что ничего не произошло. Отступ на липкую шапку считаем сами:
+   * scrollIntoView прижал бы верх меню прямо под неё, и заголовок был бы закрыт.
+   */
+  function scrollToMenu() {
+    try {
+      const header = document.querySelector('header');
+      const stuck = header && getComputedStyle(header).position === 'sticky' ? header.getBoundingClientRect().height : 0;
+      const top = root.getBoundingClientRect().top + window.scrollY - stuck - 12;
+      const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: Math.max(0, top), behavior: calm ? 'instant' : 'smooth' });
+    } catch (_) { /* прокрутка - удобство, без неё меню всё равно открыто */ }
+  }
 
   // ── Массаж в тот же день ───────────────────────────────────────────
   // Показываем только те сеансы, которые примыкают к выбранному слоту
@@ -1034,6 +1154,10 @@
     const lengthParam = p.get('length');
     const subId = p.get('subcategory');
     const catId = p.get('category');
+
+    // ?master=ksenia без услуги: меню записи этого мастера. С услугой
+    // (?service=…&master=…) работает прежний путь - его используют письма.
+    if (masterId && !serviceId && startWithMaster(masterId, { catId, subId })) return;
 
     if (serviceId) {
       const svc = getService(serviceId);
