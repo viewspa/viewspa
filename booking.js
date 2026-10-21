@@ -363,7 +363,70 @@
     box.dataset.count = String(shown);   // сетке в CSS нужно знать, сколько колонок
   }
 
+  // ── история браузера ───────────────────────────────────────────────
+  // Каждый новый экран записи - отдельная запись в истории, поэтому кнопка
+  // «Назад» в браузере (и жест на телефоне) возвращает на шаг назад, а не
+  // выкидывает со страницы. Повторная отрисовка того же шага (смена дня,
+  // месяца) историю не плодит.
+  let restoringKey = null;   // ключ экрана, который сейчас восстанавливает popstate
+
+  function stepSnapshot() {
+    return {
+      step: state.step, categoryId: state.categoryId || null, subcategoryId: state.subcategoryId || null,
+      serviceId: state.serviceId || null, masterId: state.masterId || null, length: state.length || null,
+      preferMaster: state.preferMaster || null,
+    };
+  }
+  function snapKey(s) {
+    return [s.step, s.categoryId, s.subcategoryId, s.serviceId, s.masterId, s.length, s.preferMaster].join('|');
+  }
+
+  function recordStep() {
+    try {
+      const snap = stepSnapshot();
+      const key = snapKey(snap);
+      const cur = history.state && history.state.bk;
+      if (restoringKey !== null || state.step === 'done' || !cur) {
+        // восстановление из истории, финальный экран или первый экран страницы: запись не добавляем
+        snap.n = cur ? cur.n : 0;
+        restoringKey = null;
+        history.replaceState({ bk: snap }, '', location.href);
+      } else if (snapKey(cur) === key) {
+        snap.n = cur.n;
+        history.replaceState({ bk: snap }, '', location.href);
+      } else {
+        snap.n = cur.n + 1;
+        history.pushState({ bk: snap }, '', location.href);
+      }
+    } catch (_) { /* история - удобство, без неё запись работает */ }
+  }
+
+  /** Кнопка «‹ Back» в карточке: на шаг назад по истории, если она есть. */
+  function goBack() {
+    const cur = history.state && history.state.bk;
+    if (cur && cur.n > 0 && state.step !== 'done') { history.back(); return; }
+    back();
+  }
+
+  window.addEventListener('popstate', (e) => {
+    const snap = e.state && e.state.bk;
+    if (!snap || !state.categories) return;   // не наша запись или каталог ещё не пришёл
+    Object.assign(state, {
+      categoryId: snap.categoryId, subcategoryId: snap.subcategoryId, serviceId: snap.serviceId,
+      masterId: snap.masterId, length: snap.length, preferMaster: snap.preferMaster,
+    });
+    restoringKey = snapKey(snap);
+    const detailsOk = state.slot && getService(state.serviceId);
+    const fn = {
+      category: renderCategory, subcategory: renderSubcategory, service: renderService,
+      master: renderMaster, length: renderLength, time: loadTime,
+      details: detailsOk ? renderDetails : loadTime, done: renderCategory,
+    }[snap.step] || renderCategory;
+    try { fn(); } catch (_) { restoringKey = null; renderCategory(); }
+  });
+
   function shell(title, sub, inner, opts = {}) {
+    recordStep();
     syncSpecialists(state.step === 'category' ? null : state.categoryId);
     root.innerHTML = `
       ${progressHtml()}
@@ -1036,7 +1099,7 @@
     const t = e.target.closest('[data-act]');
     if (!t) return;
     const act = t.dataset.act;
-    if (act === 'back') return back();
+    if (act === 'back') return goBack();
     if (act === 'allmasters') {
       // Выход из режима «к мастеру»: полное меню и ссылка без ?master.
       state.preferMaster = null;
@@ -1090,7 +1153,7 @@
       for (const [k, v] of Object.entries(changes)) {
         if (v == null) u.searchParams.delete(k); else u.searchParams.set(k, v);
       }
-      history.replaceState(null, '', u.pathname + u.search + u.hash);
+      history.replaceState(history.state, '', u.pathname + u.search + u.hash);
     } catch (_) { /* адресная строка - удобство, не необходимость */ }
   }
 
