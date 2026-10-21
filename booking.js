@@ -75,12 +75,9 @@
   // услуги, а сам мастер уже выбран: шаг «Specialist» пропускается. Комбо на
   // двух мастеров остаётся у каждого из двух.
   // Услуги, которые в меню конкретного мастера не показываем, хотя он в них
-  // участвует. Комбо «маникюр + педикюр» занимает обоих мастеров сразу, и в
-  // меню любого из них оно лишнее; остаётся только в общем меню.
-  const HIDDEN_IN_MASTER_MENU = {
-    ksenia: ['mani-pedi-combo'],
-    anastasia: ['mani-pedi-combo'],
-  };
+  // участвует: { ksenia: ['id-услуги'] }. Сейчас пусто - комбо «маникюр +
+  // педикюр» показываются и в общем меню, и в меню каждого из двух мастеров.
+  const HIDDEN_IN_MASTER_MENU = {};
   const masterDoes = (svc, id) => {
     if ((HIDDEN_IN_MASTER_MENU[id] || []).includes(svc.id)) return false;
     return svc.dualMaster
@@ -372,10 +369,16 @@
     state.step = 'service';
     const cat = visibleCats().find((c) => c.id === state.categoryId);
     const sub = cat.subcategories.find((s) => s.id === state.subcategoryId);
+    // В меню «Same Time» приставка «— Same Time» в каждой строке повторяет
+    // название самого меню и растягивает имя на пять строк. В списке её
+    // прячем; в каталоге и в уведомлениях владельцу имя остаётся полным.
+    const listName = (svc) => sub.id === 'same-time'
+      ? svc.name.replace(/\s+[—–-]\s+Same Time$/i, '')
+      : svc.name;
     const rows = sub.services.map((svc) =>
       `<button class="bk-svc" data-act="svc" data-id="${svc.id}">
          <span class="bk-svc-main">
-           <span class="bk-svc-name">${svc.name}</span>
+           <span class="bk-svc-name">${listName(svc)}</span>
            <span class="bk-svc-dur">⏱ ${fmtDur(svc.durationMin)}</span>
          </span>
          <span class="bk-svc-price">${priceRange(svc)} ›</span>
