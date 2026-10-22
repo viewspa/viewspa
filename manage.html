@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Your appointment | View Spa</title>
+<style>body{font-family:Arial,Helvetica,sans-serif;background:#faf7f2;color:#1E1E1E;margin:0;padding:40px 20px;text-align:center}a{color:#8A6D1F}</style>
+</head>
+<body>
+<p>Opening your appointment&hellip;</p>
+<noscript><p><a id="go" href="#">Continue to your appointment</a></p></noscript>
+<script>
+// Ссылка из письма живёт на домене студии и перебрасывает на воркер,
+// где лежит сама страница управления записью.
+(function () {
+  var base = 'https://viewspa-booking.ivanseydametov.workers.dev';
+  var target = base + '/api/manage' + location.search;
+  var a = document.getElementById('go');
+  if (a) a.href = target;
+  location.replace(target);
+})();
+</script>
+</body>
+</html>
