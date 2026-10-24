@@ -654,6 +654,17 @@
   async function loadTime() {
     state.step = 'time';
     const now = new Date();
+    // Слоты в кэше принадлежат конкретной услуге, мастеру и длине. Сменил
+    // услугу (например, вернулся назад и выбрал другую) - прежние слоты
+    // чужие, и запись на них уходила бы с неверным мастером.
+    const sig = [state.serviceId, state.masterId || '', state.length || ''].join('|');
+    if (state.cacheSig !== sig) {
+      state.cacheSig = sig;
+      state.monthCache = {};
+      state.monthCursor = null;
+      state.selectedDay = null;
+      state.slot = null;
+    }
     state.monthCache = state.monthCache || {};
     if (!state.monthCursor) state.monthCursor = { y: now.getFullYear(), m: now.getMonth() };
     shell('Pick a date & time', timeHeader(), `<div class="bk-loading">Loading availability…</div>`, { back: true });
