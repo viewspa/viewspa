@@ -1105,7 +1105,8 @@
       '</p>' +
       '<div class="cl-nums">' +
         clNum(' записей', p.total) +
-        clNum(' пришёл', p.kept) +
+        clNum(' пришёл', p.bookings.filter(function (b) { return !/CANCELLED|NO_SHOW/.test(b.status || '') && Date.parse(b.start) <= Date.now(); }).length) +
+        clNum(' впереди', p.bookings.filter(function (b) { return !/CANCELLED|NO_SHOW|DECLINED/.test(b.status || '') && Date.parse(b.start) > Date.now(); }).length) +
         clNum(' отменил', p.cancelled, true) +
         clNum(' не пришёл', p.noShow, true) +
         clNum(' позже суток', p.lateUnder24h, true) +
@@ -1132,6 +1133,8 @@
     } else {
       var rows = p.bookings.map(function (b) {
         var s = HIST_STATUS[b.status] || [b.status || '—', 'ad-warn'];
+        // Принятая запись в будущем ещё не «пришёл»: человек пока не был.
+        if (b.status === 'ACCEPTED' && Date.parse(b.start) > Date.now()) s = ['записан', 'ad-warn'];
         return '<tr>' +
           '<td>' + histWhen(b.start) + '</td>' +
           '<td><span class="ad-tag ' + s[1] + '">' + esc(s[0]) + '</span></td>' +
