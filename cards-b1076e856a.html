@@ -334,7 +334,9 @@
     <summary>Кто отменял и переносил</summary>
     <div class="ad-rev-body">
       <p class="ad-gaps-intro">Все отмены, неявки и переносы за период, сгруппированные по людям.
-      Сверху те, с кем проблем больше. Отсюда же можно поставить метку. Ничего не отправляет.</p>
+      Сверху те, с кем проблем больше. Отсюда же можно поставить метку. Ничего не отправляет.
+      Переносы считаются только те, что клиент сделал сам на сайте, с момента запуска журнала:
+      Square переносы не хранит, ручные правки в нём не видны.</p>
       <div class="ad-wb-weeks">
         <div class="ad-field">
           <label for="trb-months">Период, месяцев</label>
@@ -1109,9 +1111,16 @@
         clNum(' впереди', p.bookings.filter(function (b) { return !/CANCELLED|NO_SHOW|DECLINED/.test(b.status || '') && Date.parse(b.start) > Date.now(); }).length) +
         clNum(' отменил', p.cancelled, true) +
         clNum(' не пришёл', p.noShow, true) +
-        clNum(' позже суток', p.lateUnder24h, true) +
-        clNum(' позже часа', p.lateUnder1h, true) +
+        clNum(' перенёс на сайте', p.moved) +
+        clNum(' отмена &lt;24 ч', p.lateUnder24h, true) +
+        clNum(' перенос &lt;24 ч', p.movedUnder24h, true) +
+        clNum(' отмена &lt;1 ч', p.lateUnder1h, true) +
       '</div>' +
+      (p.moves && p.moves.length
+        ? '<p class="ad-gaps-note-in">Переносы на сайте: ' + p.moves.map(function (m) {
+            return histWhen(m.from) + ' → ' + histWhen(m.to) + ' (' + histNotice(Math.round(m.hoursBefore * 60)) + ')';
+          }).join('; ') + '</p>'
+        : '') +
       (f ? '<p class="cl-flagline"><b>Отмечен ' + histWhen(f.at) + '.</b>' +
            (f.note ? ' ' + esc(f.note) : '') +
            '<br>При новой записи придёт письмо с предупреждением. Клиент этого не видит.</p>' : '') +
@@ -1141,17 +1150,16 @@
           '<td>' + esc(b.master || '—') + '</td>' +
           '<td>' + (b.minutes != null ? b.minutes + ' мин' : '—') + '</td>' +
           '<td>' + histNotice(b.noticeMinutes) + '</td>' +
-          '<td>' + (b.editedAt ? 'меняли ' + histWhen(b.editedAt) : '—') + '</td>' +
           '<td>' + (HIST_SOURCE[b.source] || '—') + '</td>' +
           '</tr>';
       }).join('');
       table =
         '<div class="ad-scroll"><table><thead><tr>' +
         '<th>Когда</th><th>Чем кончилось</th><th>Мастер</th><th>Длит.</th>' +
-        '<th>Предупредил</th><th>Правки</th><th>Откуда</th>' +
+        '<th>Предупредил</th><th>Откуда</th>' +
         '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
-        '<p class="ad-gaps-note-in">«Правки» — запись меняли после создания. Square не сообщает, ' +
-        'что именно изменилось и кто это сделал: сдвинуть время мог и клиент, и мастер.</p>';
+        '<p class="ad-gaps-note-in">Переносы считаются только те, что клиент сделал сам на сайте, ' +
+        'с момента запуска журнала. Square не хранит переносы, ручные правки в нём не видны.</p>';
     }
 
     return '<div class="cl-card' + (f ? ' flagged' : '') + '">' + head + act + table + '</div>';
@@ -1196,10 +1204,10 @@
       var s = HIST_STATUS[e.status] || [e.status || '—', 'ad-warn'];
       return '<tr>' +
         '<td>' + histWhen(e.start) + '</td>' +
-        '<td><span class="ad-tag ' + (e.kind === 'edit' ? 'ad-warn' : s[1]) + '">' +
-          (e.kind === 'edit' ? 'перенесли' : esc(s[0])) + '</span></td>' +
+        '<td><span class="ad-tag ' + (e.kind === 'move' ? 'ad-warn' : s[1]) + '">' +
+          (e.kind === 'move' ? 'перенёс на ' + histWhen(e.movedTo) : esc(s[0])) + '</span></td>' +
         '<td>' + esc(e.master || '—') + '</td>' +
-        '<td>' + (e.kind === 'cancel' ? histNotice(e.noticeMinutes) : '—') + '</td>' +
+        '<td>' + (e.kind === 'move' ? histNotice(e.hoursBefore == null ? null : Math.round(e.hoursBefore * 60)) : histNotice(e.noticeMinutes)) + '</td>' +
         '<td>' + (HIST_SOURCE[e.source] || '—') + '</td>' +
         '</tr>';
     }).join('');
@@ -1215,11 +1223,13 @@
         (p.email ? '<a href="mailto:' + esc(p.email) + '">' + esc(p.email) + '</a>' : 'почты нет') +
       '</p>' +
       '<div class="cl-nums">' +
+        clNum(' пришёл', p.kept) +
+        clNum(' перенёс на сайте', p.moved) +
         clNum(' отменил', p.cancelled, true) +
         clNum(' не пришёл', p.noShow, true) +
-        clNum(' перенёс', p.edited) +
-        clNum(' позже суток', p.lateUnder24h, true) +
-        clNum(' позже часа', p.lateUnder1h, true) +
+        clNum(' отмена &lt;24 ч', p.lateUnder24h, true) +
+        clNum(' перенос &lt;24 ч', p.movedUnder24h, true) +
+        clNum(' отмена &lt;1 ч', p.lateUnder1h, true) +
       '</div>' +
       '<div class="cl-act">' +
         (f ? '' : '<input type="text" class="cl-note" placeholder="Коротко: что случилось (необязательно)" maxlength="200">') +
