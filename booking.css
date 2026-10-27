@@ -321,6 +321,10 @@ a.bk-spec-card:hover::after { transform: translateX(3px); opacity: 1; }
 .bk-addon-price { font-size: 15px; font-weight: 700; color: var(--dark); white-space: nowrap; }
 .bk-addon-price s { color: var(--mid); font-weight: 400; margin-right: 4px; }
 
+/* Дизайн ногтей: короткие названия, поэтому в два столбца - форма и так длинная. */
+.bk-design-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.bk-design-grid .bk-addon-opt { margin-bottom: 0; min-height: 44px; }
+
 /* итог в сводке, когда массаж выбран */
 .bk-total { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 13px; color: var(--mid); }
 .bk-total b { color: var(--dark); }

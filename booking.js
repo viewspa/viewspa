@@ -876,6 +876,7 @@
          <label>Email - we’ll send your confirmation and directions<input name="email" type="email" required autocomplete="email" inputmode="email" placeholder="you@example.com" title="Your confirmation and directions are sent here"></label>
          ${intake}
          <label>Package or gift certificate code (optional)<input name="packageGan" placeholder="16 digits from your card - we apply it to this visit"></label>
+         <div id="bk-design"></div>
          <div id="bk-addon"></div>
          <label class="bk-agree">
            <input type="checkbox" name="agreePolicy" required>
@@ -886,6 +887,7 @@
          <div class="bk-error" id="bk-form-err" hidden></div>
        </form>`, { back: true });
     renderTurnstile();
+    renderDesignBlock();
     renderAddonBlock();     // если опции уже загружены (например, вернулись назад)
     updateAddonSummary();
     const _form = document.getElementById('bk-form');
@@ -899,7 +901,39 @@
     // клиент мог писать привычно: (305) 555-1234. Код страны (+1) подставляется сам.
     _form.addEventListener('submit', submitBooking);
     // Гель-маникюр к массажу не предлагается тому, кто платит пакетом или сертификатом.
-    _form.elements.packageGan.addEventListener('input', () => { renderAddonBlock(); updateAddonSummary(); });
+    _form.elements.packageGan.addEventListener('input', () => { renderAddonBlock(); renderDesignBlock(); updateAddonSummary(); });
+  }
+
+  // Дизайн ногтей: прибавляет цену, время записи не меняет. Только к ногтевым
+  // услугам, кроме «Extras» (там дизайн как отдельная услуга).
+  function designAllowed() {
+    const s = getService(state.serviceId);
+    if (!state.designs || !s || !s.cat) return false;
+    if (s.cat.id === 'nail') return !(s.sub && s.sub.id === 'extras');
+    // К массажу дизайн возможен на гель-маникюре, добавленном в этой же записи.
+    return isMassageNow() && !!state.addon;
+  }
+
+  function renderDesignBlock() {
+    const box = document.getElementById('bk-design');
+    if (!box) return;
+    if (!designAllowed()) { box.innerHTML = ''; state.design = null; return; }
+    const rows = state.designs.options.map((o) => {
+      const on = state.design === o.id;
+      return `<button type="button" class="bk-addon-opt${on ? ' on' : ''}" data-act="design" data-id="${o.id}" aria-pressed="${on}">
+          <span class="bk-addon-main"><span class="bk-addon-name">${o.name}</span></span>
+        </button>`;
+    }).join('');
+    box.innerHTML = `
+      <div class="bk-addon-box">
+        <p class="bk-addon-title">Add a nail design${isMassageNow() ? ' to your gel manicure' : ''} - +${fmtMoney(state.designs.priceUsd)}</p>
+        <p class="bk-addon-sub">Your appointment time stays the same. Tap again to remove it. For something else, choose Other and describe it in the note.</p>
+        <div class="bk-design-grid">${rows}</div>
+      </div>`;
+  }
+
+  function designPrice() {
+    return state.design && state.designs ? Number(state.designs.priceUsd) || 0 : 0;
   }
 
   function isMassageNow() {
@@ -931,6 +965,7 @@
         serviceVariationVersion: state.slot.serviceVariationVersion,
         customer: { name: fd.get('name'), email: fd.get('email'), phone, note },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
+        design: designAllowed() && state.design ? state.design : undefined,
         addon: state.addon && !(isMassageNow() && fd.get('packageGan'))
           ? { serviceId: state.addon.serviceId, startAt: state.addon.startAt, masterId: state.addon.masterId, length: state.addon.length || undefined }
           : undefined,
@@ -1048,12 +1083,15 @@
     }
     const payLine = res.paidWith === 'package'
       ? `${masterLabel} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
-      : `${masterLabel} · ${fmtMoney(state.slot.price)} (pay in person)`;
+      : `${masterLabel} · ${fmtMoney(state.slot.price + (res.design && !res.design.onAddon ? res.design.priceUsd : 0))}${res.design && !res.design.onAddon ? ` incl. ${res.design.name} design` : ''} (pay in person)`;
+    const designHtml = res.paidWith === 'package' && res.design && !res.design.onAddon
+      ? `<div class="bk-done-addon"><div><b>+ ${res.design.name} design</b></div><div>${fmtMoney(res.design.priceUsd)}, paid at the studio</div></div>`
+      : '';
     // доп-услуга: подтверждена, либо честно сообщаем, что не прошла
     const addonHtml = res.addon
       ? `<div class="bk-done-addon">
            <div><b>+ ${res.addon.name}</b></div>
-           <div>${dayLabel(res.addon.startAt)}, ${timeLabel(res.addon.startAt)} · ${res.addon.masterName} · ${fmtMoney(res.addon.priceWithDiscount)} <s>${fmtMoney(res.addon.price)}</s></div>
+           <div>${dayLabel(res.addon.startAt)}, ${timeLabel(res.addon.startAt)} · ${res.addon.masterName} · ${fmtMoney(res.addon.priceWithDiscount + (res.design && res.design.onAddon ? res.design.priceUsd : 0))} <s>${fmtMoney(res.addon.price)}</s>${res.design && res.design.onAddon ? ` · incl. ${res.design.name} design` : ''}</div>
          </div>`
       : (res.addonFailed
           ? `<div class="bk-done-addon bk-done-addon-warn">
@@ -1068,6 +1106,7 @@
          <div><b>${svc.name}</b></div>
          <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)}</div>
          <div>${payLine}</div>
+         ${designHtml}
          ${addonHtml}
        </div>
        <a href="index.html" class="btn btn-dark" style="margin-top:18px;display:inline-block">Back to site</a>`,
@@ -1139,8 +1178,15 @@
       state.selectedDay = day;
       state.addon = null;
       state.addonOptions = null;
+      state.design = null;
       renderDetails();
       loadAddonOptions();   // подгружаем в фоне — форма не ждёт
+      return;
+    }
+    if (act === 'design') {
+      state.design = state.design === t.dataset.id ? null : t.dataset.id;   // повторный клик снимает
+      renderDesignBlock();
+      updateAddonSummary();
       return;
     }
     if (act === 'addon') {
@@ -1152,6 +1198,7 @@
         && state.addon.masterId === opt.masterId && state.addon.length === opt.length;
       state.addon = same ? null : opt;
       renderAddonBlock();
+      renderDesignBlock();
       updateAddonSummary();
       return;
     }
@@ -1274,9 +1321,12 @@
   function updateAddonSummary() {
     const el = document.getElementById('bk-total-line');
     if (!el) return;
-    if (!state.addon) { el.innerHTML = ''; return; }
-    const total = (Number(state.slot.price) || 0) + (Number(state.addon.priceWithDiscount) || 0);
-    el.innerHTML = `<div class="bk-total">+ ${isMassageNow() ? 'gel manicure' : state.addon.durationMin + ' min massage'} · <b>${fmtMoney(total)} total</b></div>`;
+    if (!state.addon && !designPrice()) { el.innerHTML = ''; return; }
+    const total = (Number(state.slot.price) || 0) + (state.addon ? Number(state.addon.priceWithDiscount) || 0 : 0) + designPrice();
+    const parts = [];
+    if (state.addon) parts.push(isMassageNow() ? 'gel manicure' : state.addon.durationMin + ' min massage');
+    if (designPrice()) parts.push('design');
+    el.innerHTML = `<div class="bk-total">+ ${parts.join(' + ')} · <b>${fmtMoney(total)} total</b></div>`;
   }
 
   // ── диплинк по параметрам ссылки ───────────────────────────────────
@@ -1411,6 +1461,7 @@
     try {
       const cat = await api('/api/catalog');
       state.business = cat.business; state.masters = cat.masters; state.categories = cat.categories;
+      state.designs = cat.designs || null;
       applyDeepLink();
     } catch (e) {
       root.innerHTML = `<div class="bk-card"><div class="bk-error">Booking is temporarily unavailable (${e.message}).<br>Please call (754) 202-6666.</div></div>`;
