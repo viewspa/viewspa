@@ -42,6 +42,9 @@
     masterId: null, // null = «любой/сравнить»
     preferMaster: null, // запись «к конкретному мастеру»: меню урезано до его услуг
     length: null, // выбранная длина (short/medium/long) для услуг с длинами
+    second: null, // вторая услуга подряд: { serviceId, masterId, length }
+    xPick: null,  // что сейчас выбираем для второй услуги: { serviceId, masterId }
+    design: { hands: null, feet: null }, // выбранный дизайн: отдельно руки и ноги
     slot: null,
     selectedDay: null,
     monthCursor: null,   // {y, m} - какой месяц показан в календаре
@@ -321,7 +324,11 @@
   const STEPS = ['category', 'service', 'master', 'time', 'details', 'done'];
   function progressHtml() {
     const labels = { category: 'Service', service: 'Choose', master: 'Specialist', time: 'Time', details: 'Details', done: 'Done' };
-    const cur = STEPS.indexOf(state.step === 'subcategory' ? 'category' : (state.step === 'length' ? 'master' : state.step));
+    // Выбор второй услуги - часть шага «Specialist»: время ещё впереди.
+    const shown = state.step === 'subcategory' ? 'category'
+      : (state.step === 'length' || /^x(svc|master|length)$/.test(state.step) ? 'master'
+        : (state.step === 'wait' ? 'time' : state.step));
+    const cur = STEPS.indexOf(shown);
     return `<div class="bk-progress">${STEPS.map((s, i) =>
       `<span class="bk-pstep ${i <= cur ? 'on' : ''}">${labels[s]}</span>`).join('<span class="bk-pline"></span>')}</div>`;
   }
@@ -420,6 +427,8 @@
     const fn = {
       category: renderCategory, subcategory: renderSubcategory, service: renderService,
       master: renderMaster, length: renderLength, time: loadTime,
+      xsvc: renderExtraService, xmaster: renderExtraMaster, xlength: renderExtraLength,
+      wait: renderWaitForm,
       details: detailsOk ? renderDetails : loadTime, done: renderCategory,
     }[snap.step] || renderCategory;
     try { fn(); } catch (_) { restoringKey = null; renderCategory(); }
@@ -634,11 +643,18 @@
     const from = startOfMonth > now ? startOfMonth : now;
     const to = new Date(y, m + 1, 1, 0, 0, 0); // первое число следующего месяца
 
-    const { slots } = await api('/api/availability', {
-      serviceId: state.serviceId, masterId: state.masterId || undefined,
-      length: state.length || undefined,
-      from: from.toISOString(), to: to.toISOString(),
-    });
+    // Две услуги подряд: сервер отдаёт только то время, когда обе встают вплотную.
+    const { slots } = state.second
+      ? await api('/api/pair-availability', {
+          a: { serviceId: state.serviceId, masterId: state.masterId || undefined, length: state.length || undefined },
+          b: { serviceId: state.second.serviceId, masterId: state.second.masterId || undefined, length: state.second.length || undefined },
+          from: from.toISOString(), to: to.toISOString(),
+        })
+      : await api('/api/availability', {
+          serviceId: state.serviceId, masterId: state.masterId || undefined,
+          length: state.length || undefined,
+          from: from.toISOString(), to: to.toISOString(),
+        });
     const byDay = {};
     for (const s of slots) { (byDay[dayKey(s.startAt)] ||= []).push(s); }
     for (const d of Object.keys(byDay)) byDay[d].sort((a, b) => a.startAt.localeCompare(b.startAt));
@@ -648,7 +664,283 @@
 
   function timeHeader() {
     const svc = getService(state.serviceId);
-    return `${svc.name}${state.masterId ? ' · ' + state.masters[state.masterId].name : ''}`;
+    const first = `${svc.name}${state.masterId ? ' · ' + state.masters[state.masterId].name : ''}`;
+    if (!state.second) return first;
+    const s2 = getService(state.second.serviceId);
+    return `${first} + ${s2.name}${state.second.masterId ? ' · ' + state.masters[state.second.masterId].name : ''}`;
+  }
+
+  // ── Вторая услуга подряд ────────────────────────────────────────────
+  // Клиент добавляет её ДО выбора времени; календарь тогда показывает только
+  // время, когда обе услуги идут вплотную. Скидки нет. Кто за чем идёт,
+  // решает сервер: по умолчанию снятие, маникюр, педикюр, а если кресло
+  // не позволяет, наоборот.
+  const SHORT_KIND = { extras: 'Removal', manicure: 'Mani', pedicure: 'Pedi' };
+
+  /** Годится ли услуга как часть пары (то же правило, что на сервере). */
+  function pairable(svc) {
+    return !!(svc && svc.cat && svc.cat.id === 'nail' && !svc.dualMaster
+      && svc.sub && svc.sub.id !== 'same-time' && svc.id !== 'nail-designs');
+  }
+
+  /** Подпись времени у пары: «Mani → Pedi», с мастерами, когда мастер не выбран. */
+  function pairTag(s) {
+    return (s.segments || []).map((seg) => {
+      const sv = getService(seg.serviceId);
+      const chosen = seg.serviceId === state.serviceId ? state.masterId : (state.second && state.second.masterId);
+      const who = !chosen && seg.masterId && state.masters[seg.masterId] ? ' ' + state.masters[seg.masterId].name : '';
+      return `${SHORT_KIND[sv && sv.sub && sv.sub.id] || 'Service'}${who}`;
+    }).join(' → ');
+  }
+
+  /** Блок над календарём: добавить вторую услугу или убрать уже добавленную. */
+  function pairControlHtml() {
+    const svc = getService(state.serviceId);
+    if (!pairable(svc)) return '';
+    if (state.second) {
+      const s2 = getService(state.second.serviceId);
+      const who = state.second.masterId ? ' · ' + state.masters[state.second.masterId].name : '';
+      return `<div class="bk-pair-box">
+          <span class="bk-pair-text"><b>+ ${s2.name}</b>${who}<br><span class="bk-pair-sub">Right after your first service. No gaps in between.</span></span>
+          <button type="button" class="bk-pair-btn" data-act="xrm">Remove</button>
+        </div>`;
+    }
+    return `<div class="bk-pair-box">
+        <span class="bk-pair-text"><b>Need another service?</b><br><span class="bk-pair-sub">Add a manicure, pedicure or removal and we’ll show times that fit both.</span></span>
+        <button type="button" class="bk-pair-btn" data-act="xadd">+ Add service</button>
+      </div>`;
+  }
+
+  // ── Лист ожидания ───────────────────────────────────────────────────
+  // Не нашёл время - оставил заявку. Воркер раз в час ищет подходящее время
+  // и пишет письмо со ссылкой на запись. Сам клиента не записывает.
+  function waitlistHtml(strong) {
+    return `<div class="bk-pair-box${strong ? ' bk-pair-strong' : ''}">
+        <span class="bk-pair-text"><b>${strong ? 'Nothing that works?' : 'Can’t find a time that suits you?'}</b><br><span class="bk-pair-sub">Join the waiting list and we’ll email you the moment a time opens.</span></span>
+        <button type="button" class="bk-pair-btn" data-act="wait">Join the list</button>
+      </div>`;
+  }
+
+  function renderWaitForm() {
+    state.step = 'wait';
+    const turnstile = CONFIG.turnstileSiteKey
+      ? `<div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>` : '';
+    shell('Join the waiting list', 'We’ll email you as soon as a time that suits you opens up.',
+      `<div class="bk-summary"><div><b>${timeHeader()}</b></div></div>
+       <form id="bk-wait-form" class="bk-form">
+         <label>Full name<input name="name" required autocomplete="name"></label>
+         <label>Email - we’ll write here when a time opens<input name="email" type="email" required autocomplete="email" inputmode="email" placeholder="you@example.com"></label>
+         <label>Phone (optional)<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(305) 555-1234"></label>
+         <label>Which days work for you?
+           <select name="days">
+             <option value="any">Any day</option>
+             <option value="weekdays">Weekdays</option>
+             <option value="weekends">Weekends</option>
+           </select>
+         </label>
+         <label>What time of day?
+           <select name="when">
+             <option value="any">Any time</option>
+             <option value="morning">Morning (before noon)</option>
+             <option value="afternoon">Afternoon (noon to 5 pm)</option>
+             <option value="evening">Evening (after 5 pm)</option>
+           </select>
+         </label>
+         <label class="bk-agree">
+           <input type="checkbox" name="agree" required>
+           <span>I understand this is not a booking and does not hold a time. If one opens, I’ll get an email and whoever books first gets it. We keep my details only for this - <a href="privacy-policy.html" target="_blank" rel="noopener">privacy policy</a>.</span>
+         </label>
+         ${turnstile}
+         <button type="submit" class="btn btn-gold bk-submit">Join the waiting list</button>
+         <div class="bk-error" id="bk-form-err" hidden></div>
+       </form>`, { back: true });
+    renderTurnstile();
+    document.getElementById('bk-wait-form').addEventListener('submit', submitWait);
+  }
+
+  async function submitWait(e) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('.bk-submit');
+    const err = document.getElementById('bk-form-err');
+    err.hidden = true;
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const fd = new FormData(form);
+      await api('/api/waitlist-join', {
+        a: { serviceId: state.serviceId, masterId: state.masterId || undefined, length: state.length || undefined },
+        b: state.second
+          ? { serviceId: state.second.serviceId, masterId: state.second.masterId || undefined, length: state.second.length || undefined }
+          : undefined,
+        prefs: { days: fd.get('days'), when: fd.get('when') },
+        customer: { name: fd.get('name'), email: fd.get('email'), phone: normalizePhone(fd.get('phone')) || undefined },
+        source: (typeof window.vsSource === 'function' ? window.vsSource() : null) || undefined,
+        turnstileToken: turnstileToken(form),
+      });
+      state.step = 'done';
+      shell('You’re on the list', 'We’ll email you as soon as a time opens.',
+        `<div class="bk-summary bk-summary-done">
+           <div><b>${timeHeader()}</b></div>
+           <div>We’ll check every hour and keep your request for 30 days.</div>
+         </div>
+         <p class="bk-sub" style="margin-top:14px">A confirmation is on its way to your email, with a link to leave the list any time.</p>
+         <a href="index.html" class="btn btn-dark" style="margin-top:18px;display:inline-block">Back to site</a>`,
+        { eyebrow: 'Waiting list' });
+    } catch (e2) {
+      resetTurnstile();
+      err.textContent = /turnstile|spam check/i.test(e2.message || '')
+        ? 'Couldn’t verify you’re human. Please tap the button again, or call/WhatsApp us.'
+        : e2.message;
+      err.hidden = false;
+      btn.disabled = false; btn.textContent = 'Join the waiting list';
+    }
+  }
+
+  // ── Подсказка про Same Time ─────────────────────────────────────────
+  // Маникюр и педикюр можно сделать одновременно у двух мастеров: вдвое
+  // быстрее. Когда клиент собрал именно такую пару, напоминаем об этом и
+  // показываем ближайшее время комбо, чтобы он мог перейти на него одним тапом.
+
+  /** Комбо Same Time, которое заменяет выбранные две услуги, или null. */
+  function sameTimeFor() {
+    if (!state.second || !state.categories) return null;
+    const ids = [state.serviceId, state.second.serviceId];
+    if (ids[0] === ids[1]) return null;
+    for (const cat of state.categories) {
+      for (const sub of cat.subcategories) {
+        for (const s of sub.services) {
+          if (s.dualMaster && Array.isArray(s.parts) && ids.every((id) => s.parts.includes(id))) return s;
+        }
+      }
+    }
+    return null;
+  }
+
+  /** Длительность услуги: у выбранного мастера, а если мастер не выбран, типовая. */
+  function serviceMinutes(serviceId, masterId) {
+    const s = getService(serviceId);
+    const e = s && (s.masters || []).find((m) => m.masterId === masterId);
+    return (e && e.durationMin) || (s && s.durationMin) || 0;
+  }
+
+  /** Подгружаем ближайшее время комбо один раз на пару услуг. */
+  function loadSameTime() {
+    const combo = sameTimeFor();
+    if (!combo) { state.sameTime = null; return; }
+    if (state.sameTime && state.sameTime.id === combo.id) return;   // уже есть или грузится
+    const mine = { id: combo.id, slots: null };
+    state.sameTime = mine;
+    api('/api/availability', {
+      serviceId: combo.id,
+      from: new Date().toISOString(), to: new Date(Date.now() + 21 * 86400000).toISOString(),
+    }).then((r) => {
+      if (state.sameTime !== mine) return;   // пара уже другая
+      mine.slots = (r.slots || []).slice(0, 3);
+      if (state.step === 'time') renderTime();
+    }).catch(() => { if (state.sameTime === mine) mine.slots = []; });
+  }
+
+  function sameTimeHtml() {
+    const combo = sameTimeFor();
+    const st = state.sameTime;
+    if (!combo || !st || st.id !== combo.id || !st.slots || !st.slots.length) return '';
+    const seq = serviceMinutes(state.serviceId, state.masterId) + serviceMinutes(state.second.serviceId, state.second.masterId);
+    const btns = st.slots.map((s, i) =>
+      `<button type="button" class="bk-soon" data-act="sametime" data-i="${i}">
+         <span class="bk-soon-day">${dayLabel(s.startAt)}</span>
+         <span class="bk-soon-time">${timeLabel(s.startAt)}</span>
+       </button>`).join('');
+    return `<div class="bk-pair-box bk-pair-tip">
+        <span class="bk-pair-text"><b>Faster: do both at the same time</b><br>
+          <span class="bk-pair-sub">Ksenia does your manicure while Anastasia does your pedicure: ${fmtDur(combo.durationMin).trim()}${seq > combo.durationMin ? ` instead of ${fmtDur(seq).trim()}` : ''}, ${fmtMoney(combo.price)} in total. Soonest times:</span></span>
+        <div class="bk-soon-row">${btns}</div>
+      </div>`;
+  }
+
+  // Услуги, которые можно добавить: ногти, другого вида, чем первая.
+  function extraServices() {
+    const first = getService(state.serviceId);
+    const nail = state.categories.find((c) => c.id === 'nail');
+    const out = [];
+    for (const sub of (nail ? nail.subcategories : [])) {
+      if (!first || sub.id === first.sub.id) continue;
+      const list = sub.services.filter((s) => pairable({ ...s, cat: nail, sub }));
+      if (list.length) out.push({ sub, list });
+    }
+    return out;
+  }
+
+  function renderExtraService() {
+    state.step = 'xsvc';
+    const groups = extraServices();
+    const body = groups.map((g) => `
+      <p class="bk-block-title">${g.sub.name}</p>
+      <div class="bk-list">${g.list.map((svc) => `
+        <button class="bk-svc" data-act="xsvc" data-id="${svc.id}">
+          <span class="bk-svc-main">
+            <span class="bk-svc-name">${svc.name}</span>
+            <span class="bk-svc-dur">⏱ ${fmtDur(svc.durationMin)}</span>
+          </span>
+          <span class="bk-svc-price">${priceRange(svc)} ›</span>
+        </button>`).join('')}</div>`).join('');
+    shell('Add another service', 'It will follow your first service, with no gap. Pick what to add.',
+      body || '<p class="bk-sub">Nothing to add to this service online. Please call (754) 202-6666.</p>', { back: true });
+  }
+
+  function renderExtraMaster() {
+    state.step = 'xmaster';
+    const svc = getService(state.xPick.serviceId);
+    const masters = svc.masters.map((m) => ({ ...state.masters[m.masterId], price: m.price }));
+    if (masters.length === 1) return pickExtraMaster(masters[0].id);
+    const cards = masters.map((m) =>
+      `<button class="bk-master" data-act="xmaster" data-id="${m.id}">
+         <span class="bk-master-av">${m.name[0]}</span>
+         <span class="bk-master-body">
+           <span class="bk-master-name">${m.name}</span>
+           <span class="bk-master-role">${m.role}</span>
+         </span>
+         <span class="bk-master-price">${fmtMoney(m.price)} ›</span>
+       </button>`).join('');
+    const any = `<button class="bk-master bk-master-any" data-act="xmaster" data-id="">
+         <span class="bk-master-av">★</span>
+         <span class="bk-master-body">
+           <span class="bk-master-name">Any specialist</span>
+           <span class="bk-master-role">Compare all available times</span>
+         </span>
+         <span class="bk-master-price">›</span>
+       </button>`;
+    shell('Choose your specialist', `For ${svc.name}.`, `<div class="bk-list">${any}${cards}</div>`, { back: true });
+  }
+
+  function renderExtraLength() {
+    state.step = 'xlength';
+    const svc = getService(state.xPick.serviceId);
+    const lengths = lengthsFor(svc.id, state.xPick.masterId) || [];
+    const cards = lengths.map((L) =>
+      `<button class="bk-master" data-act="xlength" data-id="${L.id}">
+         <span class="bk-master-body">
+           <span class="bk-master-name">${L.name} length</span>
+           <span class="bk-master-role">${svc.name}</span>
+         </span>
+         <span class="bk-master-price">${fmtMoney(L.price)} ›</span>
+       </button>`).join('');
+    shell('Choose nail length', `${svc.name} · ${state.masters[state.xPick.masterId].name}`,
+      `<div class="bk-list">${cards}</div>`, { back: true });
+  }
+
+  /** Мастер для второй услуги выбран: нужна длина (если есть) или сразу время. */
+  function pickExtraMaster(masterId) {
+    state.xPick.masterId = masterId || null;
+    const lengths = lengthsFor(state.xPick.serviceId, state.xPick.masterId);
+    if (lengths) return renderExtraLength();
+    return finishExtra(null);
+  }
+
+  function finishExtra(length) {
+    state.second = { serviceId: state.xPick.serviceId, masterId: state.xPick.masterId, length: length || null };
+    state.xPick = null;
+    state.slot = null;
+    loadTime();
   }
 
   async function loadTime() {
@@ -657,7 +949,8 @@
     // Слоты в кэше принадлежат конкретной услуге, мастеру и длине. Сменил
     // услугу (например, вернулся назад и выбрал другую) - прежние слоты
     // чужие, и запись на них уходила бы с неверным мастером.
-    const sig = [state.serviceId, state.masterId || '', state.length || ''].join('|');
+    const sec = state.second ? [state.second.serviceId, state.second.masterId || '', state.second.length || ''].join(':') : '';
+    const sig = [state.serviceId, state.masterId || '', state.length || '', sec].join('|');
     if (state.cacheSig !== sig) {
       state.cacheSig = sig;
       state.monthCache = {};
@@ -714,7 +1007,8 @@
     if (!out.length) return '';
     const chips = out.map(({ day, slot }) => {
       const i = state.monthCache[monthKey(+day.slice(0, 4), +day.slice(5, 7) - 1)][day].indexOf(slot);
-      const who = !state.masterId && slot.masterId ? `<em>${state.masters[slot.masterId]?.name || ''}</em>` : '';
+      const who = slot.pair ? `<em>${pairTag(slot)}</em>`
+        : (!state.masterId && slot.masterId ? `<em>${state.masters[slot.masterId]?.name || ''}</em>` : '');
       return `<button class="bk-soon" data-act="slot" data-day="${day}" data-i="${i}">
                 <span class="bk-soon-day">${dayLabel(slot.startAt)}</span>
                 <span class="bk-soon-time">${timeLabel(slot.startAt)}</span>${who}
@@ -773,7 +1067,8 @@
     const list = byDay[state.selectedDay] || [];
     if (!list.length) return '';
     const slots = list.map((s, i) => {
-      const tag = !state.masterId && s.masterId ? `<span class="bk-slot-who">${state.masters[s.masterId]?.name || ''}</span>` : '';
+      const tag = s.pair ? `<span class="bk-slot-who">${pairTag(s)}</span>`
+        : (!state.masterId && s.masterId ? `<span class="bk-slot-who">${state.masters[s.masterId]?.name || ''}</span>` : '');
       return `<button class="bk-slot" data-act="slot" data-i="${i}" data-day="${state.selectedDay}">${timeLabel(s.startAt)}${tag}</button>`;
     }).join('');
     return `<div class="bk-day-slots">
@@ -783,15 +1078,18 @@
   }
 
   function renderTime() {
+    loadSameTime();
     const anySlots = Object.values(state.monthCache).some((byDay) => Object.keys(byDay).length);
     if (!anySlots && Object.keys(state.monthCache).length >= 2) {
       shell('Pick a date & time', timeHeader(),
-        `${calendarHtml()}<div class="bk-error">Nothing free in this window. Please call us at (754) 202-6666 and we will find a time.</div>`,
+        `${pairControlHtml()}${sameTimeHtml()}${calendarHtml()}<div class="bk-error">${state.second
+          ? 'No time fits both services back to back. Try other specialists or remove one service, or call us at (754) 202-6666.'
+          : 'Nothing free in this window. Please call us at (754) 202-6666 and we will find a time.'}</div>${waitlistHtml(true)}`,
         { back: true });
       return;
     }
     shell('Pick a date & time', timeHeader(),
-      `${soonestHtml()}${calendarHtml()}${slotsHtml()}`, { back: true });
+      `${pairControlHtml()}${sameTimeHtml()}${soonestHtml()}${calendarHtml()}${slotsHtml()}${waitlistHtml(false)}`, { back: true });
   }
 
   async function goMonth(dir) {
@@ -840,7 +1138,21 @@
     const _ls = lengthsFor(state.serviceId, state.slot.masterId);
     const _lenName = _ls && state.length ? (_ls.find((L) => L.id === state.length) || {}).name : null;
     track('begin_checkout', { currency: 'USD', value: state.slot.price, items: [gaItem()] });
-    const summary = `
+    // Две услуги подряд: по строке на каждую, с её временем и мастером.
+    const segLines = (state.slot.segments || []).map((sg) => {
+      const sv = getService(sg.serviceId);
+      const ls = lengthsFor(sg.serviceId, sg.masterId);
+      const ln = ls && sg.length ? (ls.find((L) => L.id === sg.length) || {}).name : null;
+      const who = (state.masters[sg.masterId] || {}).name || '';
+      return `<div>${timeLabel(sg.startAt)} · <b>${sv.name}${ln ? ' · ' + ln + ' length' : ''}</b> · ${who} · ${fmtMoney(sg.price)}</div>`;
+    }).join('');
+    const summary = state.slot.pair
+      ? `<div class="bk-summary">
+          <div>${dayLabel(state.slot.startAt)} · ${fmtDur(state.slot.durationMin)} in total</div>
+          ${segLines}
+          <div id="bk-total-line"></div>
+        </div>`
+      : `
       <div class="bk-summary">
         <div><b>${svc.name}${_lenName ? ' · ' + _lenName + ' length' : ''}</b></div>
         <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)} · ${fmtDur(svc.durationMin)}</div>
@@ -904,36 +1216,59 @@
     _form.elements.packageGan.addEventListener('input', () => { renderAddonBlock(); renderDesignBlock(); updateAddonSummary(); });
   }
 
-  // Дизайн ногтей: прибавляет цену, время записи не меняет. Только к ногтевым
-  // услугам, кроме «Extras» (там дизайн как отдельная услуга).
-  function designAllowed() {
-    const s = getService(state.serviceId);
-    if (!state.designs || !s || !s.cat) return false;
-    if (s.cat.id === 'nail') return !(s.sub && s.sub.id === 'extras');
-    // К массажу дизайн возможен на гель-маникюре, добавленном в этой же записи.
-    return isMassageNow() && !!state.addon;
+  // Дизайн ногтей: доплата, время записи не меняет. Руки и ноги - каждый
+  // отдельная доплата. Только к маникюру и педикюру, кроме «Extras» (там дизайн
+  // как отдельная услуга); к массажу - на гель-маникюре, добавленном к нему.
+  function designAreas() {
+    if (!state.designs) return [];
+    const areas = new Set();
+    const add = (s) => {
+      if (!s || !s.cat || s.cat.id !== 'nail' || (s.sub && s.sub.id === 'extras')) return;
+      if (s.dualMaster) { areas.add('hands'); areas.add('feet'); }
+      else if (s.sub && s.sub.id === 'pedicure') areas.add('feet');
+      else areas.add('hands');
+    };
+    add(getService(state.serviceId));
+    if (state.second) add(getService(state.second.serviceId));
+    if (isMassageNow() && state.addon) areas.add('hands');
+    return ['hands', 'feet'].filter((a) => areas.has(a));
   }
 
   function renderDesignBlock() {
     const box = document.getElementById('bk-design');
     if (!box) return;
-    if (!designAllowed()) { box.innerHTML = ''; state.design = null; return; }
-    const rows = state.designs.options.map((o) => {
-      const on = state.design === o.id;
-      return `<button type="button" class="bk-addon-opt${on ? ' on' : ''}" data-act="design" data-id="${o.id}" aria-pressed="${on}">
-          <span class="bk-addon-main"><span class="bk-addon-name">${o.name}</span></span>
-        </button>`;
+    const areas = designAreas();
+    for (const a of ['hands', 'feet']) if (!areas.includes(a)) state.design[a] = null;
+    if (!areas.length) { box.innerHTML = ''; return; }
+    box.innerHTML = areas.map((area, n) => {
+      const rows = state.designs.options.map((o) => {
+        const on = state.design[area] === o.id;
+        return `<button type="button" class="bk-addon-opt${on ? ' on' : ''}" data-act="design" data-area="${area}" data-id="${o.id}" aria-pressed="${on}">
+            <span class="bk-addon-main"><span class="bk-addon-name">${o.name}</span></span>
+          </button>`;
+      }).join('');
+      const what = area === 'feet' ? 'your toes' : (isMassageNow() ? 'your gel manicure' : 'your hands');
+      return `
+        <div class="bk-addon-box">
+          <p class="bk-addon-title">Add a nail design to ${what} - +${fmtMoney(state.designs.priceUsd)}</p>
+          <p class="bk-addon-sub">Your appointment time stays the same. Tap again to remove it.${n === 0 ? ' For something else, choose Other and describe it in the note.' : ''}</p>
+          <div class="bk-design-grid">${rows}</div>
+        </div>`;
     }).join('');
-    box.innerHTML = `
-      <div class="bk-addon-box">
-        <p class="bk-addon-title">Add a nail design${isMassageNow() ? ' to your gel manicure' : ''} - +${fmtMoney(state.designs.priceUsd)}</p>
-        <p class="bk-addon-sub">Your appointment time stays the same. Tap again to remove it. For something else, choose Other and describe it in the note.</p>
-        <div class="bk-design-grid">${rows}</div>
-      </div>`;
   }
 
+  /** Сколько дизайнов выбрано (только по тем частям, что есть в записи). */
+  function designCount() {
+    return designAreas().filter((a) => state.design[a]).length;
+  }
   function designPrice() {
-    return state.design && state.designs ? Number(state.designs.priceUsd) || 0 : 0;
+    return state.designs ? designCount() * (Number(state.designs.priceUsd) || 0) : 0;
+  }
+  /** Что уходит на сервер: { hands: 'chrome', feet: 'ombre' } или ничего. */
+  function selectedDesigns() {
+    const out = {};
+    for (const a of designAreas()) if (state.design[a]) out[a] = state.design[a];
+    return Object.keys(out).length ? out : undefined;
   }
 
   function isMassageNow() {
@@ -957,15 +1292,21 @@
         .map((b) => b.dataset.concern).filter(Boolean);
       const note = [areas.length ? 'Areas: ' + areas.join(', ') : '', (fd.get('note') || '').trim()]
         .filter(Boolean).join(' · ');
+      // Две услуги подряд: основная - та, что идёт первой по времени, вторая
+      // начинается в её конце. Все данные берём из выбранного времени.
+      const segs = state.slot.pair ? state.slot.segments : null;
       const res = await api('/api/book', {
-        serviceId: state.serviceId,
-        masterId: state.slot.masterId,
-        length: state.length || undefined,
+        serviceId: segs ? segs[0].serviceId : state.serviceId,
+        masterId: segs ? segs[0].masterId : state.slot.masterId,
+        length: segs ? (segs[0].length || undefined) : (state.length || undefined),
         startAt: state.slot.startAt,
-        serviceVariationVersion: state.slot.serviceVariationVersion,
+        serviceVariationVersion: segs ? undefined : state.slot.serviceVariationVersion,
+        pair: segs
+          ? { serviceId: segs[1].serviceId, masterId: segs[1].masterId, length: segs[1].length || undefined, startAt: segs[1].startAt }
+          : undefined,
         customer: { name: fd.get('name'), email: fd.get('email'), phone, note },
         packageGan: (fd.get('packageGan') || '').replace(/\s+/g, '') || undefined,
-        design: designAllowed() && state.design ? state.design : undefined,
+        designs: selectedDesigns(),
         addon: state.addon && !(isMassageNow() && fd.get('packageGan'))
           ? { serviceId: state.addon.serviceId, startAt: state.addon.startAt, masterId: state.addon.masterId, length: state.addon.length || undefined }
           : undefined,
@@ -1081,17 +1422,28 @@
     } catch (err) {
       try { console.error('tracking build failed', err); } catch (_) {}
     }
+    // Дизайн платится сверх услуг: на самом визите (основная и вторая запись)
+    // и на маникюре к массажу (там он вписан в строку доп-услуги).
+    const designs = res.designs || [];
+    const visitDesigns = designs.filter((d) => d.where !== 'addon');
+    const addonDesigns = designs.filter((d) => d.where === 'addon');
+    const sumUsd = (list) => list.reduce((s, d) => s + (Number(d.priceUsd) || 0), 0);
+    const namesOf = (list) => list.map((d) => `${d.name} (${d.area})`).join(' + ');
+    const segs = state.slot.pair ? state.slot.segments : null;
+    const whoLabel = segs
+      ? [...new Set(segs.map((sg) => (state.masters[sg.masterId] || {}).name).filter(Boolean))].join(' + ')
+      : masterLabel;
     const payLine = res.paidWith === 'package'
-      ? `${masterLabel} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
-      : `${masterLabel} · ${fmtMoney(state.slot.price + (res.design && !res.design.onAddon ? res.design.priceUsd : 0))}${res.design && !res.design.onAddon ? ` incl. ${res.design.name} design` : ''} (pay in person)`;
-    const designHtml = res.paidWith === 'package' && res.design && !res.design.onAddon
-      ? `<div class="bk-done-addon"><div><b>+ ${res.design.name} design</b></div><div>${fmtMoney(res.design.priceUsd)}, paid at the studio</div></div>`
+      ? `${whoLabel} · Paid with package${res.sessionsLeft != null ? ` · ${res.sessionsLeft} sessions left` : ''}`
+      : `${whoLabel} · ${fmtMoney(state.slot.price + sumUsd(visitDesigns))}${visitDesigns.length ? ` incl. ${namesOf(visitDesigns)} design${visitDesigns.length > 1 ? 's' : ''}` : ''} (pay in person)`;
+    const designHtml = res.paidWith === 'package' && visitDesigns.length
+      ? `<div class="bk-done-addon"><div><b>+ ${namesOf(visitDesigns)} design${visitDesigns.length > 1 ? 's' : ''}</b></div><div>${fmtMoney(sumUsd(visitDesigns))}, paid at the studio</div></div>`
       : '';
     // доп-услуга: подтверждена, либо честно сообщаем, что не прошла
     const addonHtml = res.addon
       ? `<div class="bk-done-addon">
            <div><b>+ ${res.addon.name}</b></div>
-           <div>${dayLabel(res.addon.startAt)}, ${timeLabel(res.addon.startAt)} · ${res.addon.masterName} · ${fmtMoney(res.addon.priceWithDiscount + (res.design && res.design.onAddon ? res.design.priceUsd : 0))} <s>${fmtMoney(res.addon.price)}</s>${res.design && res.design.onAddon ? ` · incl. ${res.design.name} design` : ''}</div>
+           <div>${dayLabel(res.addon.startAt)}, ${timeLabel(res.addon.startAt)} · ${res.addon.masterName} · ${fmtMoney(res.addon.priceWithDiscount + sumUsd(addonDesigns))} <s>${fmtMoney(res.addon.price)}</s>${addonDesigns.length ? ` · incl. ${namesOf(addonDesigns)} design` : ''}</div>
          </div>`
       : (res.addonFailed
           ? `<div class="bk-done-addon bk-done-addon-warn">
@@ -1103,8 +1455,9 @@
     // уходит при записи, поэтому «подтвердим позже» было бы неправдой.
     shell('You’re booked! 🎉', 'Your confirmation and directions are on their way to your email.',
       `<div class="bk-summary bk-summary-done">
-         <div><b>${svc.name}</b></div>
-         <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)}</div>
+         <div><b>${segs ? segs.map((sg) => getService(sg.serviceId).name).join(' + ') : svc.name}</b></div>
+         <div>${dayLabel(state.slot.startAt)}, ${timeLabel(state.slot.startAt)}${segs ? ` · ${fmtDur(state.slot.durationMin)} in total` : ''}</div>
+         ${segs ? segs.map((sg) => `<div>${timeLabel(sg.startAt)} · ${getService(sg.serviceId).name}</div>`).join('') : ''}
          <div>${payLine}</div>
          ${designHtml}
          ${addonHtml}
@@ -1118,6 +1471,10 @@
     const order = ['category', 'subcategory', 'service', 'master', 'time', 'details'];
     const map = {
       details: 'time',
+      wait: 'time',
+      xsvc: 'time',
+      xmaster: 'xsvc',
+      xlength: 'xmaster',
       time: () => {
         const svc = getService(state.serviceId);
         if (svc && svc.dualMaster) return 'service';
@@ -1141,7 +1498,7 @@
       // нет. Иначе renderMaster сам бы отправил клиента вперёд, по кругу.
       else if (state.preferMaster && svc.masters.some((m) => m.masterId === state.preferMaster)) prev = 'service';
     }
-    ({ category: renderCategory, subcategory: renderSubcategory, service: renderService, master: renderMaster, length: renderLength, time: loadTime, details: renderDetails }[prev] || renderCategory)();
+    ({ category: renderCategory, subcategory: renderSubcategory, service: renderService, master: renderMaster, length: renderLength, time: loadTime, details: renderDetails, xsvc: renderExtraService, xmaster: renderExtraMaster }[prev] || renderCategory)();
   }
 
   // ── click delegation ───────────────────────────────────────────────
@@ -1154,13 +1511,33 @@
       // Выход из режима «к мастеру»: полное меню и ссылка без ?master.
       state.preferMaster = null;
       state.serviceId = null; state.masterId = null; state.slot = null; state.length = null;
+      state.second = null; state.xPick = null;
       setUrlParams({ master: null });
       return renderCategory();
     }
     if (act === 'cat') { state.categoryId = t.dataset.id; state.subcategoryId = null; return renderSubcategory(); }
     if (act === 'sub') { state.subcategoryId = t.dataset.id; return renderService(); }
+    if (act === 'wait') { return renderWaitForm(); }
+    if (act === 'xadd') { return renderExtraService(); }
+    if (act === 'xrm') { state.second = null; state.sameTime = null; state.slot = null; return loadTime(); }
+    if (act === 'sametime') {
+      // Перешли на комбо Same Time: вместо двух услуг подряд одна запись у двух мастеров.
+      const combo = sameTimeFor();
+      const s = state.sameTime && state.sameTime.slots && state.sameTime.slots[+t.dataset.i];
+      if (!combo || !s) return;
+      state.serviceId = combo.id; state.masterId = null; state.length = null;
+      state.second = null; state.xPick = null; state.sameTime = null;
+      state.slot = s; state.selectedDay = dayKey(s.startAt);
+      state.addon = null; state.addonOptions = null; state.design = { hands: null, feet: null };
+      track('select_item', { items: [gaItem()] });
+      return renderDetails();
+    }
+    if (act === 'xsvc') { state.xPick = { serviceId: t.dataset.id, masterId: null }; return renderExtraMaster(); }
+    if (act === 'xmaster') { return pickExtraMaster(t.dataset.id); }
+    if (act === 'xlength') { return finishExtra(t.dataset.id); }
     if (act === 'svc') {
       state.serviceId = t.dataset.id; state.masterId = null; state.slot = null; state.length = null;
+      state.second = null; state.xPick = null; state.sameTime = null;   // другая первая услуга - вторая выбирается заново
       track('select_item', { items: [gaItem()] });
       const _svc = getService(state.serviceId);
       return _svc && _svc.dualMaster ? loadTime() : renderMaster();
@@ -1178,13 +1555,17 @@
       state.selectedDay = day;
       state.addon = null;
       state.addonOptions = null;
-      state.design = null;
+      state.design = { hands: null, feet: null };
       renderDetails();
+      // Массаж к ногтям предлагаем и к одной услуге, и к двум подряд: тогда
+      // ищем вплотную ко всему блоку (slot.startAt и slot.durationMin - его).
       loadAddonOptions();   // подгружаем в фоне — форма не ждёт
       return;
     }
     if (act === 'design') {
-      state.design = state.design === t.dataset.id ? null : t.dataset.id;   // повторный клик снимает
+      const area = t.dataset.area;
+      if (area !== 'hands' && area !== 'feet') return;
+      state.design[area] = state.design[area] === t.dataset.id ? null : t.dataset.id;   // повторный клик снимает
       renderDesignBlock();
       updateAddonSummary();
       return;
@@ -1321,12 +1702,15 @@
   function updateAddonSummary() {
     const el = document.getElementById('bk-total-line');
     if (!el) return;
-    if (!state.addon && !designPrice()) { el.innerHTML = ''; return; }
+    const pair = !!(state.slot && state.slot.pair);
+    if (!state.addon && !designPrice() && !pair) { el.innerHTML = ''; return; }
     const total = (Number(state.slot.price) || 0) + (state.addon ? Number(state.addon.priceWithDiscount) || 0 : 0) + designPrice();
     const parts = [];
     if (state.addon) parts.push(isMassageNow() ? 'gel manicure' : state.addon.durationMin + ' min massage');
-    if (designPrice()) parts.push('design');
-    el.innerHTML = `<div class="bk-total">+ ${parts.join(' + ')} · <b>${fmtMoney(total)} total</b></div>`;
+    if (designPrice()) parts.push(designCount() > 1 ? 'designs' : 'design');
+    el.innerHTML = pair && !parts.length
+      ? `<div class="bk-total"><b>${fmtMoney(total)} total</b></div>`
+      : `<div class="bk-total">${pair ? '2 services ' : ''}+ ${parts.join(' + ')} · <b>${fmtMoney(total)} total</b></div>`;
   }
 
   // ── диплинк по параметрам ссылки ───────────────────────────────────
@@ -1356,6 +1740,17 @@
         if (lengthParam) {
           const ls = lengthsFor(serviceId, state.masterId);
           if (ls && ls.some((L) => L.id === lengthParam)) state.length = lengthParam;
+        }
+        // Ссылка из письма листа ожидания: к первой услуге добавляется вторая
+        // (?add=…&addmaster=…&addlength=…), чтобы клиент не собирал пару заново.
+        const addId = p.get('add');
+        const s2 = addId ? getService(addId) : null;
+        if (s2 && pairable(svc) && pairable(s2) && s2.id !== svc.id && s2.sub.id !== svc.sub.id) {
+          const am = p.get('addmaster');
+          const aMaster = am && s2.masters.some((m) => m.masterId === am) ? am : null;
+          const als = aMaster ? lengthsFor(addId, aMaster) : null;
+          const al = p.get('addlength');
+          state.second = { serviceId: addId, masterId: aMaster, length: als && al && als.some((L) => L.id === al) ? al : null };
         }
         track('select_item', { items: [gaItem()] });
         return state.masterId ? maybeLengthThenTime() : renderMaster();

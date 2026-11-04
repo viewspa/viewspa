@@ -368,6 +368,17 @@
     </div>
   </details>
 
+  <details class="ad-issue" data-tab="clients" id="ad-wait" hidden>
+    <summary>Лист ожидания</summary>
+    <div class="ad-rev-body">
+      <p class="ad-gaps-intro">Кто оставил заявку, не найдя время на сайте. Раз в час (с 7 до 21 по времени студии) сайт ищет
+        подходящее время и сам пишет клиенту письмо со ссылкой на запись. Заявка живёт 30 дней, а если человек записался сам,
+        исчезает. Отсюда её можно убрать вручную.</p>
+      <button class="btn btn-dark" id="wait-load" type="button">Показать</button>
+      <div id="wait-out"></div>
+    </div>
+  </details>
+
   <details class="ad-issue" data-tab="mail" id="ad-wb" hidden>
     <summary>Письма «давно не были»</summary>
     <div class="ad-rev-body">
@@ -741,6 +752,7 @@
       $('ad-gaps').hidden = false;
       $('ad-hist').hidden = false;
       $('ad-trouble').hidden = false;
+      $('ad-wait').hidden = false;
       $('ad-src').hidden = false;
       $('ad-wb').hidden = false;
       $('ad-tv').hidden = false;
@@ -1266,6 +1278,66 @@
       showError(e.message);
     }
     btn.disabled = false; btn.textContent = was;
+  });
+
+  // ── Лист ожидания ────────────────────────────────────────────────
+  // Заявки клиентов, которые не нашли время. Письма им уходят сами; здесь
+  // видно, кто ждёт, сколько раз ему уже писали, и можно убрать заявку.
+  async function loadWait() {
+    var btn = $('wait-load'), was = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Загружаю…';
+    showError('');
+    try {
+      var res = await fetch(API + '/api/admin/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: '{}',
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      if (!d.entries.length) {
+        $('wait-out').innerHTML = '<p class="ad-gaps-note">Сейчас никто не ждёт.</p>';
+      } else {
+        $('wait-out').innerHTML = '<p class="ad-gaps-note">Ждут: <b>' + d.entries.length + '</b></p>' +
+          '<div class="ad-scroll"><table><thead><tr>' +
+          '<th>Клиент</th><th>Ждёт</th><th>Пожелания</th><th>С какого дня</th><th>Писали</th><th>Откуда</th><th></th>' +
+          '</tr></thead><tbody>' + d.entries.map(function (e) {
+            return '<tr>' +
+              '<td><b>' + esc(e.name) + '</b><br>' +
+                (e.phone ? '<a href="tel:' + esc(e.phone) + '">' + esc(e.phone) + '</a><br>' : '') +
+                '<a href="mailto:' + esc(e.email) + '">' + esc(e.email) + '</a></td>' +
+              '<td>' + esc(e.what) + '</td>' +
+              '<td>' + esc(e.prefs) + '</td>' +
+              '<td>' + histWhen(e.createdAt) + '<br><span class="ad-gaps-note-in">до ' + histWhen(e.expiresAt) + '</span></td>' +
+              '<td>' + (e.notified ? e.notified + ' раз, последнее ' + histWhen(e.lastNotifyAt) : 'ещё нет') + '</td>' +
+              '<td>' + esc(e.source || '—') + '</td>' +
+              '<td><button type="button" class="btn wait-del" data-id="' + esc(e.id) + '">Убрать</button></td>' +
+              '</tr>';
+          }).join('') + '</tbody></table></div>';
+      }
+    } catch (e) {
+      showError(e.message);
+    }
+    btn.disabled = false; btn.textContent = was;
+  }
+  $('wait-load').addEventListener('click', loadWait);
+  document.addEventListener('click', async function (ev) {
+    var b = ev.target.closest ? ev.target.closest('.wait-del') : null;
+    if (!b) return;
+    if (!window.confirm('Убрать эту заявку из листа ожидания? Клиенту это не отправляется.')) return;
+    b.disabled = true;
+    try {
+      var res = await fetch(API + '/api/admin/waitlist-remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': $('ad-secret').value.trim() },
+        body: JSON.stringify({ id: b.getAttribute('data-id') }),
+      });
+      var d = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(d.error || ('Не получилось (' + res.status + ')'));
+      loadWait();
+    } catch (e) {
+      showError(e.message); b.disabled = false;
+    }
   });
 
   // Метка «отменял поздно». Обработчик один на все карточки: они
