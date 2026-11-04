@@ -342,6 +342,12 @@ a.bk-spec-card:hover::after { transform: translateX(3px); opacity: 1; }
 .bk-pair-strong { border-style: solid; border-color: var(--dark); margin-top: 16px; }
 .bk-form select { padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-body); font-size: 16px; color: var(--dark); background: var(--white); }
 .bk-form select:focus { outline: none; border-color: var(--gold); }
+/* minmax(0, 1fr): у полей даты и времени своя минимальная ширина, и на узком
+   телефоне правый столбец иначе вылезал за край карточки. */
+.bk-wait-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.bk-wait-grid label { min-width: 0; }
+.bk-wait-grid input { width: 100%; min-width: 0; box-sizing: border-box; padding-left: 10px; padding-right: 8px; font-size: 15px; }
+.bk-form input[type="date"], .bk-form input[type="time"] { background: var(--white); }
 
 /* Подсказка про Same Time: текст сверху, кнопки времени под ним. */
 .bk-pair-tip { flex-direction: column; align-items: stretch; border-style: solid; }

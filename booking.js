@@ -721,6 +721,11 @@
       </div>`;
   }
 
+  /** Дата через n дней в виде ГГГГ-ММ-ДД по часам студии (для границ полей даты). */
+  function waitDate(n) {
+    return dayKey(new Date(Date.now() + n * 86400000).toISOString());
+  }
+
   function renderWaitForm() {
     state.step = 'wait';
     const turnstile = CONFIG.turnstileSiteKey
@@ -731,19 +736,19 @@
          <label>Full name<input name="name" required autocomplete="name"></label>
          <label>Email - we’ll write here when a time opens<input name="email" type="email" required autocomplete="email" inputmode="email" placeholder="you@example.com"></label>
          <label>Phone (optional)<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(305) 555-1234"></label>
-         <label>Which days work for you?
+         <p class="bk-block-title" style="margin:6px 0 -4px">When can you come?</p>
+         <p class="bk-sub" style="margin:0">Leave a field empty if it doesn’t matter. We’ll only write about times that fit.</p>
+         <div class="bk-wait-grid">
+           <label>From date<input name="dateFrom" type="date" min="${waitDate(0)}" max="${waitDate(90)}"></label>
+           <label>To date<input name="dateTo" type="date" min="${waitDate(0)}" max="${waitDate(90)}"></label>
+           <label>Start no earlier than<input name="timeFrom" type="time" step="900"></label>
+           <label>Start no later than<input name="timeTo" type="time" step="900"></label>
+         </div>
+         <label>Only on (optional)
            <select name="days">
-             <option value="any">Any day</option>
-             <option value="weekdays">Weekdays</option>
-             <option value="weekends">Weekends</option>
-           </select>
-         </label>
-         <label>What time of day?
-           <select name="when">
-             <option value="any">Any time</option>
-             <option value="morning">Morning (before noon)</option>
-             <option value="afternoon">Afternoon (noon to 5 pm)</option>
-             <option value="evening">Evening (after 5 pm)</option>
+             <option value="any">Any day of the week</option>
+             <option value="weekdays">Weekdays only</option>
+             <option value="weekends">Weekends only</option>
            </select>
          </label>
          <label class="bk-agree">
@@ -767,12 +772,21 @@
     btn.disabled = true; btn.textContent = 'Sending…';
     try {
       const fd = new FormData(form);
+      const dateFrom = fd.get('dateFrom') || '', dateTo = fd.get('dateTo') || '';
+      const timeFrom = fd.get('timeFrom') || '', timeTo = fd.get('timeTo') || '';
+      // Ошибки диапазона ловим до отправки: человеку понятнее, чем ответ сервера.
+      if (dateFrom && dateTo && dateTo < dateFrom) throw new Error('The last date must not be before the first date.');
+      if (timeFrom && timeTo && timeTo < timeFrom) throw new Error('The latest start time must not be before the earliest.');
       await api('/api/waitlist-join', {
         a: { serviceId: state.serviceId, masterId: state.masterId || undefined, length: state.length || undefined },
         b: state.second
           ? { serviceId: state.second.serviceId, masterId: state.second.masterId || undefined, length: state.second.length || undefined }
           : undefined,
-        prefs: { days: fd.get('days'), when: fd.get('when') },
+        prefs: {
+          days: fd.get('days'),
+          dateFrom: dateFrom || undefined, dateTo: dateTo || undefined,
+          timeFrom: timeFrom || undefined, timeTo: timeTo || undefined,
+        },
         customer: { name: fd.get('name'), email: fd.get('email'), phone: normalizePhone(fd.get('phone')) || undefined },
         source: (typeof window.vsSource === 'function' ? window.vsSource() : null) || undefined,
         turnstileToken: turnstileToken(form),
