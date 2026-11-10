@@ -732,7 +732,7 @@
       ? `<div class="cf-turnstile" data-sitekey="${CONFIG.turnstileSiteKey}"></div>` : '';
     shell('Join the waiting list', 'We’ll email you as soon as a time that suits you opens up.',
       `<div class="bk-summary"><div><b>${timeHeader()}</b></div></div>
-       <form id="bk-wait-form" class="bk-form">
+       <form id="bk-wait-form" class="bk-form" data-clarity-mask="True">
          <label>Full name<input name="name" required autocomplete="name"></label>
          <label>Email - we’ll write here when a time opens<input name="email" type="email" required autocomplete="email" inputmode="email" placeholder="you@example.com"></label>
          <label>Phone (optional)<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(305) 555-1234"></label>
@@ -1194,7 +1194,7 @@
       : `<label>Note (optional)<textarea name="note" rows="2"></textarea></label>`;
     shell('Your details', 'Pay in person at your appointment.',
       `${summary}
-       <form id="bk-form" class="bk-form">
+       <form id="bk-form" class="bk-form" data-clarity-mask="True">
          <label>Full name<input name="name" required autocomplete="name"></label>
          <label>Phone
            <input name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="(305) 555-1234" title="Your mobile number - we’ll text your confirmation">

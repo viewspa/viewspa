@@ -62,6 +62,17 @@ function vsEnsureAnalytics() {
 window.vsEnsureAnalytics = vsEnsureAnalytics;
 vsEnsureAnalytics();
 
+// Microsoft Clarity: записи экрана и тепловые карты, проект viewspa.
+// Подключён здесь, а не в каждой странице: analytics.js общий для публичных страниц,
+// а админка, manage.html и waitlist-leave.html его не грузят, так что данные клиентов
+// и ссылки с токенами в записи не попадают. Маскировку полей не отключать: формы
+// записи и листа ожидания помечены data-clarity-mask в booking.js.
+(function (c, l, a, r, i, t, y) {
+  c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+  t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+  y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+})(window, document, 'clarity', 'script', 'zboipo3zzf');
+
 // ── Источник визита ────────────────────────────────────────────────────────
 // Запоминаем первое касание на ЛЮБОЙ странице (раньше метки клика ловились
 // только на booking.html — реклама, ведущая на /massage, теряла gclid).
