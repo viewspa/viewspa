@@ -28,6 +28,9 @@
 .bk-progress { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 26px; flex-wrap: wrap; }
 .bk-pstep { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #8A8172; }
 .bk-pstep.on { color: var(--gold-accessible); }
+/* Пройденный шаг - кнопка: зона касания выше текста, вид прежний. */
+button.bk-pstep { background: none; border: 0; padding: 8px 2px; margin: -8px 0; font-family: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button.bk-pstep:hover, button.bk-pstep:focus-visible { text-decoration: underline; text-underline-offset: 4px; }
 .bk-pline { width: 16px; height: 1px; background: var(--border); }
 
 /* card */

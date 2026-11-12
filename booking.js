@@ -329,8 +329,37 @@
       : (state.step === 'length' || /^x(svc|master|length)$/.test(state.step) ? 'master'
         : (state.step === 'wait' ? 'time' : state.step));
     const cur = STEPS.indexOf(shown);
+    // Пройденные шаги нажимаются: на телефоне их принимают за вкладки (в записи Clarity
+    // человек тапал по «Specialist» и «Time» и ничего не происходило). Текущий и будущие
+    // остаются текстом, на финальном экране возврата нет.
+    const canGo = state.step !== 'done';
     return `<div class="bk-progress">${STEPS.map((s, i) =>
-      `<span class="bk-pstep ${i <= cur ? 'on' : ''}">${labels[s]}</span>`).join('<span class="bk-pline"></span>')}</div>`;
+      (canGo && i < cur && canJump(s))
+        ? `<button type="button" class="bk-pstep on go" data-act="goto" data-step="${s}">${labels[s]}</button>`
+        : `<span class="bk-pstep ${i <= cur ? 'on' : ''}">${labels[s]}</span>`).join('<span class="bk-pline"></span>')}</div>`;
+  }
+
+  // Куда можно вернуться из индикатора. Шаг, которого в этой записи не было
+  // (мастер у услуги один или выбран карточкой), не нажимается: вести на него
+  // значило бы отправить клиента вперёд, по кругу.
+  function canJump(stage) {
+    const svc = getService(state.serviceId);
+    if (stage === 'category') return !(state.preferMaster && visibleCats().length === 1);
+    if (stage === 'service') {
+      const cat = visibleCats().find((c) => c.id === state.categoryId);
+      return !!(cat && cat.subcategories.some((s) => s.id === state.subcategoryId));
+    }
+    if (stage === 'master') {
+      if (!svc || svc.dualMaster || svc.masters.length < 2) return false;
+      return !(state.preferMaster && svc.masters.some((m) => m.masterId === state.preferMaster));
+    }
+    if (stage === 'time') return !!(svc && (svc.dualMaster || state.masterId));
+    return false;
+  }
+
+  function jumpTo(stage) {
+    if (!canJump(stage)) return;
+    ({ category: renderCategory, service: renderService, master: renderMaster, time: loadTime })[stage]();
   }
 
   // ── Мастера над меню зависят от выбранного раздела ──────────────────
@@ -1521,6 +1550,7 @@
     if (!t) return;
     const act = t.dataset.act;
     if (act === 'back') return goBack();
+    if (act === 'goto') return jumpTo(t.dataset.step);
     if (act === 'allmasters') {
       // Выход из режима «к мастеру»: полное меню и ссылка без ?master.
       state.preferMaster = null;
